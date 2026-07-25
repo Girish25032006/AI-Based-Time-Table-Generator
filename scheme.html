@@ -117,6 +117,7 @@
 
                     <input
                         type="text"
+                        id="searchScheme"
                         class="form-control w-50"
                         placeholder="Search Scheme">
 
@@ -148,7 +149,7 @@
 
                     </thead>
 
-                    <tbody>
+                    <tbody id="schemeTableBody">
 
                         <tr>
 
@@ -242,6 +243,7 @@
 
                         <input
                             type="text"
+                            id="schemeName"
                             class="form-control"
                             placeholder="Example: VTU 2022 Scheme">
 
@@ -260,8 +262,8 @@
                     </button>
 
                     <button
-                        class="btn btn-primary">
-
+                        class="btn btn-primary" id="saveScheme">
+                        
                         Save Scheme
 
                     </button>
@@ -280,7 +282,7 @@
 <!-- Bootstrap JS -->
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
+<script src="js/scheme.js"></script>
 </body>
 
 </html>

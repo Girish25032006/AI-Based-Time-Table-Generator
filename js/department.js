@@ -10,25 +10,25 @@ if (departments.length === 0) {
 
     departments = [
 
-        {
-            id: 1,
-            code: "CSE",
-            name: "Computer Science & Engineering"
-        },
+    {
+        id: 1,
+        code: "CSE",
+        name: "Computer Science & Engineering"
+    },
 
-        {
-            id: 2,
-            code: "AIML",
-            name: "Artificial Intelligence & Machine Learning"
-        },
+    {
+        id: 2,
+        code: "AIML",
+        name: "Artificial Intelligence & Machine Learning"
+    },
 
-        {
-            id: 3,
-            code: "ISE",
-            name: "Information Science & Engineering"
-        }
+    {
+        id: 3,
+        code: "ISE",
+        name: "Information Science & Engineering"
+    }
 
-    ];
+];
 
     localStorage.setItem(
         "departments",
@@ -50,7 +50,7 @@ function loadDepartments() {
         <tr>
 
             <td>${department.id}</td>
-
+            <td>${department.code}</td>
             <td>${department.name}</td>
 
             <td>
@@ -83,18 +83,27 @@ function loadDepartments() {
 loadDepartments();
 // Save Department
 document.getElementById("saveDepartment").addEventListener("click", function () {
-
+    const departmentCode = document.getElementById("departmentCode").value.trim().toUpperCase();
     const departmentName = document.getElementById("departmentName").value.trim();
 
-    if (departmentName === "") {
-        alert("Department name is required.");
-        return;
-    }
+    if (departmentCode === "" || departmentName === "") {
 
-    const duplicate = departments.some((dept, index) =>
-        dept.name.toLowerCase() === departmentName.toLowerCase() &&
-        index !== editIndex
-    );
+    alert("Please fill all fields.");
+
+    return;
+
+}
+
+   const duplicate = departments.some((dept, index) =>
+
+    (
+        dept.code?.toLowerCase() === departmentCode.toLowerCase() ||
+        dept.name.toLowerCase() === departmentName.toLowerCase()
+    )
+
+    && index !== editIndex
+
+);
 
     if (duplicate) {
         alert("Department already exists.");
@@ -110,12 +119,14 @@ document.getElementById("saveDepartment").addEventListener("click", function () 
 
         departments.push({
             id: newId,
+            code: departmentCode,
             name: departmentName
-        });
+});
 
     } else {
 
         // Update
+        departments[editIndex].code = departmentCode;
         departments[editIndex].name = departmentName;
         editIndex = -1;
 
@@ -127,7 +138,7 @@ document.getElementById("saveDepartment").addEventListener("click", function () 
         "departments",
         JSON.stringify(departments)
     );
-
+    document.getElementById("departmentCode").value = "";
     document.getElementById("departmentName").value = "";
 
     const modal = bootstrap.Modal.getInstance(document.getElementById("departmentModal"));
@@ -138,8 +149,11 @@ function editDepartment(index) {
 
     editIndex = index;
 
+    document.getElementById("departmentCode").value =
+    departments[index].code;
+
     document.getElementById("departmentName").value =
-        departments[index].name;
+    departments[index].name;
 
     const modal = new bootstrap.Modal(
         document.getElementById("departmentModal")

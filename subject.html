@@ -133,7 +133,7 @@
                             <option>CE</option>
 
                         </select>
-
+                        
                     </div>
 
                     <div class="col-md-4">
@@ -147,6 +147,7 @@
                             <option>2025</option>
 
                         </select>
+                        
 
                     </div>
 
@@ -167,7 +168,7 @@
                             <option>8</option>
 
                         </select>
-
+                        
                     </div>
 
                 </div>
@@ -175,6 +176,43 @@
             </div>
 
         </div>
+        <div class="row mb-3">
+
+    <div class="col-md-4">
+        <label class="form-label">Department</label>
+        <select class="form-select" id="filterDepartment">
+            <option value="">All Departments</option>
+            <option value="CSE">CSE</option>
+            <option value="AIML">AIML</option>
+            <option value="ISE">ISE</option>
+        </select>
+    </div>
+
+    <div class="col-md-4">
+        <label class="form-label">Scheme</label>
+        <select class="form-select" id="filterScheme">
+            <option value="">All Schemes</option>
+            <option value="2022">2022</option>
+            <option value="2025">2025</option>
+        </select>
+    </div>
+
+    <div class="col-md-4">
+        <label class="form-label">Semester</label>
+        <select class="form-select" id="filterSemester">
+            <option value="">All Semesters</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+        </select>
+    </div>
+
+</div>
 
         <!-- Subject Table -->
 
@@ -297,7 +335,7 @@
 
                 <div class="modal-header">
 
-                    <h5 class="modal-title">Add Subject</h5>
+                    <h5 class="modal-title"  onclick="resetSubjectForm()">Add Subject</h5>
 
                     <button
                         type="button"

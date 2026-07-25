@@ -1,4 +1,6 @@
 let subjects = JSON.parse(localStorage.getItem("subjects")) || [];
+const departments = JSON.parse(localStorage.getItem("departments")) || [];
+const schemes = JSON.parse(localStorage.getItem("schemes")) || [];
 
 let editIndex = -1;
 
@@ -44,6 +46,18 @@ function loadSubjects(){
 const table=document.getElementById("subjectTableBody");
 
 table.innerHTML="";
+if (subjects.length === 0) {
+
+    table.innerHTML = `
+        <tr>
+            <td colspan="10" class="text-center text-danger">
+                No subjects found.
+            </td>
+        </tr>
+    `;
+
+    return;
+}
 
 subjects.forEach((subject,index)=>{
 
@@ -97,7 +111,6 @@ Delete
 
 }
 
-loadSubjects();
 document.getElementById("saveSubject").addEventListener("click", function () {
 
     const department = document.getElementById("department").value;
@@ -169,6 +182,7 @@ document.getElementById("saveSubject").addEventListener("click", function () {
     }
 
     loadSubjects();
+    filterSubjects();
     localStorage.setItem(
       "subjects",
       JSON.stringify(subjects)
@@ -184,6 +198,20 @@ document.getElementById("saveSubject").addEventListener("click", function () {
     if (modal) modal.hide();
 
 });
+function resetSubjectForm() {
+
+    editIndex = -1;
+
+    document.getElementById("department").value = "";
+    document.getElementById("scheme").value = "";
+    document.getElementById("semester").value = "";
+    document.getElementById("subjectCode").value = "";
+    document.getElementById("subjectName").value = "";
+    document.getElementById("credits").value = "";
+    document.getElementById("weeklyHours").value = "";
+    document.getElementById("subjectType").value = "";
+
+}
 function editSubject(index) {
 
     editIndex = index;
@@ -217,21 +245,46 @@ function deleteSubject(index) {
   );
 
     loadSubjects();
-
+    filterSubjects();
 }
 // Search Subject
-document.getElementById("searchSubject").addEventListener("keyup", function () {
+document.getElementById("searchSubject")
+    .addEventListener("keyup", filterSubjects);
+function filterSubjects() {
 
-    const searchValue = this.value.toLowerCase();
+    const department = document.getElementById("filterDepartment").value;
+    const scheme = document.getElementById("filterScheme").value;
+    const semester = document.getElementById("filterSemester").value;
+    const search = document.getElementById("searchSubject").value.toLowerCase();
 
-    document.querySelectorAll("#subjectTableBody tr").forEach(row => {
+    const rows = document.querySelectorAll("#subjectTableBody tr");
+
+    rows.forEach(row => {
+
+        const rowDepartment = row.cells[3].textContent.trim();
+        const rowScheme = row.cells[4].textContent.trim();
+        const rowSemester = row.cells[5].textContent.trim();
 
         const code = row.cells[1].textContent.toLowerCase();
         const name = row.cells[2].textContent.toLowerCase();
 
+        const departmentMatch =
+            department === "" || rowDepartment === department;
+
+        const schemeMatch =
+            scheme === "" || rowScheme === scheme;
+
+        const semesterMatch =
+            semester === "" || rowSemester === semester;
+
+        const searchMatch =
+            code.includes(search) || name.includes(search);
+
         if (
-            code.includes(searchValue) ||
-            name.includes(searchValue)
+            departmentMatch &&
+            schemeMatch &&
+            semesterMatch &&
+            searchMatch
         ) {
             row.style.display = "";
         } else {
@@ -240,4 +293,94 @@ document.getElementById("searchSubject").addEventListener("keyup", function () {
 
     });
 
-});
+}
+function loadDepartmentFilter() {
+
+    const filter = document.getElementById("filterDepartment");
+
+    filter.innerHTML = `<option value="">All Departments</option>`;
+
+    departments.forEach(department => {
+
+        filter.innerHTML += `
+            <option value="${department.code}">
+              ${department.code}
+            </option>
+        `;
+
+    });
+
+}
+
+function loadSchemeFilter() {
+
+    const filter = document.getElementById("filterScheme");
+
+    filter.innerHTML = `<option value="">All Schemes</option>`;
+
+    schemes.forEach(scheme => {
+
+        const value = scheme.name.replace(" Scheme", "");
+
+        filter.innerHTML += `
+            <option value="${value}">
+                ${scheme.name}
+            </option>
+        `;
+
+    });
+
+}
+function loadDepartmentDropdown() {
+
+    const dropdown = document.getElementById("department");
+
+    dropdown.innerHTML = `<option value="">Select Department</option>`;
+
+    departments.forEach(department => {
+
+        dropdown.innerHTML += `
+            <option value="${department.code}">
+              ${department.code}
+            </option>
+        `;
+
+    });
+
+}
+function loadSchemeDropdown() {
+
+    const dropdown = document.getElementById("scheme");
+
+    dropdown.innerHTML = `<option value="">Select Scheme</option>`;
+
+    schemes.forEach(scheme => {
+
+        const value = scheme.name.replace(" Scheme", "");
+
+        dropdown.innerHTML += `
+            <option value="${value}">
+                ${scheme.name}
+            </option>
+        `;
+
+    });
+
+}
+loadSubjects();
+
+loadDepartmentFilter();
+loadSchemeFilter();
+
+loadDepartmentDropdown();
+loadSchemeDropdown();
+
+document.getElementById("filterDepartment")
+    .addEventListener("change", filterSubjects);
+
+document.getElementById("filterScheme")
+    .addEventListener("change", filterSubjects);
+
+document.getElementById("filterSemester")
+    .addEventListener("change", filterSubjects);
+

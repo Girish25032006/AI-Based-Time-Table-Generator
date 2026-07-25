@@ -1,0 +1,249 @@
+/* =========================
+   GLOBAL
+========================= */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI',sans-serif;
+}
+
+body{
+    background:#f4f7fc;
+}
+
+/* =========================
+   LOGIN PAGE
+========================= */
+
+.left-panel{
+    background:linear-gradient(135deg,#0d6efd,#003c8f);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    color:white;
+    padding:50px;
+}
+
+.login-card{
+    width:400px;
+    background:#fff;
+    padding:40px;
+    border-radius:15px;
+    box-shadow:0 10px 25px rgba(0,0,0,.15);
+}
+
+.form-control{
+    height:48px;
+}
+
+.btn{
+    height:46px;
+    font-weight:600;
+}
+
+.login-card img{
+    border-radius:50%;
+}
+
+/* =========================
+   SIDEBAR
+========================= */
+
+.sidebar{
+
+    width:250px;
+    min-height:100vh;
+
+    background:#0d6efd;
+
+    color:white;
+
+    position:fixed;
+
+    left:0;
+    top:0;
+
+}
+
+.logo{
+
+    text-align:center;
+
+    padding:25px;
+
+    border-bottom:1px solid rgba(255,255,255,.2);
+
+}
+
+.logo h3{
+    color:white;
+    font-weight:bold;
+}
+
+/* =========================
+   MENU
+========================= */
+
+.sidebar .nav-link{
+
+    color:white;
+
+    padding:15px 25px;
+
+    transition:.3s;
+
+    font-size:16px;
+
+}
+
+.sidebar .nav-link i{
+
+    margin-right:10px;
+
+}
+
+.sidebar .nav-link:hover{
+
+    background:white;
+
+    color:#0d6efd;
+
+    border-radius:8px;
+
+    margin:5px;
+
+}
+
+.sidebar .active{
+
+    background:white;
+
+    color:#0d6efd !important;
+
+    border-radius:8px;
+
+    margin:5px;
+
+}
+
+/* =========================
+   MAIN CONTENT
+========================= */
+
+.main-content{
+
+    margin-left:250px;
+
+    width:100%;
+
+    padding:30px;
+
+}
+
+/* =========================
+   NAVBAR
+========================= */
+
+.navbar{
+
+    border-radius:12px;
+
+    padding:15px 25px;
+
+}
+
+/* =========================
+   DASHBOARD CARDS
+========================= */
+
+.dashboard-card{
+
+    border:none;
+
+    border-radius:15px;
+
+    transition:.3s;
+
+    box-shadow:0 8px 20px rgba(0,0,0,.08);
+
+}
+
+.dashboard-card:hover{
+
+    transform:translateY(-6px);
+
+}
+
+.dashboard-card .card-body{
+
+    padding:30px;
+
+}
+
+.dashboard-card h6{
+
+    color:gray;
+
+}
+
+.dashboard-card h2{
+
+    color:#0d6efd;
+
+    font-weight:bold;
+
+}
+
+/* =========================
+   QUICK ACTION BUTTONS
+========================= */
+
+button{
+
+    border-radius:10px !important;
+
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media(max-width:992px){
+
+.sidebar{
+
+    width:80px;
+
+}
+
+.logo h3{
+
+    display:none;
+
+}
+
+.sidebar .nav-link{
+
+    text-align:center;
+
+    font-size:0;
+
+}
+
+.sidebar .nav-link i{
+
+    font-size:22px;
+
+    margin:0;
+
+}
+
+.main-content{
+
+    margin-left:80px;
+
+}
+
+}

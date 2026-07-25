@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>View Timetable</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+
+<div class="d-flex">
+
+    <!-- Sidebar -->
+
+    <div class="sidebar">
+
+        <div class="logo">
+            <h3>AI Timetable</h3>
+        </div>
+
+        <ul class="nav flex-column">
+
+            <li class="nav-item">
+                <a href="dashboard.html" class="nav-link">
+                    <i class="bi bi-speedometer2"></i>
+                    Dashboard
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a href="department.html" class="nav-link">
+                    <i class="bi bi-building"></i>
+                    Department
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a href="scheme.html" class="nav-link">
+                    <i class="bi bi-journal-bookmark"></i>
+                    Scheme
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a href="subject.html" class="nav-link">
+                    <i class="bi bi-book"></i>
+                    Subject
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a href="faculty.html" class="nav-link">
+                    <i class="bi bi-person-workspace"></i>
+                    Faculty
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a href="generate-timetable.html" class="nav-link">
+                    <i class="bi bi-calendar-week"></i>
+                    Generate Timetable
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a href="view-timetable.html" class="nav-link active">
+                    <i class="bi bi-table"></i>
+                    View Timetable
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a href="index.html" class="nav-link text-danger">
+                    <i class="bi bi-box-arrow-right"></i>
+                    Logout
+                </a>
+            </li>
+
+        </ul>
+
+    </div>
+
+    <!-- Main Content -->
+
+    <div class="main-content">
+
+        <!-- Navbar -->
+
+        <nav class="navbar bg-white shadow-sm rounded px-4 mb-4">
+
+            <h4>
+                <i class="bi bi-table"></i>
+                View Timetable
+            </h4>
+
+            <div>
+
+                <i class="bi bi-person-circle fs-4"></i>
+
+                <b class="ms-2">Admin</b>
+
+            </div>
+
+        </nav>
+
+        <!-- Filter Section -->
+
+        <div class="card shadow-sm mb-4">
+
+            <div class="card-body">
+
+                <div class="row g-3">
+
+                    <div class="col-md-3">
+
+                        <label class="form-label">
+                            Department
+                        </label>
+
+                        <select class="form-select">
+
+                            <option>AIML</option>
+                            <option>CSE</option>
+                            <option>ISE</option>
+                            <option>ECE</option>
+                            <option>EEE</option>
+                            <option>ME</option>
+                            <option>CE</option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="col-md-2">
+
+                        <label class="form-label">
+                            Scheme
+                        </label>
+
+                        <select class="form-select">
+
+                            <option>2022</option>
+                            <option>2025</option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="col-md-2">
+
+                        <label class="form-label">
+                            Semester
+                        </label>
+
+                        <select class="form-select">
+
+                            <option>1</option>
+                            <option>2</option>
+                            <option>3</option>
+                            <option>4</option>
+                            <option>5</option>
+                            <option>6</option>
+                            <option>7</option>
+                            <option>8</option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="col-md-3">
+
+                        <label class="form-label">
+                            Academic Year
+                        </label>
+
+                        <select class="form-select">
+
+                            <option>2026-27</option>
+                            <option>2027-28</option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="col-md-2 d-flex align-items-end">
+
+                        <button class="btn btn-primary w-100">
+
+                            <i class="bi bi-search"></i>
+
+                            Search
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Timetable Card -->
+
+        <div class="card shadow">
+
+            <div class="card-body">
+              <!-- College Header -->
+
+<div class="text-center mb-4">
+
+    <div class="row align-items-center">
+
+        <div class="col-2">
+
+            <!-- Replace with your college logo -->
+            <img src="images/logo.jpg"
+                 alt="College Logo"
+                 width="90"
+                 height="90"
+                 class="img-fluid">
+
+        </div>
+
+        <div class="col-10">
+
+            <h2 class="fw-bold mb-1">
+                SRI KRISHNA INSTITUTE OF TECHNOLOGY
+            </h2>
+
+            <p class="mb-0">
+                (Accredited by NAAC | Approved by AICTE | Affiliated to VTU,
+                Belagavi)
+            </p>
+
+            <small>
+                #57, Chikkabanavara, Bengaluru - 560090
+            </small>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Information Row -->
+
+<table class="table table-bordered text-center mb-4">
+
+    <tr class="table-light">
+
+        <th>Department</th>
+        <th>Semester</th>
+        <th>Division</th>
+        <th>Room No.</th>
+        <th>Branch</th>
+        <th>Version</th>
+        <th>W.E.F.</th>
+
+    </tr>
+
+    <tr>
+
+        <td>AIML</td>
+        <td>VII</td>
+        <td>A</td>
+        <td>S-201</td>
+        <td>AIML</td>
+        <td>1</td>
+        <td>20/07/2026</td>
+
+    </tr>
+
+</table>
+
+<!-- Timetable -->
+
+<div class="table-responsive">
+
+<table class="table table-bordered text-center align-middle">
+
+<thead class="table-primary">
+
+<tr>
+
+<th rowspan="2">Day</th>
+
+<th>I</th>
+<th>II</th>
+
+<th class="table-warning">
+Tea Break
+</th>
+
+<th>III</th>
+<th>IV</th>
+
+<th class="table-danger">
+Lunch Break
+</th>
+
+<th>V</th>
+<th>VI</th>
+<th>VII</th>
+
+</tr>
+
+<tr>
+
+<th>
+9:10<br>9:55
+</th>
+
+<th>
+10:05<br>11:00
+</th>
+
+<th>
+11:00<br>11:15
+</th>
+
+<th>
+11:15<br>12:10
+</th>
+
+<th>
+12:10<br>1:05
+</th>
+
+<th>
+1:05<br>1:45
+</th>
+
+<th>
+1:45<br>2:40
+</th>
+
+<th>
+2:40<br>3:35
+</th>
+
+<th>
+3:35<br>4:30
+</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+<tr>
+
+<th>Monday</th>
+
+<td>DL & RL</td>
+<td>ML-II</td>
+
+<td rowspan="6"
+    class="table-warning fw-bold align-middle">
+
+TEA<br>BREAK
+
+</td>
+
+<td>BDA</td>
+<td>DSP</td>
+
+<td rowspan="6"
+    class="table-danger fw-bold align-middle">
+
+LUNCH<br>BREAK
+
+</td>
+
+<td>DL & RL</td>
+<td>ML-II</td>
+<td>Placement</td>
+
+</tr>
+
+<tr>
+
+<th>Tuesday</th>
+
+<td>OE</td>
+<td>DL & RL</td>
+
+<td>DSP</td>
+<td>ML-II</td>
+
+<td>Project</td>
+<td>Proctor</td>
+<td>-</td>
+
+</tr>
+
+<tr>
+
+<th>Wednesday</th>
+
+<td>DL & RL</td>
+<td>OE</td>
+
+<td>DL & RL</td>
+<td>BDA</td>
+
+<td>BDA</td>
+<td>DSP</td>
+<td>Remedial</td>
+
+</tr>
+
+<tr>
+
+<th>Thursday</th>
+
+<td>ML-II</td>
+<td>BDA</td>
+
+<td>DSP</td>
+<td>OE</td>
+
+<td>-</td>
+<td>Project</td>
+<td>-</td>
+
+</tr>
+
+<tr>
+
+<th>Friday</th>
+
+<td>BDA</td>
+<td>DSP</td>
+
+<td>DL & RL</td>
+<td>ML-II</td>
+
+<td>Activity</td>
+<td>Library</td>
+<td>Placement</td>
+
+</tr>
+
+<tr>
+
+<th>Saturday</th>
+
+<td>-</td>
+<td>Project</td>
+
+<td>Project</td>
+<td>-</td>
+
+<td>-</td>
+<td>Project</td>
+<td>-</td>
+
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
+<!-- Subject & Faculty Details -->
+
+<div class="row mt-4">
+
+    <!-- Subject Details -->
+
+    <div class="col-lg-6">
+
+        <div class="card shadow-sm mb-4">
+
+            <div class="card-header bg-primary text-white">
+
+                <h5 class="mb-0">
+                    Subject Details
+                </h5>
+
+            </div>
+
+            <div class="card-body p-0">
+
+                <table class="table table-bordered table-hover mb-0">
+
+                    <thead class="table-light">
+
+                        <tr>
+
+                            <th>Code</th>
+                            <th>Subject Name</th>
+                            <th>Credits</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        <tr>
+                            <td>BAIL751</td>
+                            <td>Deep Learning & Reinforcement Learning</td>
+                            <td>4</td>
+                        </tr>
+
+                        <tr>
+                            <td>BAIL752</td>
+                            <td>Machine Learning - II</td>
+                            <td>4</td>
+                        </tr>
+
+                        <tr>
+                            <td>BAIL753</td>
+                            <td>Big Data Analytics</td>
+                            <td>3</td>
+                        </tr>
+
+                        <tr>
+                            <td>BAIL754</td>
+                            <td>Digital Signal Processing</td>
+                            <td>3</td>
+                        </tr>
+
+                        <tr>
+                            <td>BAIL755</td>
+                            <td>Open Elective</td>
+                            <td>3</td>
+                        </tr>
+
+                        <tr>
+                            <td>BAIL756L</td>
+                            <td>Project / Laboratory</td>
+                            <td>2</td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Faculty Details -->
+
+    <div class="col-lg-6">
+
+        <div class="card shadow-sm mb-4">
+
+            <div class="card-header bg-success text-white">
+
+                <h5 class="mb-0">
+                    Faculty Details
+                </h5>
+
+            </div>
+
+            <div class="card-body p-0">
+
+                <table class="table table-bordered table-hover mb-0">
+
+                    <thead class="table-light">
+
+                        <tr>
+
+                            <th>Faculty</th>
+                            <th>Subject</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        <tr>
+                            <td>Dr. Ravi Kumar</td>
+                            <td>DL & RL</td>
+                        </tr>
+
+                        <tr>
+                            <td>Prof. Priya S</td>
+                            <td>ML-II</td>
+                        </tr>
+
+                        <tr>
+                            <td>Dr. Naveen</td>
+                            <td>BDA</td>
+                        </tr>
+
+                        <tr>
+                            <td>Prof. Manjunath</td>
+                            <td>DSP</td>
+                        </tr>
+
+                        <tr>
+                            <td>Dr. Sneha</td>
+                            <td>Open Elective</td>
+                        </tr>
+
+                        <tr>
+                            <td>Project Guide</td>
+                            <td>Project / Lab</td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Notes -->
+
+<div class="alert alert-info">
+
+    <h6 class="mb-2">
+        Notes
+    </h6>
+
+    <ul class="mb-0">
+
+        <li>Tea Break : <strong>11:00 AM - 11:15 AM</strong></li>
+
+        <li>Lunch Break : <strong>1:05 PM - 1:45 PM</strong></li>
+
+        <li>Working Days : <strong>Monday to Saturday</strong></li>
+
+        <li>Timetable generated automatically by AI Timetable System.</li>
+
+    </ul>
+
+</div>
+<!-- Action Buttons -->
+
+<div class="d-flex justify-content-center gap-3 my-4">
+
+    <button class="btn btn-primary">
+        <i class="bi bi-printer"></i>
+        Print Timetable
+    </button>
+
+    <button class="btn btn-success">
+        <i class="bi bi-file-earmark-pdf"></i>
+        Export PDF
+    </button>
+
+    <button class="btn btn-info text-white">
+        <i class="bi bi-download"></i>
+        Download
+    </button>
+
+    <button class="btn btn-warning text-dark">
+        <i class="bi bi-arrow-repeat"></i>
+        Regenerate
+    </button>
+
+</div>
+
+<hr>
+
+<!-- Signature Section -->
+
+<div class="row text-center mt-5 mb-4">
+
+    <div class="col-md-4">
+
+        <div style="height:60px;"></div>
+
+        <hr>
+
+        <h6 class="fw-bold">
+            Timetable Coordinator
+        </h6>
+
+    </div>
+
+    <div class="col-md-4">
+
+        <div style="height:60px;"></div>
+
+        <hr>
+
+        <h6 class="fw-bold">
+            Head of Department
+        </h6>
+
+    </div>
+
+    <div class="col-md-4">
+
+        <div style="height:60px;"></div>
+
+        <hr>
+
+        <h6 class="fw-bold">
+            Principal
+        </h6>
+
+    </div>
+
+</div>
+
+<!-- Footer -->
+
+<div class="text-center mt-4">
+
+    <small class="text-muted">
+
+        © 2026 AI-Based Automatic Timetable Generation System |
+        Developed using HTML, CSS, Bootstrap, JavaScript,
+        Spring Boot & MySQL
+
+    </small>
+
+</div>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Bootstrap JS -->
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+
+</html>

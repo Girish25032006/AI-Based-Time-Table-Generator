@@ -121,7 +121,7 @@
 
                         <label class="form-label">Department</label>
 
-                        <select class="form-select">
+                        <select class="form-select"id="department">
 
                             <option>Select Department</option>
                             <option>AIML</option>
@@ -140,7 +140,7 @@
 
                         <label class="form-label">Scheme</label>
 
-                        <select class="form-select">
+                        <select class="form-select" id="scheme">
 
                             <option>Select Scheme</option>
                             <option>2022</option>
@@ -154,7 +154,7 @@
 
                         <label class="form-label">Semester</label>
 
-                        <select class="form-select">
+                        <select class="form-select" id="semester">
 
                             <option>Select Semester</option>
                             <option>1</option>
@@ -187,6 +187,7 @@
                     <input
                         type="text"
                         class="form-control w-50"
+                        id="searchSubject"
                         placeholder="Search Subject">
 
                     <button
@@ -206,21 +207,33 @@
 
                     <thead class="table-primary">
 
-                    <tr>
+<tr>
 
-                        <th>ID</th>
-                        <th>Subject Code</th>
-                        <th>Subject Name</th>
-                        <th>Credits</th>
-                        <th>Weekly Hours</th>
-                        <th>Type</th>
-                        <th width="150">Action</th>
+    <th>ID</th>
 
-                    </tr>
+    <th>Subject Code</th>
 
-                    </thead>
+    <th>Subject Name</th>
 
-                    <tbody>
+    <th>Department</th>
+
+    <th>Scheme</th>
+
+    <th>Semester</th>
+
+    <th>Credits</th>
+
+    <th>Weekly Hours</th>
+
+    <th>Type</th>
+
+    <th>Action</th>
+
+</tr>
+
+</thead>
+
+                    <tbody id="subjectTableBody">
 
                     <tr>
 
@@ -298,65 +311,11 @@
 
                     <div class="row">
 
-                        <div class="col-md-4 mb-3">
+                       
 
-                            <label class="form-label">
-                                Department
-                            </label>
+                        
 
-                            <select class="form-select">
-
-                                <option>Select Department</option>
-                                <option>AIML</option>
-                                <option>CSE</option>
-                                <option>ISE</option>
-                                <option>ECE</option>
-                                <option>EEE</option>
-                                <option>ME</option>
-                                <option>CE</option>
-
-                            </select>
-
-                        </div>
-
-                        <div class="col-md-4 mb-3">
-
-                            <label class="form-label">
-                                Scheme
-                            </label>
-
-                            <select class="form-select">
-
-                                <option>Select Scheme</option>
-                                <option>2022</option>
-                                <option>2025</option>
-
-                            </select>
-
-                        </div>
-
-                        <div class="col-md-4 mb-3">
-
-                            <label class="form-label">
-                                Semester
-                            </label>
-
-                            <select class="form-select">
-
-                                <option>Select Semester</option>
-
-                                <option>1</option>
-                                <option>2</option>
-                                <option>3</option>
-                                <option>4</option>
-                                <option>5</option>
-                                <option>6</option>
-                                <option>7</option>
-                                <option>8</option>
-
-                            </select>
-
-                        </div>
+                        
 
                         <div class="col-md-6 mb-3">
 
@@ -366,6 +325,7 @@
 
                             <input
                                 type="text"
+                                id="subjectCode"
                                 class="form-control"
                                 placeholder="BCS501">
 
@@ -379,6 +339,7 @@
 
                             <input
                                 type="text"
+                                id="subjectName"
                                 class="form-control"
                                 placeholder="Software Engineering">
 
@@ -392,6 +353,7 @@
 
                             <input
                                 type="number"
+                                id="credits"
                                 class="form-control"
                                 placeholder="4">
 
@@ -405,6 +367,7 @@
 
                             <input
                                 type="number"
+                                id="weeklyHours"
                                 class="form-control"
                                 placeholder="4">
 
@@ -416,7 +379,7 @@
                                 Type
                             </label>
 
-                            <select class="form-select">
+                            <select class="form-select" id="subjectType">
 
                                 <option>Select Type</option>
                                 <option>Theory</option>
@@ -441,7 +404,7 @@
                     </button>
 
                     <button
-                        class="btn btn-primary">
+                        class="btn btn-primary" id="saveSubject">
 
                         Save Subject
 
@@ -461,7 +424,7 @@
 <!-- Bootstrap JS -->
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
+<script src="js/subject.js"></script>
 </body>
 
 </html>

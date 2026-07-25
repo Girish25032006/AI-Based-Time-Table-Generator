@@ -1,14 +1,32 @@
 // Store Schemes
-let schemes = [];
+let schemes = JSON.parse(localStorage.getItem("schemes")) || [];
 
 // Used while editing
 let editIndex = -1;
 
 // Sample Data
-schemes.push(
-    { id: 1, name: "2022 Scheme" },
-    { id: 2, name: "2025 Scheme" }
-);
+if (schemes.length === 0) {
+
+    schemes = [
+
+        {
+            id: 1,
+            name: "2022 Scheme"
+        },
+
+        {
+            id: 2,
+            name: "2025 Scheme"
+        }
+
+    ];
+
+    localStorage.setItem(
+        "schemes",
+        JSON.stringify(schemes)
+    );
+
+}
 
 // Load Table
 function loadSchemes() {
@@ -82,6 +100,10 @@ document.getElementById("saveScheme").addEventListener("click", function () {
     }
 
     loadSchemes();
+    localStorage.setItem(
+        "schemes",
+        JSON.stringify(schemes)
+   );
 
     document.getElementById("schemeName").value = "";
 
@@ -111,6 +133,10 @@ function deleteScheme(index) {
     }
 
     schemes.splice(index, 1);
+    localStorage.setItem(
+        "schemes",
+        JSON.stringify(schemes)
+    );
 
     loadSchemes();
 

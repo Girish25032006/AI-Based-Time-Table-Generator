@@ -1,15 +1,41 @@
 // Store departments
-let departments = [];
+let departments = JSON.parse(localStorage.getItem("departments")) || [];
+
 
 // Used while editing
 let editIndex = -1;
 
 // Sample Data
-departments.push(
-    { id: 1, name: "Computer Science & Engineering" },
-    { id: 2, name: "Artificial Intelligence & Machine Learning" },
-    { id: 3, name: "Information Science & Engineering" }
-);
+if (departments.length === 0) {
+
+    departments = [
+
+        {
+            id: 1,
+            code: "CSE",
+            name: "Computer Science & Engineering"
+        },
+
+        {
+            id: 2,
+            code: "AIML",
+            name: "Artificial Intelligence & Machine Learning"
+        },
+
+        {
+            id: 3,
+            code: "ISE",
+            name: "Information Science & Engineering"
+        }
+
+    ];
+
+    localStorage.setItem(
+        "departments",
+        JSON.stringify(departments)
+    );
+
+}
 
 // Display table
 function loadDepartments() {
@@ -97,6 +123,11 @@ document.getElementById("saveDepartment").addEventListener("click", function () 
 
     loadDepartments();
 
+    localStorage.setItem(
+        "departments",
+        JSON.stringify(departments)
+    );
+
     document.getElementById("departmentName").value = "";
 
     const modal = bootstrap.Modal.getInstance(document.getElementById("departmentModal"));
@@ -117,6 +148,7 @@ function editDepartment(index) {
     modal.show();
 
 }
+
 function deleteDepartment(index) {
 
     const confirmDelete = confirm(
@@ -128,6 +160,11 @@ function deleteDepartment(index) {
     }
 
     departments.splice(index, 1);
+
+    localStorage.setItem(
+        "departments",
+        JSON.stringify(departments)
+    );
 
     loadDepartments();
 

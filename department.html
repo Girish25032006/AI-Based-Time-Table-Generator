@@ -116,10 +116,11 @@ Logout
 <div class="d-flex justify-content-between mb-3">
 
 <input type="text"
-class="form-control w-50"
+class="form-control"
+id="searchDepartment"
 placeholder="Search Department">
 
-<button class="btn btn-primary"
+<button class="btn btn-primary btn-add-department"
 data-bs-toggle="modal"
 data-bs-target="#departmentModal">
 
@@ -149,7 +150,7 @@ Add Department
 
 </thead>
 
-<tbody>
+<tbody id="departmentTableBody">
 
 <tr>
 
@@ -244,6 +245,7 @@ placeholder="Example: AIML">
 
 <input
 type="text"
+id="departmentName"
 class="form-control"
 placeholder="Department Name">
 
@@ -258,7 +260,7 @@ Cancel
 
 </button>
 
-<button class="btn btn-primary">
+<button class="btn btn-primary" id="saveDepartment">
 
 Save
 
@@ -273,6 +275,7 @@ Save
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/department.js"></script>
 
 </body>
 </html>

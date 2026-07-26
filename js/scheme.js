@@ -1,32 +1,12 @@
 // Store Schemes
-let schemes = JSON.parse(localStorage.getItem("schemes")) || [];
+const API_URL = "http://127.0.0.1:5000/schemes";
 
+let schemes = [];
 // Used while editing
 let editIndex = -1;
 
 // Sample Data
-if (schemes.length === 0) {
 
-    schemes = [
-
-        {
-            id: 1,
-            name: "2022 Scheme"
-        },
-
-        {
-            id: 2,
-            name: "2025 Scheme"
-        }
-
-    ];
-
-    localStorage.setItem(
-        "schemes",
-        JSON.stringify(schemes)
-    );
-
-}
 
 // Load Table
 function loadSchemes() {
@@ -39,8 +19,8 @@ function loadSchemes() {
 
         tableBody.innerHTML += `
             <tr>
-                <td>${scheme.id}</td>
-                <td>${scheme.name}</td>
+                <td>${scheme.scheme_id}</td>
+                <td>${scheme.scheme_year}</td>
                 <td>
                     <button
                         class="btn btn-warning btn-sm"
@@ -61,8 +41,8 @@ function loadSchemes() {
 
 }
 
-loadSchemes();
-document.getElementById("saveScheme").addEventListener("click", function () {
+
+document.getElementById("saveScheme").addEventListener("click", async function () {
 
     const schemeName = document.getElementById("schemeName").value.trim();
 
@@ -72,9 +52,9 @@ document.getElementById("saveScheme").addEventListener("click", function () {
     }
 
     const duplicate = schemes.some((scheme, index) =>
-        scheme.name.toLowerCase() === schemeName.toLowerCase() &&
-        index !== editIndex
-    );
+   scheme.scheme_year.toString()=== schemeName.toLowerCase() &&
+    index !== editIndex
+);
 
     if (duplicate) {
         alert("Scheme already exists.");
@@ -83,27 +63,37 @@ document.getElementById("saveScheme").addEventListener("click", function () {
 
     if (editIndex === -1) {
 
-        const newId = schemes.length > 0
-            ? schemes[schemes.length - 1].id + 1
-            : 1;
+    await fetch(API_URL, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            scheme_year: schemeName
+        })
+    });
 
-        schemes.push({
-            id: newId,
-            name: schemeName
-        });
+    await fetchSchemes();
 
-    } else {
+}  else {
 
-        schemes[editIndex].name = schemeName;
-        editIndex = -1;
+    await fetch(`${API_URL}/${schemes[editIndex].scheme_id}`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            scheme_year: schemeName
+        })
+    });
 
-    }
+    editIndex = -1;
 
-    loadSchemes();
-    localStorage.setItem(
-        "schemes",
-        JSON.stringify(schemes)
-   );
+    await fetchSchemes();
+
+}
+
+    await fetchSchemes();
 
     document.getElementById("schemeName").value = "";
 
@@ -117,7 +107,7 @@ function editScheme(index) {
     editIndex = index;
 
     document.getElementById("schemeName").value =
-        schemes[index].name;
+        schemes[index].scheme_year;
 
     const modal = new bootstrap.Modal(
         document.getElementById("schemeModal")
@@ -126,19 +116,21 @@ function editScheme(index) {
     modal.show();
 
 }
-function deleteScheme(index) {
+async function deleteScheme(index) {
 
-    if (!confirm("Are you sure you want to delete this scheme?")) {
+    const confirmDelete = confirm(
+        "Are you sure you want to delete this scheme?"
+    );
+
+    if (!confirmDelete) {
         return;
     }
 
-    schemes.splice(index, 1);
-    localStorage.setItem(
-        "schemes",
-        JSON.stringify(schemes)
-    );
+    await fetch(`${API_URL}/${schemes[index].scheme_id}`, {
+        method: "DELETE"
+    });
 
-    loadSchemes();
+    await fetchSchemes();
 
 }
 document.getElementById("searchScheme").addEventListener("keyup", function () {
@@ -158,3 +150,15 @@ document.getElementById("searchScheme").addEventListener("keyup", function () {
     });
 
 });
+
+async function fetchSchemes() {
+
+    const response = await fetch(API_URL);
+
+    schemes = await response.json();
+
+    loadSchemes();
+
+}
+
+fetchSchemes();

@@ -1,41 +1,14 @@
 // Store departments
-let departments = JSON.parse(localStorage.getItem("departments")) || [];
-
+const API_URL = "http://127.0.0.1:5000/departments";
+let departments = [];
 
 // Used while editing
 let editIndex = -1;
 
 // Sample Data
-if (departments.length === 0) {
 
-    departments = [
 
-    {
-        id: 1,
-        code: "CSE",
-        name: "Computer Science & Engineering"
-    },
-
-    {
-        id: 2,
-        code: "AIML",
-        name: "Artificial Intelligence & Machine Learning"
-    },
-
-    {
-        id: 3,
-        code: "ISE",
-        name: "Information Science & Engineering"
-    }
-
-];
-
-    localStorage.setItem(
-        "departments",
-        JSON.stringify(departments)
-    );
-
-}
+    
 
 // Display table
 function loadDepartments() {
@@ -46,43 +19,40 @@ function loadDepartments() {
 
     departments.forEach((department, index) => {
 
-        tableBody.innerHTML += `
-        <tr>
+       tableBody.innerHTML += `
+<tr>
 
-            <td>${department.id}</td>
-            <td>${department.code}</td>
-            <td>${department.name}</td>
+    <td>${department.department_id}</td>
 
-            <td>
+    <td>${department.department_code}</td>
 
-                <button
-                    class="btn btn-warning btn-sm"
-                    onclick="editDepartment(${index})">
+    <td>${department.department_name}</td>
 
-                    Edit
+    <td>
+        <button
+            class="btn btn-warning btn-sm"
+            onclick="editDepartment(${index})">
+            Edit
+        </button>
 
-                </button>
+        <button
+            class="btn btn-danger btn-sm"
+            onclick="deleteDepartment(${index})">
+            Delete
+        </button>
+    </td>
 
-                <button
-                    class="btn btn-danger btn-sm"
-                    onclick="deleteDepartment(${index})">
-
-                    Delete
-
-                </button>
-
-            </td>
-
-        </tr>
-        `;
+</tr>
+`;
 
     });
 
 }
 
-loadDepartments();
+
 // Save Department
-document.getElementById("saveDepartment").addEventListener("click", function () {
+document.getElementById("saveDepartment").addEventListener("click", async function () {
+    console.log("Save button clicked");
     const departmentCode = document.getElementById("departmentCode").value.trim().toUpperCase();
     const departmentName = document.getElementById("departmentName").value.trim();
 
@@ -96,12 +66,12 @@ document.getElementById("saveDepartment").addEventListener("click", function () 
 
    const duplicate = departments.some((dept, index) =>
 
-    (
-        dept.code?.toLowerCase() === departmentCode.toLowerCase() ||
-        dept.name.toLowerCase() === departmentName.toLowerCase()
-    )
+(
+    dept.department_code?.toLowerCase() === departmentCode.toLowerCase() ||
+    dept.department_name.toLowerCase() === departmentName.toLowerCase()
+)
 
-    && index !== editIndex
+&& index !== editIndex
 
 );
 
@@ -112,32 +82,39 @@ document.getElementById("saveDepartment").addEventListener("click", function () 
 
     if (editIndex === -1) {
 
-        // Add
-        const newId = departments.length > 0
-            ? departments[departments.length - 1].id + 1
-            : 1;
+    await fetch(API_URL, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            department_code: departmentCode,
+            department_name: departmentName
+        })
+    });
 
-        departments.push({
-            id: newId,
-            code: departmentCode,
-            name: departmentName
-});
+    await fetchDepartments();
 
-    } else {
+} else {
 
-        // Update
-        departments[editIndex].code = departmentCode;
-        departments[editIndex].name = departmentName;
-        editIndex = -1;
+    await fetch(`${API_URL}/${departments[editIndex].department_id}`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            department_code: departmentCode,
+            department_name: departmentName
+        })
+    });
 
-    }
+    editIndex = -1;
 
-    loadDepartments();
+    await fetchDepartments();
 
-    localStorage.setItem(
-        "departments",
-        JSON.stringify(departments)
-    );
+}
+
+    await fetchDepartments();
     document.getElementById("departmentCode").value = "";
     document.getElementById("departmentName").value = "";
 
@@ -150,10 +127,10 @@ function editDepartment(index) {
     editIndex = index;
 
     document.getElementById("departmentCode").value =
-    departments[index].code;
+        departments[index].department_code;
 
     document.getElementById("departmentName").value =
-    departments[index].name;
+        departments[index].department_name;
 
     const modal = new bootstrap.Modal(
         document.getElementById("departmentModal")
@@ -163,7 +140,7 @@ function editDepartment(index) {
 
 }
 
-function deleteDepartment(index) {
+async function deleteDepartment(index) {
 
     const confirmDelete = confirm(
         "Are you sure you want to delete this department?"
@@ -173,14 +150,11 @@ function deleteDepartment(index) {
         return;
     }
 
-    departments.splice(index, 1);
+    await fetch(`${API_URL}/${departments[index].department_id}`, {
+        method: "DELETE"
+    });
 
-    localStorage.setItem(
-        "departments",
-        JSON.stringify(departments)
-    );
-
-    loadDepartments();
+    await fetchDepartments();
 
 }
 document.getElementById("searchDepartment").addEventListener("keyup", function () {
@@ -202,3 +176,13 @@ document.getElementById("searchDepartment").addEventListener("keyup", function (
     });
 
 });
+async function fetchDepartments() {
+
+    const response = await fetch(API_URL);
+
+    departments = await response.json();
+
+    loadDepartments();
+
+}
+fetchDepartments();

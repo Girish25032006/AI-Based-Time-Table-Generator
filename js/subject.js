@@ -1,46 +1,53 @@
-let subjects = JSON.parse(localStorage.getItem("subjects")) || [];
-const departments = JSON.parse(localStorage.getItem("departments")) || [];
-const schemes = JSON.parse(localStorage.getItem("schemes")) || [];
+const API_URL = "http://127.0.0.1:5000/subjects";
+
+let subjects = [];
+let departments = [];
+let schemes = [];
 
 let editIndex = -1;
+let editSubjectId = null;
+async function fetchDepartments() {
 
-if (subjects.length === 0) {
+    const response = await fetch("http://127.0.0.1:5000/departments");
+    departments = await response.json();
 
-    subjects = [
-
-        {
-            id: 1,
-            code: "BCS301",
-            name: "Data Structures",
-            department: "CSE",
-            scheme: "2022",
-            semester: "3",
-            credits: 4,
-            hours: 5,
-            type: "Theory"
-        },
-
-        {
-            id: 2,
-            code: "BAI301",
-            name: "Python Programming",
-            department: "AIML",
-            scheme: "2022",
-            semester: "3",
-            credits: 4,
-            hours: 5,
-            type: "Theory"
-        }
-
-    ];
-
-    localStorage.setItem(
-        "subjects",
-        JSON.stringify(subjects)
-    );
+    loadDepartmentDropdown();
+    loadDepartmentFilter();
 
 }
 
+
+async function fetchSchemes() {
+
+    const response = await fetch("http://127.0.0.1:5000/schemes");
+    schemes = await response.json();
+
+    loadSchemeDropdown();
+    loadSchemeFilter();
+
+}
+async function fetchSubjects() {
+
+    try {
+
+        const response = await fetch(API_URL);
+
+        const data = await response.json();
+
+        
+
+        subjects = data;
+
+        loadSubjects();
+        filterSubjects();
+
+    } catch (error) {
+
+        alert(error);
+
+    }
+
+}
 function loadSubjects(){
 
 const table=document.getElementById("subjectTableBody");
@@ -65,23 +72,29 @@ table.innerHTML+=`
 
 <tr>
 
-<td>${subject.id}</td>
+<td>${subject.subject_id}</td>
 
-<td>${subject.code}</td>
+<td>${subject.subject_code}</td>
 
-<td>${subject.name}</td>
+<td>${subject.subject_name}</td>
 
-<td>${subject.department}</td>
+<td>${subject.department_code}</td>
 
-<td>${subject.scheme}</td>
+<td>${subject.scheme_year}</td>
 
-<td>${subject.semester}</td>
+<td>${subject.semester_no}</td>
 
 <td>${subject.credits}</td>
 
-<td>${subject.hours}</td>
+<td>${subject.lecture_hours}</td>
 
-<td>${subject.type}</td>
+<td>${subject.tutorial_hours}</td>
+
+<td>${subject.practical_hours}</td>
+
+<td>${subject.cycle ?? "-"}</td>
+
+<td>${subject.is_optional ? "Yes" : "No"}</td>
 
 <td>
 
@@ -111,7 +124,7 @@ Delete
 
 }
 
-document.getElementById("saveSubject").addEventListener("click", function () {
+document.getElementById("saveSubject").addEventListener("click", async function () {
 
     const department = document.getElementById("department").value;
     const scheme = document.getElementById("scheme").value;
@@ -119,9 +132,17 @@ document.getElementById("saveSubject").addEventListener("click", function () {
     const code = document.getElementById("subjectCode").value.trim();
     const name = document.getElementById("subjectName").value.trim();
     const credits = document.getElementById("credits").value;
-    const hours = document.getElementById("weeklyHours").value;
-    const type = document.getElementById("subjectType").value;
+    const lectureHours = document.getElementById("lectureHours").value;
+    const tutorialHours = document.getElementById("tutorialHours").value;
+    const practicalHours = document.getElementById("practicalHours").value;
+    const cycle = document.getElementById("cycleField").style.display === "none"
+    ? null
+    : document.getElementById("cycle").value;
+    const isOptional = document.getElementById("isOptional").value;
+    const groupId = document.getElementById("groupId").value;
+    const optionGroupId = document.getElementById("optionGroupId").value;
 
+    
     if (
         department === "" ||
         scheme === "" ||
@@ -129,69 +150,72 @@ document.getElementById("saveSubject").addEventListener("click", function () {
         code === "" ||
         name === "" ||
         credits === "" ||
-        hours === "" ||
-        type === ""
+        lectureHours === "" ||
+        tutorialHours === "" ||
+        practicalHours === ""
     ) {
         alert("Please fill all fields.");
         return;
     }
+    const subjectData = {
+    department,
+    scheme,
+    semester,
+    subject_code: code,
+    subject_name: name,
+    credits,
+    lecture_hours: lectureHours,
+    tutorial_hours: tutorialHours,
+    practical_hours: practicalHours,
+    cycle,
+    group_id: groupId === "" ? 1 : groupId,
+    is_optional: isOptional,
+    option_group_id: optionGroupId || null
+};
+alert("Cycle value = " + cycle);
+let response;
 
-    const duplicate = subjects.some((subject, index) =>
-        subject.code.toLowerCase() === code.toLowerCase() &&
-        index !== editIndex
-    );
+if (editSubjectId === null) {
 
-    if (duplicate) {
-        alert("Subject Code already exists.");
-        return;
-    }
+    response = await fetch(API_URL, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(subjectData)
+    });
 
-    if (editIndex === -1) {
+} else {
 
-        const newId = subjects.length > 0
-            ? subjects[subjects.length - 1].id + 1
-            : 1;
+    response = await fetch(`${API_URL}/${editSubjectId}`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(subjectData)
+    });
 
-        subjects.push({
-            id: newId,
-            code,
-            name,
-            department,
-            scheme,
-            semester,
-            credits,
-            hours,
-            type
-        });
+    editSubjectId = null;
+}
 
-    } else {
+const result = await response.json();
 
-        subjects[editIndex] = {
-            ...subjects[editIndex],
-            code,
-            name,
-            department,
-            scheme,
-            semester,
-            credits,
-            hours,
-            type
-        };
+alert(result.message);
 
-        editIndex = -1;
-    }
+await fetchSubjects();
 
-    loadSubjects();
-    filterSubjects();
-    localStorage.setItem(
-      "subjects",
-      JSON.stringify(subjects)
-    );
+editSubjectId = null;
+editIndex = -1;
+resetSubjectForm();
+
+filterSubjects();
 
     document.getElementById("subjectCode").value = "";
     document.getElementById("subjectName").value = "";
     document.getElementById("credits").value = "";
-    document.getElementById("weeklyHours").value = "";
+    document.getElementById("lectureHours").value = "";
+    document.getElementById("tutorialHours").value = "";
+    document.getElementById("practicalHours").value = "";
 
     const modal = bootstrap.Modal.getInstance(document.getElementById("subjectModal"));
 
@@ -208,8 +232,13 @@ function resetSubjectForm() {
     document.getElementById("subjectCode").value = "";
     document.getElementById("subjectName").value = "";
     document.getElementById("credits").value = "";
-    document.getElementById("weeklyHours").value = "";
-    document.getElementById("subjectType").value = "";
+    document.getElementById("lectureHours").value = "";
+    document.getElementById("tutorialHours").value = "";
+    document.getElementById("practicalHours").value = "";
+    document.getElementById("cycle").value = "";
+    document.getElementById("groupId").value = "";
+    document.getElementById("isOptional").value = "0";
+    document.getElementById("optionGroupId").value = "";
 
 }
 function editSubject(index) {
@@ -217,34 +246,42 @@ function editSubject(index) {
     editIndex = index;
 
     const subject = subjects[index];
+    editSubjectId = subject.subject_id;
 
-    document.getElementById("department").value = subject.department;
-    document.getElementById("scheme").value = subject.scheme;
-    document.getElementById("semester").value = subject.semester;
-    document.getElementById("subjectCode").value = subject.code;
-    document.getElementById("subjectName").value = subject.name;
+    document.getElementById("department").value = subject.department_code;
+    document.getElementById("scheme").value = subject.scheme_year;
+    document.getElementById("semester").value = subject.semester_no;
+    document.getElementById("subjectCode").value = subject.subject_code;
+    document.getElementById("subjectName").value = subject.subject_name;
     document.getElementById("credits").value = subject.credits;
-    document.getElementById("weeklyHours").value = subject.hours;
-    document.getElementById("subjectType").value = subject.type;
+    document.getElementById("lectureHours").value = subject.lecture_hours;
+    document.getElementById("tutorialHours").value = subject.tutorial_hours;
+    document.getElementById("practicalHours").value = subject.practical_hours;
+    document.getElementById("cycle").value = subject.cycle;
+    document.getElementById("isOptional").value = subject.is_optional;
 
     new bootstrap.Modal(
         document.getElementById("subjectModal")
     ).show();
 
 }
-function deleteSubject(index) {
+async function deleteSubject(index) {
 
     if (!confirm("Are you sure you want to delete this subject?")) {
         return;
     }
 
-    subjects.splice(index, 1);
-    localStorage.setItem(
-      "subjects",
-      JSON.stringify(subjects)
-  );
+    const subjectId = subjects[index].subject_id;
 
-    loadSubjects();
+    const response = await fetch(`${API_URL}/${subjectId}`, {
+        method: "DELETE"
+    });
+
+    const result = await response.json();
+
+    alert(result.message);
+
+    await fetchSubjects();
     filterSubjects();
 }
 // Search Subject
@@ -252,9 +289,9 @@ document.getElementById("searchSubject")
     .addEventListener("keyup", filterSubjects);
 function filterSubjects() {
 
-    const department = document.getElementById("filterDepartment").value;
-    const scheme = document.getElementById("filterScheme").value;
-    const semester = document.getElementById("filterSemester").value;
+    const department = document.getElementById("filterDepartment")?.value || "";
+    const scheme = document.getElementById("filterScheme")?.value || "";
+    const semester = document.getElementById("filterSemester")?.value || "";
     const search = document.getElementById("searchSubject").value.toLowerCase();
 
     const rows = document.querySelectorAll("#subjectTableBody tr");
@@ -264,6 +301,7 @@ function filterSubjects() {
         const rowDepartment = row.cells[3].textContent.trim();
         const rowScheme = row.cells[4].textContent.trim();
         const rowSemester = row.cells[5].textContent.trim();
+        
 
         const code = row.cells[1].textContent.toLowerCase();
         const name = row.cells[2].textContent.toLowerCase();
@@ -303,8 +341,8 @@ function loadDepartmentFilter() {
     departments.forEach(department => {
 
         filter.innerHTML += `
-            <option value="${department.code}">
-              ${department.code}
+            <option value="${department.department_code}">
+                ${department.department_code}
             </option>
         `;
 
@@ -320,11 +358,11 @@ function loadSchemeFilter() {
 
     schemes.forEach(scheme => {
 
-        const value = scheme.name.replace(" Scheme", "");
+        
 
         filter.innerHTML += `
-            <option value="${value}">
-                ${scheme.name}
+            <option value="${scheme.scheme_year}">
+                ${scheme.scheme_year}
             </option>
         `;
 
@@ -340,8 +378,8 @@ function loadDepartmentDropdown() {
     departments.forEach(department => {
 
         dropdown.innerHTML += `
-            <option value="${department.code}">
-              ${department.code}
+            <option value="${department.department_code}">
+                ${department.department_code}
             </option>
         `;
 
@@ -356,24 +394,25 @@ function loadSchemeDropdown() {
 
     schemes.forEach(scheme => {
 
-        const value = scheme.name.replace(" Scheme", "");
-
+       
         dropdown.innerHTML += `
-            <option value="${value}">
-                ${scheme.name}
+            <option value="${scheme.scheme_year}">
+                ${scheme.scheme_year}
             </option>
         `;
 
     });
 
 }
-loadSubjects();
+fetchDepartments();
+fetchSchemes();
+fetchSubjects();
 
-loadDepartmentFilter();
-loadSchemeFilter();
+//loadDepartmentFilter();
+//loadSchemeFilter();
 
-loadDepartmentDropdown();
-loadSchemeDropdown();
+//loadDepartmentDropdown();
+//loadSchemeDropdown();
 
 document.getElementById("filterDepartment")
     .addEventListener("change", filterSubjects);
@@ -383,4 +422,63 @@ document.getElementById("filterScheme")
 
 document.getElementById("filterSemester")
     .addEventListener("change", filterSubjects);
+const semesterDropdown = document.getElementById("semester");
 
+semesterDropdown.addEventListener("change", function () {
+
+    const semester = parseInt(this.value);
+
+    if (semester === 1 || semester === 2) {
+        document.getElementById("cycleField").style.display = "block";
+    } else {
+        document.getElementById("cycleField").style.display = "none";
+        document.getElementById("cycle").value = "";
+    }
+
+});
+document.getElementById("cycleField").style.display = "none";
+
+document.getElementById("optionalField").style.display = "none";
+document.getElementById("optionGroupField").style.display = "none";
+
+semesterDropdown.addEventListener("change", function () {
+
+    const semester = parseInt(this.value);
+
+    if (semester >= 3) {
+        document.getElementById("optionalField").style.display = "block";
+    } else {
+        document.getElementById("optionalField").style.display = "none";
+        document.getElementById("optionGroupField").style.display = "none";
+        document.getElementById("isOptional").value = "0";
+        document.getElementById("optionGroupId").value = "";
+    }
+
+});
+
+document.getElementById("isOptional").addEventListener("change", function () {
+
+    if (this.value === "1") {
+        document.getElementById("optionGroupField").style.display = "block";
+    } else {
+        document.getElementById("optionGroupField").style.display = "none";
+        document.getElementById("optionGroupId").value = "";
+    }
+
+});
+// Hide Group initially
+document.getElementById("groupField").style.display = "none";
+
+// Show/Hide Group based on Practical Hours
+document.getElementById("practicalHours").addEventListener("input", function () {
+
+    const practicalHours = parseInt(this.value) || 0;
+
+    if (practicalHours > 0) {
+        document.getElementById("groupField").style.display = "block";
+    } else {
+        document.getElementById("groupField").style.display = "none";
+        document.getElementById("group").value = "";
+    }
+
+});

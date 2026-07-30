@@ -159,9 +159,7 @@
                         <th>Faculty Name</th>
                         <th>Department</th>
                         <th>Designation</th>
-                        <th>Subjects</th>
                         <th>Workload</th>
-                        <th>Morning Preference</th>
                         <th>Status</th>
                         <th width="150">Action</th>
                     </tr>
@@ -170,66 +168,7 @@
 
                     <tbody id="facultyTableBody">
 
-                    <tr>
-
-                        
-                        <td>Dr. Ravi Kumar</td>
-                        <td>AIML</td>
-                        <td>Professor</td>
-                        <td>18 Hours</td>
-                        <td>Yes</td>
-                        <td>
-
-                            <span class="badge ${faculty.status === 'Active'
-                                ? 'bg-success'
-                                : 'bg-danger'}">
-
-                                ${faculty.status}
-
-                            </span>
-
-                        </td>
-
-                        <td>
-
-                            <button class="btn btn-warning btn-sm">
-                                <i class="bi bi-pencil"></i>
-                            </button>
-
-                            <button class="btn btn-danger btn-sm">
-                                <i class="bi bi-trash"></i>
-                            </button>
-
-                        </td>
-
-                    </tr>
-
-                    <tr>
-
-                        
-                        <td>Priya S</td>
-                        <td>CSE</td>
-                        <td>Assistant Professor</td>
-                        
-                        <td>16 Hours</td>
-                        <td>No</td>
-                        <td>
-                            <span class="badge bg-success">Active</span>
-                        </td>
-
-                        <td>
-
-                            <button class="btn btn-warning btn-sm">
-                                <i class="bi bi-pencil"></i>
-                            </button>
-
-                            <button class="btn btn-danger btn-sm">
-                                <i class="bi bi-trash"></i>
-                            </button>
-
-                        </td>
-
-                    </tr>
+                    
 
                     </tbody>
 
@@ -281,17 +220,8 @@
                                 Department
                             </label>
 
-                            <select class="form-select"  id="facultyDepartment">
-
-                                <option>Select Department</option>
-                                <option>AIML</option>
-                                <option>CSE</option>
-                                <option>ISE</option>
-                                <option>ECE</option>
-                                <option>EEE</option>
-                                <option>ME</option>
-                                <option>CE</option>
-
+                            <select class="form-select" id="facultyDepartment">
+                                <option value="">Select Department</option>
                             </select>
 
                         </div>
@@ -304,10 +234,12 @@
 
                             <select class="form-select" id="facultyDesignation">
 
-                                <option>Select Designation</option>
-                                <option>Professor</option>
-                                <option>Associate Professor</option>
+                                <option value="">Select Designation</option>
                                 <option>Assistant Professor</option>
+                                <option>Associate Professor</option>
+                                <option>Professor</option>
+                                <option>HOD</option>
+                                <option>Principal</option>
 
                             </select>
 
@@ -327,25 +259,11 @@
                                 type="number"
                                 id="facultyWorkload"
                                 class="form-control"
-                                placeholder="18">
+                                readonly>
 
                         </div>
 
-                        <div class="col-md-6 mb-3">
-
-                            <label class="form-label">
-                                Morning Preference
-                            </label>
-
-                            <select class="form-select"  id="facultyMorningPreference">
-
-                                <option>Select Preference</option>
-                                <option>Yes</option>
-                                <option>No</option>
-
-                            </select>
-
-                        </div>
+                        
 
                         <div class="col-md-6 mb-3">
 
@@ -365,25 +283,6 @@
                     </div>
 
                 </div>
-                <div class="col-md-12 mb-3">
-
-    <label class="form-label">
-        Subjects
-    </label>
-
-    <div
-        id="facultySubjects"
-        class="border rounded p-3"
-        style="max-height:220px; overflow-y:auto;">
-
-        <small class="text-muted">
-            Select Department to load subjects.
-        </small>
-
-    </div>
-
-</div>
-
                 <div class="modal-footer">
 
                     <button
@@ -394,7 +293,7 @@
 
                     </button>
 
-                    <button
+                    <button  type="button"
                         class="btn btn-primary" onclick="saveFaculty()">
 
                         Save Faculty
@@ -402,6 +301,11 @@
                     </button>
 
                 </div>
+                
+
+</div>
+
+                
 
             </div>
 

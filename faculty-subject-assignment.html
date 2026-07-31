@@ -127,7 +127,31 @@
             <div class="card-body">
 
                 <div class="d-flex justify-content-between mb-3">
+                    <select
+                        id="filterAcademicYear"
+                        class="form-select w-25 me-2">
 
+                        <option value="">Select Academic Year</option>
+                        
+
+                    </select>
+                    <select
+                        id="filterSemesterType"
+                        class="form-select w-25 me-2">
+
+                        <option value="">
+                            Select Semester Type
+                        </option>
+
+                        <option value="Odd">
+                            Odd (1,3,5,7)
+                        </option>
+
+                        <option value="Even">
+                            Even (2,4,6,8)
+                        </option>
+
+                    </select>
                     <input
                         type="text"
                         id="searchAssignment"
@@ -135,8 +159,8 @@
                         placeholder="Search Assignment">
 
                     <button
-                        class="btn btn-primary"
-                        onclick="resetFacultyForm()"
+
+                        class="btn btn-primary px-4 text-nowrap"
                         data-bs-toggle="modal"
                         data-bs-target="#facultyModal">
 
@@ -145,8 +169,29 @@
                     </button>
 
                 </div>
+                <div id="assignmentSummary" class="alert alert-info mb-3">
+
+                        <strong>Academic Year:</strong>
+                        <span id="summaryAcademicYear">-</span>
+
+                        &nbsp;&nbsp;|&nbsp;&nbsp;
+
+                        <strong>Semester Type:</strong>
+                        <span id="summarySemesterType">-</span>
+
+                        &nbsp;&nbsp;|&nbsp;&nbsp;
+
+                        <strong>Total Assignments:</strong>
+                        <span id="summaryTotal">0</span>
+
+                    </div>
 
                 <!-- Faculty Table -->
+                 <div class="d-flex justify-content-between align-items-center mb-2">
+                    
+
+             
+                
 
                 <table class="table table-hover table-bordered">
 
@@ -205,16 +250,9 @@
                                 Department
                             </label>
 
-                            <select class="form-select"  id="facultyDepartment">
+                            <select class="form-select"   id="assignmentDepartment">
 
-                                <option>Select Department</option>
-                                <option>AIML</option>
-                                <option>CSE</option>
-                                <option>ISE</option>
-                                <option>ECE</option>
-                                <option>EEE</option>
-                                <option>ME</option>
-                                <option>CE</option>
+                                
 
                             </select>
 
@@ -222,66 +260,96 @@
                         <div class="col-md-6 mb-3">
 
                             <label class="form-label">
-                                Semester Type
+                                Scheme
                             </label>
 
-                            <select class="form-select" id="semesterType">
+                            <select
+                                class="form-select"
+                                id="assignmentScheme">
 
-                                <option value="">Select Semester Type</option>
-                                <option value="Odd">Odd Semester</option>
-                                <option value="Even">Even Semester</option>
+                                
 
                             </select>
 
                         </div>
-
                         <div class="col-md-6 mb-3">
 
                             <label class="form-label">
-                                Faculty
+                                Semester 
                             </label>
+                            <div class="col-md-3">
 
-                            <select class="form-select" id="assignmentFaculty">
+                                <label class="form-label">
+                                    Semester Type
+                                </label>
 
-                                <option value="">
-                                    Select Faculty
-                                </option>
+                                <select
+                                    id="assignmentSemesterType"
+                                    class="form-select">
 
-                            </select>
+                                    <option value="">
+                                        Select Semester Type
+                                    </option>
 
-                        </div>
+                                    <option value="Odd">
+                                        Odd
+                                    </option>
 
-                        <div class="col-md-12 mb-3">
+                                    <option value="Even">
+                                        Even
+                                    </option>
 
-                            <label class="form-label">
-                                Available Subjects
-                            </label>
-
-                            <div
-                                id="assignmentSubjects"
-                                class="border rounded p-3"
-                                style="max-height:250px; overflow-y:auto;">
-
-                                <small class="text-muted">
-                                    Select Department and Semester Type to load subjects.
-                                </small>
+                                </select>
 
                             </div>
 
+                            <select class="form-select" id="assignmentSemester">
+
+                                <option value="">Select Semester Type First</option>
+                                <option value="1">Semester 1</option>
+                                <option value="2">Semester 2</option>
+                                <option value="3">Semester 3</option>
+                                <option value="4">Semester 4</option>
+                                <option value="5">Semester 5</option>
+                                <option value="6">Semester 6</option>
+                                <option value="7">Semester 7</option>
+                                <option value="8">Semester 8</option>
+
+                            </select>
+
                         </div>
-                        
+                        <div class="col-md-6 mb-3">
 
-                        
+                            <label class="form-label">
+                                Academic Year
+                            </label>
 
-                        
+                            <input
+                                type="text"
+                                id="academicYear"
+                                class="form-control"
+                                placeholder="2026-27">
 
-                        
+                        </div>
+                        <table class="table table-bordered">
 
-                        
+                            <thead>
 
-                        
+                                <tr>
+                                    <th>Subject Code</th>
+                                    <th>Subject Name</th>
+                                    <th>Faculty Department</th>
+                                    <th>Faculty</th>
+                                </tr>
 
-                    
+                            </thead>
+
+                            <tbody id="assignmentSubjectsTable">
+
+                            </tbody>
+
+                        </table>
+                    </div>
                 <div class="modal-footer">
 
                     <button
@@ -293,12 +361,13 @@
                     </button>
 
                     <button
-                        class="btn btn-primary" onclick="saveAssignment()">
-
-                        Save Faculty
-
+                        type="button"
+                        class="btn btn-primary"
+                        onclick="saveAssignments()">
+                        Save All Assignments
                     </button>
 
+                </div>
                 </div>
 
             </div>
@@ -306,7 +375,7 @@
         </div>
 
     </div>
-        </div>
+        
 
 </div>
 

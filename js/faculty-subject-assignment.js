@@ -1,338 +1,485 @@
-let assignments =
-JSON.parse(localStorage.getItem("assignments")) || [];
+const API_URL = "http://127.0.0.1:5000/faculty-subject-assignments";
+const SUBJECT_API = "http://127.0.0.1:5000/assignment-subjects";
+const FACULTY_API = "http://127.0.0.1:5000/assignment-faculties";
+const DEPARTMENT_API = "http://127.0.0.1:5000/departments";
+const SCHEME_API = "http://127.0.0.1:5000/schemes";
+const DEPARTMENT_ASSIGNMENT_API = "http://127.0.0.1:5000/assignment-departments";
+const ACADEMIC_YEAR_API = "http://127.0.0.1:5000/academic-years";
 
-let editIndex = -1;
+async function loadDepartments() {
 
-function loadDepartmentDropdown() {
+    const response = await fetch(DEPARTMENT_API);
 
-    const departments =
-        JSON.parse(localStorage.getItem("departments")) || [];
+    const departments = await response.json();
 
-    const department =
-        document.getElementById("facultyDepartment");
+    const departmentDropdown =
+        document.getElementById("assignmentDepartment");
 
-    department.innerHTML =
+    departmentDropdown.innerHTML =
         '<option value="">Select Department</option>';
 
-    departments.forEach(dept => {
+    departments.forEach(department => {
 
-        department.innerHTML += `
-            <option value="${dept.code}">
-                ${dept.code}
+        departmentDropdown.innerHTML += `
+
+            <option value="${department.department_code}">
+                ${department.department_code}
+            </option>
+
+        `;
+
+    });
+
+}
+
+async function loadSchemes() {
+
+    const response = await fetch(SCHEME_API);
+
+    const schemes = await response.json();
+
+    const schemeDropdown =
+        document.getElementById("assignmentScheme");
+
+    schemeDropdown.innerHTML =
+        '<option value="">Select Scheme</option>';
+
+    schemes.forEach(scheme => {
+
+        schemeDropdown.innerHTML += `
+
+            <option value="${scheme.scheme_year}">
+                ${scheme.scheme_year}
+            </option>
+
+        `;
+
+    });
+
+}
+loadDepartments();
+loadSchemes();
+loadAcademicYears();
+
+async function loadSubjects() {
+
+    const department =
+        document.getElementById("assignmentDepartment").value;
+
+    const scheme =
+        document.getElementById("assignmentScheme").value;
+
+    const semester =
+        document.getElementById("assignmentSemester").value;
+
+    if (!department || !scheme || !semester) {
+        return;
+    }
+
+    const subjectResponse =
+        await fetch(`${SUBJECT_API}/${department}/${scheme}/${semester}`);
+
+    const subjects = await subjectResponse.json();
+
+    const departmentResponse =
+    await fetch(DEPARTMENT_ASSIGNMENT_API);
+
+    const departments = await departmentResponse.json();
+
+    const facultyResponse =
+        await fetch(`${FACULTY_API}/${department}`);
+
+    const faculties = await facultyResponse.json();
+
+    const table =
+        document.getElementById("assignmentSubjectsTable");
+
+    table.innerHTML = "";
+
+    subjects.forEach(subject => {
+
+        let facultyOptions =
+            '<option value="">Select Faculty</option>';
+
+        faculties.forEach(faculty => {
+
+            facultyOptions += `
+                <option value="${faculty.faculty_id}">
+                    ${faculty.faculty_name}
+                </option>
+            `;
+
+        });
+        let departmentOptions = "";
+
+        departments.forEach(dep => {
+
+            departmentOptions += `
+                <option value="${dep.department_code}"
+                    ${dep.department_code === department ? "selected" : ""}>
+                    ${dep.department_code}
+                </option>
+            `;
+
+        });
+
+        table.innerHTML += `
+            <tr>
+
+                <td>${subject.subject_code}</td>
+
+                <td>${subject.subject_name}</td>
+
+                <td>
+                    <select
+                        class="form-select department-select"
+                        data-subject-id="${subject.subject_id}">
+                        ${departmentOptions}
+                    </select>
+                </td>
+
+                <td>
+                    <select
+                        class="form-select faculty-select"
+                        data-subject-id="${subject.subject_id}">
+                        ${facultyOptions}
+                    </select>
+                </td>
+
+            </tr>
+        `;
+
+    });
+    document.querySelectorAll(".department-select").forEach(select => {
+
+    select.addEventListener("change", async function () {
+
+        const selectedDepartment = this.value;
+
+        const row = this.closest("tr");
+
+        const facultySelect =
+            row.querySelector(".faculty-select");
+
+        const response =
+            await fetch(`${FACULTY_API}/${selectedDepartment}`);
+
+        const faculties = await response.json();
+
+        facultySelect.innerHTML =
+            '<option value="">Select Faculty</option>';
+
+        faculties.forEach(faculty => {
+
+            facultySelect.innerHTML += `
+                <option value="${faculty.faculty_id}">
+                    ${faculty.faculty_name}
+                </option>
+            `;
+
+        });
+
+    });
+
+});
+
+}
+
+
+document.getElementById("assignmentDepartment")
+    .addEventListener("change", loadSubjects);
+
+document.getElementById("assignmentScheme")
+    .addEventListener("change", loadSubjects);
+
+document.getElementById("assignmentSemester")
+    .addEventListener("change", loadSubjects);
+async function saveAssignments() {
+
+    const academicYear =
+        document.getElementById("academicYear").value;
+
+    const assignments = [];
+
+    document.querySelectorAll("#assignmentSubjectsTable tr").forEach(row => {
+
+        const facultySelect =
+            row.querySelector(".faculty-select");
+
+        const subjectId =
+            facultySelect.dataset.subjectId;
+
+        const facultyId =
+            facultySelect.value;
+
+        if (facultyId !== "") {
+
+            assignments.push({
+
+                subject_id: subjectId,
+                faculty_id: facultyId,
+                academic_year: academicYear
+
+            });
+
+        }
+
+    });
+
+    const response = await fetch(API_URL, {
+
+        method: "POST",
+
+        headers: {
+            "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify(assignments)
+
+    });
+
+    const result = await response.json();
+
+    alert(result.message);
+    location.reload();
+}
+async function loadAcademicYears() {
+
+    const response =
+        await fetch(ACADEMIC_YEAR_API);
+
+    const years =
+        await response.json();
+
+    const dropdown =
+        document.getElementById("filterAcademicYear");
+
+    dropdown.innerHTML =
+        '<option value="">Select Academic Year</option>';
+
+    years.forEach(year => {
+
+        dropdown.innerHTML += `
+            <option value="${year.academic_year}">
+                ${year.academic_year}
             </option>
         `;
 
     });
 
 }
-loadDepartmentDropdown();
+async function loadAssignments() {
 
-function loadFacultyDropdown() {
-
-    const faculties =
-        JSON.parse(localStorage.getItem("faculties")) || [];
-
-    const department =
-        document.getElementById("facultyDepartment").value;
-
-    const faculty =
-        document.getElementById("assignmentFaculty");
-
-    faculty.innerHTML =
-        '<option value="">Select Faculty</option>';
-
-    faculties.forEach(item => {
-
-        if (item.department === department) {
-
-            faculty.innerHTML += `
-                <option value="${item.name}">
-                    ${item.name}
-                </option>
-            `;
-
-        }
-
-    });
-
-}
-function loadSubjects() {
-
-    const subjects =
-        JSON.parse(localStorage.getItem("subjects")) || [];
-
-    const department =
-        document.getElementById("facultyDepartment").value;
-
+    const academicYear =
+        document.getElementById("filterAcademicYear").value;
     const semesterType =
-        document.getElementById("semesterType").value;
+    document.getElementById("filterSemesterType").value;
+    
 
-    const container =
-        document.getElementById("assignmentSubjects");
-
-    container.innerHTML = "";
-
-    subjects.forEach(subject => {
-
-        const semester = parseInt(subject.semester);
-
-        const isOdd = semester % 2 !== 0;
-        const isEven = semester % 2 === 0;
-
-        if (
-            subject.department === department &&
-            (
-                (semesterType === "Odd" && isOdd) ||
-                (semesterType === "Even" && isEven)
-            )
-        ) {
-
-            container.innerHTML += `
-                <div class="form-check">
-
-                    <input
-                        class="form-check-input"
-                        type="checkbox"
-                        value="${subject.code}">
-
-                    <label class="form-check-label">
-
-                        ${subject.code} - ${subject.name}
-
-                    </label>
-
-                </div>
-            `;
-
-        }
-
-    });
-
-    if (container.innerHTML === "") {
-
-        container.innerHTML =
-            "<small class='text-muted'>No subjects found.</small>";
-
+    if (!academicYear || !semesterType) {
+        return;
     }
 
-}
+    const response =
+        
+        await fetch(`${API_URL}/${academicYear}/${semesterType}`);
 
-function saveAssignment() {
+    const assignments = await response.json();
+    document.getElementById("summaryAcademicYear").innerText =
+        academicYear;
 
-    const department =
-        document.getElementById("facultyDepartment").value;
+    document.getElementById("summarySemesterType").innerText =
+        semesterType;
 
-    const semesterType =
-        document.getElementById("semesterType").value;
+    document.getElementById("summaryTotal").innerText =
+        assignments.length;
+    const table =
+        document.getElementById("assignmentTableBody");
 
-    const faculty =
-        document.getElementById("assignmentFaculty").value;
+    table.innerHTML = "";
+    if (assignments.length === 0) {
 
-    const subjects = [];
-
-    document
-        .querySelectorAll("#assignmentSubjects input:checked")
-        .forEach(item => {
-
-            subjects.push(item.value);
-
-        });
-
-    if (
-        !department ||
-        !semesterType ||
-        !faculty ||
-        subjects.length === 0
-    ) {
-
-        alert("Please fill all fields.");
+        table.innerHTML = `
+            <tr>
+                <td colspan="5" class="text-center text-danger fw-bold">
+                    No Assignments Found
+                </td>
+            </tr>
+        `;
 
         return;
 
     }
-
-    const assignment = {
-
-    id: editIndex === -1
-        ? Date.now()
-        : assignments[editIndex].id,
-
-    department,
-
-    semesterType,
-
-    faculty,
-
-    subjects
-
-};
-
-if (editIndex === -1) {
-
-    assignments.push(assignment);
-
-} else {
-
-    assignments[editIndex] = assignment;
-
-    editIndex = -1;
-
-}
-
-    localStorage.setItem(
-        "assignments",
-        JSON.stringify(assignments)
-    );
-
-    alert("Assignment Saved Successfully!");
-    loadAssignments();
-
-    document
-    .getElementById("facultyModal")
-    .querySelector(".btn-close")
-    .click();
-
-    document.getElementById("facultyDepartment").value = "";
-    document.getElementById("semesterType").value = "";
-
-    document.getElementById("assignmentFaculty").innerHTML =
-        '<option value="">Select Faculty</option>';
-
-    document.getElementById("assignmentSubjects").innerHTML =
-        "<small class='text-muted'>Select Department and Semester Type to load subjects.</small>";
-
-}
-function loadAssignments() {
-
-    const table =
-        document.getElementById("assignmentTableBody");
-    const search =
-    document
-        .getElementById("searchAssignment")
-        .value
-        .toLowerCase();
-
-    table.innerHTML = "";
+    let currentSemester = "";
 
     assignments.forEach((assignment, index) => {
+        if (currentSemester !== assignment.semester_id) {
 
-        if (
+            currentSemester = assignment.semester_id;
 
-    !assignment.department.toLowerCase().includes(search) &&
-    !assignment.semesterType.toLowerCase().includes(search) &&
-    !assignment.faculty.toLowerCase().includes(search) &&
-    !assignment.subjects.join(", ").toLowerCase().includes(search)
-
-) {
-
-    return;
-
-}
+            table.innerHTML += `
+                <tr class="table-primary">
+                    <td colspan="6" class="fw-bold fs-5 text-center">
+                        📘 Semester ${currentSemester}
+                    </td>
+                </tr>
+            `;
+        }
 
         table.innerHTML += `
-
         <tr>
+            
 
             <td>${index + 1}</td>
 
-            <td>${assignment.department}</td>
+            <td>${assignment.department_code}</td>
 
-            <td>${assignment.semesterType}</td>
+            <td>Semester ${assignment.semester_id}</td>
 
-            <td>${assignment.faculty}</td>
-
-            <td>${assignment.subjects.join(", ")}</td>
+            <td>${assignment.faculty_name}</td>
 
             <td>
+                ${assignment.subject_code} - ${assignment.subject_name}
+            </td>
+            <td>
+
+                
 
                 <button
-                  class="btn btn-warning btn-sm"
-                  onclick="editAssignment(${index})"
-                  data-bs-toggle="modal"
-                  data-bs-target="#facultyModal">
-                    <i class="bi bi-pencil"></i>
-                <button class="btn btn-danger btn-sm" onclick="deleteAssignment(${index})">
-                    
-                    <i class="bi bi-trash"></i>
+                    class="btn btn-sm btn-danger"
+                    onclick="deleteAssignment(${assignment.assignment_id})">
+                    Delete
                 </button>
 
             </td>
 
         </tr>
-
-        `;
+    `;
 
     });
 
 }
 
-function editAssignment(index) {
+async function deleteAssignment(assignmentId) {
 
-    const assignment = assignments[index];
+    const confirmDelete = confirm(
+        "Are you sure you want to delete this assignment?"
+    );
 
-    editIndex = index;
+    if (!confirmDelete) {
+        return;
+    }
 
-    document.getElementById("facultyDepartment").value =
-        assignment.department;
+    const response = await fetch(
+        `${API_URL}/${assignmentId}`,
+        {
+            method: "DELETE"
+        }
+    );
 
-    document.getElementById("semesterType").value =
-        assignment.semesterType;
+    const result = await response.json();
 
-    loadFacultyDropdown();
+    alert(result.message);
 
-    document.getElementById("assignmentFaculty").value =
-        assignment.faculty;
+    loadAssignments();
 
-    loadSubjects();
+}
 
-    assignment.subjects.forEach(subject => {
+document
+    .getElementById("searchAssignment")
+    .addEventListener("keyup", searchAssignments);
 
-        const checkbox = document.querySelector(
-            `#assignmentSubjects input[value="${subject}"]`
-        );
+function searchAssignments() {
 
-        if (checkbox) {
+    const searchText =
+        document
+            .getElementById("searchAssignment")
+            .value
+            .toLowerCase();
 
-            checkbox.checked = true;
+    const rows =
+        document.querySelectorAll("#assignmentTableBody tr");
+
+    rows.forEach(row => {
+
+        const rowText =
+            row.innerText.toLowerCase();
+
+        if (rowText.includes(searchText)) {
+
+            row.style.display = "";
+
+        } else {
+
+            row.style.display = "none";
 
         }
 
     });
 
 }
-function deleteAssignment(index) {
+document
+    .getElementById("filterAcademicYear")
+    .addEventListener("change", loadAssignments);
+document
+    .getElementById("filterSemesterType")
+    .addEventListener("change", loadAssignments);
 
-    if (!confirm("Are you sure you want to delete this assignment?")) {
+function loadSemesterOptions() {
 
-        return;
+    const semesterType =
+        document.getElementById("assignmentSemesterType").value;
+
+    const semester =
+        document.getElementById("assignmentSemester");
+
+    semester.innerHTML =
+        '<option value="">Select Semester</option>';
+
+    let semesters = [];
+
+    if (semesterType === "Odd") {
+
+        semesters = [1, 3, 5, 7];
+
+    }
+    else if (semesterType === "Even") {
+
+        semesters = [2, 4, 6, 8];
 
     }
 
-    assignments.splice(index, 1);
+    semesters.forEach(sem => {
 
-    localStorage.setItem(
-        "assignments",
-        JSON.stringify(assignments)
-    );
+        semester.innerHTML += `
+            <option value="${sem}">
+                Semester ${sem}
+            </option>
+        `;
 
-    loadAssignments();
+    });
+    semester.value = "";
+    document.getElementById("assignmentSubjectsTable").innerHTML = "";
 
 }
-loadAssignments();
-loadDepartmentDropdown();
 document
-    .getElementById("facultyDepartment")
-    .addEventListener("change", loadFacultyDropdown);
+    .getElementById("assignmentSemesterType")
+    .addEventListener("change", loadSemesterOptions);
 
 document
-    .getElementById("semesterType")
-    .addEventListener("change", loadSubjects);
+    .getElementById("facultyModal")
+    .addEventListener("shown.bs.modal", function () {
 
-document
-    .getElementById("facultyDepartment")
-    .addEventListener("change", loadSubjects);
-document
-    .getElementById("searchAssignment")
-    .addEventListener("keyup", loadAssignments);
+        document.getElementById("assignmentDepartment").value = "";
 
+        document.getElementById("assignmentScheme").value = "";
+
+        document.getElementById("assignmentSemesterType").value = "";
+
+        document.getElementById("assignmentSemester").innerHTML =
+            '<option value="">Select Semester Type First</option>';
+
+        document.getElementById("assignmentSubjectsTable").innerHTML = "";
+
+    });
 

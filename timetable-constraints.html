@@ -126,25 +126,20 @@
 
             <div class="card-body">
 
-                <div class="d-flex justify-content-between mb-3">
+                <div class="d-flex justify-content-end mb-3">
 
-                    <input
-                        type="text"
-                        id="searchAssignment"
-                        class="form-control w-50"
-                        placeholder="Search Assignment">
+                <button
+                    class="btn btn-primary"
+                    onclick="resetConstraintForm()"
+                    data-bs-toggle="modal"
+                    data-bs-target="#facultyModal">
 
-                    <button
-                        class="btn btn-primary"
-                        onclick="resetConstraintForm()"
-                        data-bs-toggle="modal"
-                        data-bs-target="#facultyModal">
+                    <i class="bi bi-plus-circle"></i>
+                    Add Constraints
 
-                        <i class="bi bi-plus-circle"></i>
-                       Add Constraints
-                    </button>
+                </button>
 
-                </div>
+            </div>
 
                 <!-- Faculty Table -->
 
@@ -152,20 +147,22 @@
 
                     <thead class="table-primary">
 
-                    <tr>
+                        <tr>
 
-                    <th>ID</th>
-                        <th>Department</th>
-                        <th>Scheme</th>
-                        <th>Semester</th>
-                        <th>Working Days</th>
-                        <th>Periods</th>
-                        <th>Start Time</th>
-                        <th>Duration</th>
-                        <th>Lunch</th>
-                        <th width="150">Action</th>
+                            <th>ID</th>
+                            <th>Department</th>
+                            <th>Scheme</th>
+                            <th>Academic Year</th>
+                            <th>Semester</th>
+                            <th>Days</th>
+                            <th>Periods/Day</th>
+                            <th>Start Time</th>
+                            <th>Period Duration</th>
+                            <th>Lunch Break</th>
+                            <th>Short Break</th>
+                            <th width="150">Action</th>
 
-                    </tr>
+                        </tr>
 
                     </thead>
 
@@ -232,18 +229,55 @@
                           </select>
 
                         </div>
+                        <div class="col-md-6 mb-3">
+
+                            <label class="form-label">
+                                Academic Year
+                            </label>
+
+                            <input
+                                type="text"
+                                id="constraintAcademicYear"
+                                class="form-control"
+                                placeholder="Example: 2026-27">
+
+                        </div>
+                        <div class="col-md-6 mb-3">
+
+                                <label class="form-label">
+                                    Semester Type
+                                </label>
+
+                                <select class="form-select" id="constraintSemesterType">
+
+                                    <option value="">
+                                        Select Semester Type
+                                    </option>
+
+                                    <option value="Odd">
+                                        Odd
+                                    </option>
+
+                                    <option value="Even">
+                                        Even
+                                    </option>
+
+                                </select>
+
+                            </div>
 
                         <div class="col-md-6 mb-3">
 
                           <label class="form-label">
                               Semester
                           </label>
+                          
 
                           <select class="form-select" id="constraintSemester">
 
-                              <option value="">
-                                  Select Semester
-                              </option>
+                            <option value="">
+                                Select Semester Type First
+                            </option>
 
                           </select>
 
@@ -342,7 +376,7 @@
 
 </div>
 
-<div class="col-md-3 mb-3">
+<div class="col-md-4 mb-3">
 
     <label class="form-label">
         Lunch After Period
@@ -363,7 +397,7 @@
     </select>
 
 </div>
-<div class="col-md-3 mb-3">
+<div class="col-md-4 mb-3">
 
     <label class="form-label">
         Short Break After Period
@@ -384,8 +418,7 @@
 
 </div>
 
-<div class="col-md-3 mb-3">
-
+<div class="col-md-4 mb-3">
     <label class="form-label">
         Short Break Duration (Minutes)
     </label>
@@ -395,6 +428,51 @@
         id="shortBreakDuration"
         class="form-control"
         placeholder="e.g. 10">
+
+</div>
+<div class="col-md-4 mb-3">
+
+    <label class="form-label">
+        Max Faculty Periods / Day
+    </label>
+
+    <input
+        type="number"
+        id="maxPeriodsPerDay"
+        class="form-control"
+        placeholder="Example: 4">
+
+</div>
+
+<div class="col-md-4 mb-3">
+
+    <label class="form-label">
+        Max Faculty Periods / Week
+    </label>
+
+    <input
+        type="number"
+        id="maxPeriodsPerWeek"
+        class="form-control"
+        placeholder="Example: 18">
+
+</div>
+
+<div class="col-md-4 mb-3">
+
+    <label class="form-label">
+        Lab Duration (Periods)
+    </label>
+
+    <select
+        class="form-select"
+        id="labDuration">
+
+        <option value="">Select</option>
+        <option value="2">2 Periods</option>
+        <option value="3">3 Periods</option>
+
+    </select>
 
 </div>
 

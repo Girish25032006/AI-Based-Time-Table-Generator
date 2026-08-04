@@ -1,57 +1,65 @@
-let constraints =
-JSON.parse(localStorage.getItem("constraints")) || [];
+const DEPARTMENT_API =
+    "http://127.0.0.1:5000/departments";
 
-let editIndex = -1;
+const SCHEME_API =
+    "http://127.0.0.1:5000/schemes";
+
+const CONSTRAINT_API =
+    "http://127.0.0.1:5000/timetable-constraints";
+
+let editId = null;
 function init() {
 
     loadDepartmentDropdown();
 
     loadSchemeDropdown();
 
-    loadSemesterDropdown();
-
-    loadConstraints();
-
 }
 init();
-function loadDepartmentDropdown() {
+async function loadDepartmentDropdown() {
 
-    const departmentDropdown =
-        document.getElementById("constraintDepartment");
-
-    departmentDropdown.innerHTML =
-        '<option value="">Select Department</option>';
+    const response =
+        await fetch(DEPARTMENT_API);
 
     const departments =
-        JSON.parse(localStorage.getItem("departments")) || [];
+        await response.json();
+
+    const dropdown =
+        document.getElementById("constraintDepartment");
+
+    dropdown.innerHTML =
+        '<option value="">Select Department</option>';
 
     departments.forEach(department => {
 
-        departmentDropdown.innerHTML += `
-            <option value="${department.code}">
-                ${department.code}
+        dropdown.innerHTML += `
+            <option value="${department.department_code}">
+                ${department.department_code}
             </option>
         `;
 
     });
 
 }
-function loadSchemeDropdown() {
+async function loadSchemeDropdown() {
 
-    const schemeDropdown =
-        document.getElementById("constraintScheme");
-
-    schemeDropdown.innerHTML =
-        '<option value="">Select Scheme</option>';
+    const response =
+        await fetch(SCHEME_API);
 
     const schemes =
-        JSON.parse(localStorage.getItem("schemes")) || [];
+        await response.json();
+
+    const dropdown =
+        document.getElementById("constraintScheme");
+
+    dropdown.innerHTML =
+        '<option value="">Select Scheme</option>';
 
     schemes.forEach(scheme => {
 
-        schemeDropdown.innerHTML += `
-            <option value="${scheme.name}">
-                ${scheme.name}
+        dropdown.innerHTML += `
+            <option value="${scheme.scheme_year}">
+                ${scheme.scheme_year}
             </option>
         `;
 
@@ -60,20 +68,36 @@ function loadSchemeDropdown() {
 }
 function loadSemesterDropdown() {
 
+    const semesterType =
+        document.getElementById("constraintSemesterType").value;
+
     const semesterDropdown =
         document.getElementById("constraintSemester");
 
-    semesterDropdown.innerHTML = `
-        <option value="">Select Semester</option>
-        <option value="1">1st Semester</option>
-        <option value="2">2nd Semester</option>
-        <option value="3">3rd Semester</option>
-        <option value="4">4th Semester</option>
-        <option value="5">5th Semester</option>
-        <option value="6">6th Semester</option>
-        <option value="7">7th Semester</option>
-        <option value="8">8th Semester</option>
-    `;
+    semesterDropdown.innerHTML =
+        '<option value="">Select Semester</option>';
+
+    let semesters = [];
+
+    if (semesterType === "Odd") {
+
+        semesters = [1, 3, 5, 7];
+
+    } else if (semesterType === "Even") {
+
+        semesters = [2, 4, 6, 8];
+
+    }
+
+    semesters.forEach(semester => {
+
+        semesterDropdown.innerHTML += `
+            <option value="${semester}">
+                Semester ${semester}
+            </option>
+        `;
+
+    });
 
 }
 function saveConstraint() {
@@ -127,61 +151,94 @@ function saveConstraint() {
         return;
     }
 
-    const constraint = {
-
-        id: Date.now(),
+    const data = {
 
         department,
 
         scheme,
 
+        academic_year:
+            document.getElementById("constraintAcademicYear").value,
+
+        semester_type:
+            document.getElementById("constraintSemesterType").value,
+
         semester,
 
-        workingDays,
+        working_days: workingDays,
 
-        periodsPerDay,
+        periods_per_day: periodsPerDay,
 
-        collegeStartTime,
+        college_start_time: collegeStartTime,
 
-        periodDuration,
+        period_duration: periodDuration,
 
-        lunchAfterPeriod,
+        lunch_after_period: lunchAfterPeriod,
 
-        shortBreakAfterPeriod,
+        short_break_after_period: shortBreakAfterPeriod,
 
-        shortBreakDuration
+        short_break_duration: shortBreakDuration,
+
+        max_periods_per_day:
+            document.getElementById("maxPeriodsPerDay").value,
+
+        max_periods_per_week:
+            document.getElementById("maxPeriodsPerWeek").value,
+
+        lab_duration:
+            document.getElementById("labDuration").value
 
     };
 
-    if (editIndex == -1) {
+    const url = editId
+        ? `${CONSTRAINT_API}/${editId}`
+        : CONSTRAINT_API;
 
-        constraints.push(constraint);
+    const method = editId
+        ? "PUT"
+        : "POST";
 
-    } else {
+    fetch(url, {
 
-        constraint.id = constraints[editIndex].id;
+        method: method,
 
-        constraints[editIndex] = constraint;
+        headers: {
+            "Content-Type": "application/json"
+        },
 
-        editIndex = -1;
+        body: JSON.stringify(data)
 
-    }
+    })
+    .then(response => response.json())
+    .then(result => {
 
-    localStorage.setItem(
-        "constraints",
-        JSON.stringify(constraints)
-    );
+        alert(result.message);
+        loadConstraints();
 
-    loadConstraints();
+        document
+            .querySelector("#facultyModal .btn-close")
+            .click();
 
-    document
-    .querySelector("#facultyModal .btn-close")
-    .click();
+        document.getElementById("constraintForm").reset();
 
-    document.getElementById("constraintForm").reset();
-    editIndex = -1;
+        editId = null;
+
+    })
+    
+    .catch(error => {
+
+        console.error(error);
+
+        alert("Error while saving constraint.");
+
+    });
+
 }
-function loadConstraints() {
+async function loadConstraints() {
+
+    const response = await fetch(CONSTRAINT_API);
+
+    const constraints = await response.json();
 
     const tableBody =
         document.getElementById("constraintTableBody");
@@ -194,101 +251,167 @@ function loadConstraints() {
 
         <tr>
 
-    <td>${index + 1}</td>
-    <td>${constraint.department}</td>
-    <td>${constraint.scheme}</td>
-    <td>${constraint.semester}</td>
-    <td>${constraint.workingDays.join(", ")}</td>
-    <td>${constraint.periodsPerDay}</td>
-    <td>${constraint.collegeStartTime}</td>
-    <td>${constraint.periodDuration} Min</td>
-    <td>After ${constraint.lunchAfterPeriod}</td>
+            <td>${index + 1}</td>
 
-    <td>
+                <td>${constraint.department_code}</td>
 
-        <button
-            class="btn btn-warning btn-sm"
-            onclick="editConstraint(${index})">
+                <td>${constraint.scheme_year}</td>
 
-            Edit
+                <td>${constraint.academic_year}</td>
 
-        </button>
+                <td>${constraint.semester_type} - ${constraint.semester_id}</td>
 
-        <button
-            class="btn btn-danger btn-sm"
-            onclick="deleteConstraint(${index})">
+                <td>${constraint.working_days}</td>
 
-            Delete
+                <td>${constraint.periods_per_day}</td>
 
-        </button>
+                <td>${constraint.college_start_time}</td>
 
-    </td>
+                <td>${constraint.period_duration} Min</td>
 
-</tr>
+                <td>After ${constraint.lunch_after_period}</td>
+
+                <td>
+                    After ${constraint.short_break_after_period}
+                    (${constraint.short_break_duration} Min)
+                </td>
+
+                <td>
+
+                <button
+                    class="btn btn-warning btn-sm"
+                    onclick="editConstraint(${constraint.constraint_id})">
+
+                    Edit
+
+                </button>
+                <button
+                    class="btn btn-danger btn-sm"
+                    onclick="deleteConstraint(${constraint.constraint_id})">
+
+                    Delete
+                </button>
+
+            </td>
+
+        </tr>
 
         `;
 
     });
 
-
 }
+async function deleteConstraint(id) {
 
-function deleteConstraint(index) {
+    const confirmDelete = confirm(
+        "Are you sure you want to delete this constraint?"
+    );
 
-    if (confirm("Are you sure you want to delete this constraint?")) {
+    if (!confirmDelete) {
+        return;
+    }
 
-        constraints.splice(index, 1);
+    try {
 
-        localStorage.setItem(
-            "constraints",
-            JSON.stringify(constraints)
+        const response = await fetch(
+            `${CONSTRAINT_API}/${id}`,
+            {
+                method: "DELETE"
+            }
         );
 
+        const result = await response.json();
+
+        alert(result.message);
+
         loadConstraints();
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert("Error deleting constraint.");
 
     }
 
 }
-function editConstraint(index) {
+async function editConstraint(id) {
 
-    const constraint = constraints[index];
+    editId = id;
+
+    const response =
+        await fetch(`${CONSTRAINT_API}/${id}`);
+
+    const constraint =
+        await response.json();
 
     document.getElementById("constraintDepartment").value =
-        constraint.department;
+        constraint.department_code;
 
     document.getElementById("constraintScheme").value =
-        constraint.scheme;
+        constraint.scheme_year;
+
+    document.getElementById("constraintAcademicYear").value =
+        constraint.academic_year;
+
+    document.getElementById("constraintSemesterType").value =
+        constraint.semester_type;
+
+    loadSemesterDropdown();
 
     document.getElementById("constraintSemester").value =
-        constraint.semester;
+        constraint.semester_id;
+
+    document.getElementById("periodsPerDay").value =
+        constraint.periods_per_day;
+
+    document.getElementById("collegeStartTime").value =
+        constraint.college_start_time;
+
+    document.getElementById("periodDuration").value =
+        constraint.period_duration;
+
+    document.getElementById("lunchAfterPeriod").value =
+        constraint.lunch_after_period;
+
+    document.getElementById("shortBreakAfterPeriod").value =
+        constraint.short_break_after_period;
+
+    document.getElementById("shortBreakDuration").value =
+        constraint.short_break_duration;
+
+    document.getElementById("maxPeriodsPerDay").value =
+        constraint.max_periods_per_day;
+
+    document.getElementById("maxPeriodsPerWeek").value =
+        constraint.max_periods_per_week;
+
+    document.getElementById("labDuration").value =
+        constraint.lab_duration;
 
     document.querySelectorAll(
         '#constraintForm input[type="checkbox"]'
     ).forEach(day => {
 
-        day.checked = constraint.workingDays.includes(day.value);
+        day.checked = false;
 
     });
 
-    document.getElementById("periodsPerDay").value =
-        constraint.periodsPerDay;
+    constraint.working_days
+        .split(",")
+        .forEach(day => {
 
-    document.getElementById("collegeStartTime").value =
-        constraint.collegeStartTime;
+            const checkbox = document.querySelector(
+                `input[value="${day}"]`
+            );
 
-    document.getElementById("periodDuration").value =
-        constraint.periodDuration;
+            if (checkbox) {
 
-    document.getElementById("lunchAfterPeriod").value =
-        constraint.lunchAfterPeriod;
+                checkbox.checked = true;
 
-    document.getElementById("shortBreakAfterPeriod").value =
-        constraint.shortBreakAfterPeriod;
+            }
 
-    document.getElementById("shortBreakDuration").value =
-        constraint.shortBreakDuration;
-
-    editIndex = index;
+        });
 
     const modal = new bootstrap.Modal(
         document.getElementById("facultyModal")
@@ -305,6 +428,11 @@ function resetConstraintForm() {
         '#constraintForm input[type="checkbox"]'
     ).forEach(day => day.checked = false);
 
-    editIndex = -1;
+    editId = null;
 
 }
+
+document
+    .getElementById("constraintSemesterType")
+    .addEventListener("change", loadSemesterDropdown);
+loadConstraints();

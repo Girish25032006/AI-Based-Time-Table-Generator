@@ -71,13 +71,29 @@ async function loadSubjects() {
 
     const semester =
         document.getElementById("assignmentSemester").value;
+    const cycle =
+    document.getElementById("assignmentCycle").value;
 
     if (!department || !scheme || !semester) {
         return;
     }
 
-    const subjectResponse =
-        await fetch(`${SUBJECT_API}/${department}/${scheme}/${semester}`);
+    if ((semester === "1" || semester === "2") && !cycle) {
+        return;
+    }
+
+    let url = "";
+
+    if (semester === "1" || semester === "2") {
+
+        url = `${SUBJECT_API}/${department}/${scheme}/${semester}/${cycle}`;
+
+    } else {
+
+        url = `${SUBJECT_API}/${department}/${scheme}/${semester}/NA`;
+    }
+
+const subjectResponse = await fetch(url);
 
     const subjects = await subjectResponse.json();
 
@@ -193,6 +209,8 @@ document.getElementById("assignmentScheme")
     .addEventListener("change", loadSubjects);
 
 document.getElementById("assignmentSemester")
+    .addEventListener("change", loadSubjects);
+document.getElementById("assignmentCycle")
     .addEventListener("change", loadSubjects);
 async function saveAssignments() {
 
@@ -466,6 +484,30 @@ document
     .getElementById("assignmentSemesterType")
     .addEventListener("change", loadSemesterOptions);
 
+const assignmentCycle =
+    document.getElementById("assignmentCycle");
+
+const cycleDiv =
+    document.getElementById("cycleDiv");
+
+document
+    .getElementById("assignmentSemester")
+    .addEventListener("change", function () {
+
+        if (this.value === "1" || this.value === "2") {
+
+            cycleDiv.style.display = "block";
+
+        } else {
+
+            cycleDiv.style.display = "none";
+
+            assignmentCycle.value = "";
+
+        }
+
+    });
+
 document
     .getElementById("facultyModal")
     .addEventListener("shown.bs.modal", function () {
@@ -480,6 +522,36 @@ document
             '<option value="">Select Semester Type First</option>';
 
         document.getElementById("assignmentSubjectsTable").innerHTML = "";
+        document.getElementById("subjectSearch").value = "";
 
     });
+document
+    .getElementById("subjectSearch")
+    .addEventListener("keyup", function () {
 
+        const searchText =
+            this.value.toLowerCase();
+
+        const rows =
+            document.querySelectorAll(
+                "#assignmentSubjectsTable tr"
+            );
+
+        rows.forEach(row => {
+
+            const rowText =
+                row.innerText.toLowerCase();
+
+            if (rowText.includes(searchText)) {
+
+                row.style.display = "";
+
+            } else {
+
+                row.style.display = "none";
+
+            }
+
+        });
+
+    });

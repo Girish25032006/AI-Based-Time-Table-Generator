@@ -1,59 +1,250 @@
+
+/* =========================================
+   SCHEME DETAILS HEADER ACTIONS
+========================================= */
+
+.scheme-details-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    margin-top: 16px;
+}
+
+
+/* Search Department */
+
+#searchDepartment {
+    flex: 1;
+
+    height: 40px;
+
+    padding: 0 14px;
+
+    border: 1px solid #d0d5d9;
+    border-radius: 8px;
+
+    background: #ffffff;
+    color: #344054;
+
+    font-family: inherit;
+    font-size: 13px;
+
+    outline: none;
+
+    box-sizing: border-box;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+#searchDepartment::placeholder {
+    color: #98a2b3;
+}
+
+
+#searchDepartment:focus {
+    border-color: #148a55;
+
+    box-shadow:
+        0 0 0 3px rgba(20, 138, 85, 0.10);
+}
+
+
+/* =========================================
+   UPDATE BUTTON
+========================================= */
+
+.scheme-details-action-btn {
+    height: 40px;
+
+    min-width: 82px;
+
+    padding: 0 18px;
+
+    border: 1px solid #148a55;
+    border-radius: 8px;
+
+    background: #148a55;
+    color: #ffffff;
+
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.15s ease;
+}
+
+
+.scheme-details-action-btn:hover {
+    background: #107547;
+    border-color: #107547;
+}
+
+
+.scheme-details-action-btn:active {
+    transform: translateY(1px);
+}
 /* =========================================
    SCHEME DETAILS PAGE
 ========================================= */
 
 .scheme-details-container {
     width: 100%;
-}
-
-.scheme-details-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
-}
-
-
-/* =========================================
-   DEPARTMENT DETAIL BOX
-========================================= */
-
-.scheme-department-box {
-    background: #ffffff;
-    border: 1px solid #e1e8e4;
-    border-radius: 14px;
-    padding: 20px;
-    min-height: 170px;
-
-    display: flex;
-    flex-direction: column;
-
-    position: relative;
     box-sizing: border-box;
 }
 
 
 /* =========================================
-   TOP SECTION
+   SEARCH / TOP CONTROLS
+========================================= */
+
+.scheme-search-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.scheme-search-section input {
+    flex: 1;
+    height: 42px;
+    padding: 0 14px;
+
+    border: 1px solid #d0d5d9;
+    border-radius: 8px;
+
+    background: #ffffff;
+    color: #344054;
+
+    font-size: 14px;
+    outline: none;
+
+    box-sizing: border-box;
+}
+
+.scheme-search-section input:focus {
+    border-color: #148a55;
+    box-shadow: 0 0 0 3px rgba(20, 138, 85, 0.10);
+}
+
+.scheme-search-section input::placeholder {
+    color: #98a2b3;
+}
+
+
+/* Save button */
+
+.scheme-search-section button {
+    height: 42px;
+    padding: 0 24px;
+
+    border: 1px solid #148a55;
+    border-radius: 8px;
+
+    background: #148a55;
+    color: #ffffff;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.scheme-search-section button:hover {
+    background: #107547;
+    border-color: #107547;
+}
+
+
+/* =========================================
+   DEPARTMENT GRID
+========================================= */
+
+.scheme-details-grid {
+    display: grid;
+
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+
+    gap: 18px;
+
+    width: 100%;
+}
+
+
+/* =========================================
+   DEPARTMENT CARD
+========================================= */
+
+.scheme-department-box {
+    background: #ffffff;
+
+    border: 1px solid #e4e7ec;
+    border-radius: 14px;
+
+    padding: 18px;
+
+    min-height: 175px;
+
+    display: flex;
+    flex-direction: column;
+
+    box-sizing: border-box;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.2s ease;
+}
+
+.scheme-department-box:hover {
+    border-color: #cfd8d3;
+
+    box-shadow:
+        0 4px 12px rgba(16, 24, 40, 0.06);
+
+    transform: translateY(-1px);
+}
+
+
+/* =========================================
+   DEPARTMENT TOP
 ========================================= */
 
 .scheme-department-top {
     display: flex;
     align-items: flex-start;
-    gap: 16px;
+
+    gap: 14px;
+
+    min-width: 0;
 }
 
 
 /* =========================================
-   ICON
+   DEPARTMENT ICON
 ========================================= */
 
 .scheme-department-icon {
-    width: 60px;
-    height: 60px;
+    width: 54px;
+    height: 54px;
 
     flex-shrink: 0;
 
-    border-radius: 14px;
+    border-radius: 13px;
+
     background: #eaf7f0;
 
     display: flex;
@@ -62,7 +253,7 @@
 }
 
 .scheme-department-icon i {
-    font-size: 29px;
+    font-size: 25px;
     color: #148a55;
 }
 
@@ -72,20 +263,28 @@
 ========================================= */
 
 .scheme-department-info {
-    padding-top: 2px;
+    min-width: 0;
+
+    padding-top: 1px;
 }
 
 .scheme-department-code {
     color: #148a55;
-    font-size: 21px;
+
+    font-size: 19px;
     font-weight: 700;
-    margin-bottom: 6px;
+
+    line-height: 1.25;
+
+    margin-bottom: 5px;
 }
 
 .scheme-department-name {
-    color: #344054;
-    font-size: 14px;
-    line-height: 1.4;
+    color: #475467;
+
+    font-size: 13px;
+
+    line-height: 1.45;
 }
 
 
@@ -95,27 +294,76 @@
 
 .scheme-pdf-section {
     margin-top: auto;
-    padding-top: 18px;
+
+    padding-top: 20px;
 
     display: flex;
     align-items: center;
     justify-content: space-between;
 
-    gap: 10px;
+    gap: 12px;
+
+    min-width: 0;
 }
 
-.scheme-pdf-name {
-    color: #667085;
-    font-size: 13px;
+
+/* =========================================
+   PDF ITEM
+========================================= */
+
+.scheme-pdf-item {
+    width: 100%;
 
     display: flex;
     align-items: center;
+    justify-content: space-between;
+
+    gap: 12px;
+
+    min-width: 0;
+}
+
+
+/* =========================================
+   PDF NAME
+========================================= */
+
+.scheme-pdf-name {
+    display: flex;
+    align-items: center;
+
     gap: 7px;
+
+    color: #667085;
+
+    font-size: 12px;
+    font-weight: 500;
+
+    white-space: nowrap;
+
+    min-width: 0;
 }
 
 .scheme-pdf-name i {
     color: #148a55;
-    font-size: 17px;
+
+    font-size: 16px;
+
+    flex-shrink: 0;
+}
+
+
+/* =========================================
+   PDF ACTIONS
+========================================= */
+
+.scheme-pdf-actions {
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+
+    flex-shrink: 0;
 }
 
 
@@ -124,31 +372,182 @@
 ========================================= */
 
 .scheme-download-btn {
-    height: 36px;
-    padding: 0 14px;
+    height: 34px;
 
-    border-radius: 7px;
+    padding: 0 13px;
+
     border: 1px solid #148a55;
+    border-radius: 7px;
 
     background: #148a55;
     color: #ffffff;
 
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 600;
 
     text-decoration: none;
 
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
+
     gap: 6px;
 
+    white-space: nowrap;
+
+    box-sizing: border-box;
+
     cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.scheme-download-btn i {
+    font-size: 13px;
 }
 
 .scheme-download-btn:hover {
     background: #107547;
+    border-color: #107547;
     color: #ffffff;
+}
+/* =========================================
+   UPLOAD BUTTON
+========================================= */
+
+.scheme-upload-btn {
+    height: 34px;
+
+    min-width: 88px;
+
+    padding: 0 13px;
+
+    border: 1px solid #148a55;
+    border-radius: 7px;
+
+    background: #ffffff;
+    color: #148a55;
+
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 6px;
+
+    white-space: nowrap;
+
+    box-sizing: border-box;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.15s ease;
+}
+
+
+/* Upload icon */
+
+.scheme-upload-btn i {
+    font-size: 13px;
+}
+
+
+/* Hover */
+
+.scheme-upload-btn:hover {
+    background: #eaf7f0;
+
+    border-color: #148a55;
+
+    color: #107547;
+
+    box-shadow:
+        0 2px 6px rgba(20, 138, 85, 0.10);
+
+    transform: translateY(-1px);
+}
+
+
+/* Click */
+
+.scheme-upload-btn:active {
+    transform: translateY(0);
+
+    box-shadow: none;
+}
+
+
+/* Disabled / Uploading */
+
+.scheme-upload-btn:disabled {
+    opacity: 0.65;
+
+    cursor: not-allowed;
+
+    transform: none;
+
+    box-shadow: none;
+}
+
+/* =========================================
+   RE-UPLOAD BUTTON
+========================================= */
+
+.scheme-reupload-btn {
+    height: 34px;
+
+    padding: 0 12px;
+
+    border: 1px solid #148a55;
+    border-radius: 7px;
+
+    background: #ffffff;
+    color: #148a55;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 6px;
+
+    white-space: nowrap;
+
+    box-sizing: border-box;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.scheme-reupload-btn i {
+    font-size: 13px;
+}
+
+.scheme-reupload-btn:hover {
+    background: #eaf7f0;
+    border-color: #148a55;
+    color: #107547;
+}
+
+.scheme-reupload-btn:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
 }
 
 
@@ -157,37 +556,711 @@
 ========================================= */
 
 .scheme-no-pdf {
-    color: #98a2b3;
-    font-size: 13px;
-
     display: flex;
     align-items: center;
-    gap: 6px;
+
+    gap: 7px;
+
+    color: #98a2b3;
+
+    font-size: 12px;
+}
+
+.scheme-no-pdf i {
+    font-size: 15px;
 }
 
 
 /* =========================================
-   RESPONSIVE
+   ADDITIONAL PDF / SH CYCLE P CYCLE
 ========================================= */
 
-@media (max-width: 1000px) {
+.scheme-pdf-list {
+    display: flex;
+    align-items: center;
+
+    justify-content: flex-end;
+
+    gap: 18px;
+
+    width: 100%;
+}
+
+.scheme-pdf-list .scheme-pdf-item {
+    width: auto;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    gap: 7px;
+}
+
+
+/* =========================================
+   SEARCH RESULT
+========================================= */
+
+.scheme-department-box.hidden {
+    display: none;
+}
+
+
+/* =========================================
+   TABLET
+========================================= */
+
+@media (max-width: 1100px) {
 
     .scheme-details-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
 }
 
 
-@media (max-width: 650px) {
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 700px) {
+
+    .scheme-search-section {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .scheme-search-section input {
+        width: 100%;
+    }
+
+    .scheme-search-section button {
+        width: 100%;
+    }
+
 
     .scheme-details-grid {
         grid-template-columns: 1fr;
+
+        gap: 14px;
     }
+
+
+    .scheme-department-box {
+        min-height: 165px;
+
+        padding: 16px;
+    }
+
 
     .scheme-pdf-section {
         align-items: flex-start;
+    }
+
+
+    .scheme-pdf-item {
+        align-items: flex-start;
+    }
+
+
+    .scheme-pdf-actions {
+        flex-wrap: wrap;
+    }
+
+}
+
+
+/* =========================================
+   SMALL MOBILE
+========================================= */
+
+@media (max-width: 450px) {
+
+    .scheme-department-top {
+        gap: 11px;
+    }
+
+    .scheme-department-icon {
+        width: 48px;
+        height: 48px;
+
+        border-radius: 11px;
+    }
+
+    .scheme-department-icon i {
+        font-size: 22px;
+    }
+
+    .scheme-department-code {
+        font-size: 17px;
+    }
+
+    .scheme-department-name {
+        font-size: 12px;
+    }
+
+
+    .scheme-pdf-item {
         flex-direction: column;
+        align-items: flex-start;
+    }
+
+
+    .scheme-pdf-actions {
+        width: 100%;
+    }
+
+
+    .scheme-download-btn,
+    .scheme-reupload-btn {
+        flex: 1;
+    }
+
+}
+
+/* =========================================
+   SCHEME DETAILS - SIDEBAR ONLY
+========================================= */
+
+.scheme-details-container ~ * {
+    box-sizing: border-box;
+}
+
+
+/* Sidebar */
+
+body:has(.scheme-details-grid) .sidebar {
+    width: 250px;
+
+    position: fixed;
+    top: 0;
+    left: 0;
+
+    height: 100vh;
+    min-height: 100vh;
+
+    background: #ffffff;
+
+    border-right: 1px solid #e8eee9;
+
+    box-shadow: 3px 0 15px rgba(0, 0, 0, 0.04);
+
+    z-index: 1000;
+
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden;
+}
+
+
+/* =========================================
+   SIDEBAR LOGO
+========================================= */
+
+body:has(.scheme-details-grid) .sidebar-logo {
+    height: 80px;
+
+    padding: 0 22px;
+
+    display: flex;
+    align-items: center;
+
+    border-bottom: 1px solid #edf1ee;
+
+    flex-shrink: 0;
+}
+
+body:has(.scheme-details-grid) .sidebar-logo h2 {
+    margin: 0;
+
+    color: #087443;
+
+    font-size: 20px;
+
+    font-weight: 700;
+
+    letter-spacing: -0.3px;
+}
+
+
+/* =========================================
+   SIDEBAR MENU
+========================================= */
+
+body:has(.scheme-details-grid) .sidebar-menu {
+    display: flex;
+    flex-direction: column;
+
+    gap: 4px;
+
+    padding: 18px 12px;
+
+    flex: 1;
+
+    overflow-y: auto;
+}
+
+
+/* =========================================
+   SIDEBAR LINKS
+========================================= */
+
+body:has(.scheme-details-grid) .sidebar-menu a {
+    min-height: 44px;
+
+    padding: 10px 13px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+
+    border-radius: 9px;
+
+    color: #344054;
+
+    font-size: 13px;
+
+    font-weight: 500;
+
+    text-decoration: none;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+/* Icons */
+
+body:has(.scheme-details-grid) .sidebar-menu a i {
+    width: 20px;
+    min-width: 20px;
+
+    color: #168653;
+
+    font-size: 17px;
+
+    text-align: center;
+}
+
+
+/* Hover */
+
+body:has(.scheme-details-grid) .sidebar-menu a:hover {
+    background: #eef8f2;
+
+    color: #168653;
+
+    transform: translateX(2px);
+}
+
+body:has(.scheme-details-grid) .sidebar-menu a:hover i {
+    color: #168653;
+}
+
+
+/* =========================================
+   ACTIVE SCHEME
+========================================= */
+
+body:has(.scheme-details-grid) .sidebar-menu a.active {
+    background: #168653;
+
+    color: #ffffff;
+
+    font-weight: 600;
+
+    box-shadow:
+        0 4px 10px rgba(22, 134, 83, 0.18);
+}
+
+body:has(.scheme-details-grid) .sidebar-menu a.active i {
+    color: #ffffff;
+}
+
+
+/* =========================================
+   LOGOUT
+========================================= */
+
+body:has(.scheme-details-grid) .sidebar-bottom {
+    padding: 12px;
+
+    border-top: 1px solid #edf1ee;
+
+    flex-shrink: 0;
+}
+
+body:has(.scheme-details-grid) .sidebar-bottom a {
+    min-height: 44px;
+
+    padding: 10px 13px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+
+    border-radius: 9px;
+
+    color: #475467;
+
+    font-size: 13px;
+
+    font-weight: 500;
+
+    text-decoration: none;
+
+    transition: 0.2s ease;
+}
+
+body:has(.scheme-details-grid) .sidebar-bottom a i {
+    width: 20px;
+
+    color: #667085;
+
+    font-size: 17px;
+
+    text-align: center;
+}
+
+body:has(.scheme-details-grid) .sidebar-bottom a:hover {
+    background: #fff4f3;
+
+    color: #c0392b;
+}
+
+body:has(.scheme-details-grid) .sidebar-bottom a:hover i {
+    color: #c0392b;
+}
+
+
+/* =========================================
+   SCHEME DETAILS MAIN CONTENT
+========================================= */
+
+body:has(.scheme-details-grid) .main-content {
+    margin-left: 250px;
+
+    width: calc(100% - 250px);
+
+    min-height: 100vh;
+
+    padding: 30px 35px;
+
+    background: #fafcfb;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================
+   TABLET
+========================================= */
+
+@media (max-width: 1000px) {
+
+    body:has(.scheme-details-grid) .sidebar {
+        width: 220px;
+    }
+
+    body:has(.scheme-details-grid) .main-content {
+        margin-left: 220px;
+
+        width: calc(100% - 220px);
+
+        padding: 25px;
+    }
+
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 768px) {
+
+    body:has(.scheme-details-grid) .sidebar {
+        width: 70px;
+    }
+
+    body:has(.scheme-details-grid) .sidebar-logo {
+        height: 70px;
+
+        padding: 0;
+
+        justify-content: center;
+    }
+
+    body:has(.scheme-details-grid) .sidebar-logo h2 {
+        font-size: 0;
+    }
+
+    body:has(.scheme-details-grid) .sidebar-logo h2::first-letter {
+        font-size: 22px;
+    }
+
+    body:has(.scheme-details-grid) .sidebar-menu {
+        padding: 15px 10px;
+    }
+
+    body:has(.scheme-details-grid) .sidebar-menu a {
+        justify-content: center;
+
+        padding: 11px;
+
+        font-size: 0;
+    }
+
+    body:has(.scheme-details-grid) .sidebar-menu a i {
+        width: auto;
+        min-width: 0;
+
+        font-size: 19px;
+    }
+
+    body:has(.scheme-details-grid) .sidebar-bottom {
+        padding: 10px;
+    }
+
+    body:has(.scheme-details-grid) .sidebar-bottom a {
+        justify-content: center;
+
+        padding: 11px;
+
+        font-size: 0;
+    }
+
+    body:has(.scheme-details-grid) .sidebar-bottom a i {
+        width: auto;
+
+        font-size: 19px;
+    }
+
+    body:has(.scheme-details-grid) .main-content {
+        margin-left: 70px;
+
+        width: calc(100% - 70px);
+
+        padding: 20px;
+    }
+
+}
+
+/* =========================================
+   SCHEME DETAILS - SIDEBAR SUBMENU
+========================================= */
+
+.sidebar-submenu {
+    margin-left: 18px;
+    padding-left: 18px;
+
+    border-left: 2px solid #e1eee7;
+
+    margin-top: -2px;
+    margin-bottom: 6px;
+}
+
+.sidebar-submenu a {
+    display: flex;
+    align-items: center;
+
+    gap: 9px;
+
+    padding: 9px 12px;
+
+    border-radius: 7px;
+
+    color: #667085;
+
+    font-size: 12px;
+
+    text-decoration: none;
+
+    transition: all 0.2s ease;
+}
+
+.sidebar-submenu a i {
+    font-size: 14px;
+    color: #148a55;
+}
+
+.sidebar-submenu a:hover {
+    background: #eef8f2;
+    color: #148a55;
+}
+
+.sidebar-submenu a.active-submenu {
+    background: #eaf7f0;
+    color: #148a55;
+
+    font-weight: 600;
+}
+
+.sidebar-submenu a.active-submenu i {
+    color: #148a55;
+}
+
+/* =========================================
+   SCHEME DETAILS - PAGE HEADER
+========================================= */
+
+body:has(.scheme-details-grid) .page-header {
+    margin-bottom: 24px;
+
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+
+    gap: 24px;
+}
+
+body:has(.scheme-details-grid) .page-header h1 {
+    margin: 0 0 5px 0;
+
+    font-size: 28px;
+    font-weight: 700;
+
+    color: #101828;
+
+    letter-spacing: -0.5px;
+}
+
+body:has(.scheme-details-grid) .page-header p {
+    margin: 0;
+
+    color: #667085;
+
+    font-size: 14px;
+}
+
+
+/* =========================================
+   SEARCH + UPDATE
+========================================= */
+
+body:has(.scheme-details-grid) .scheme-details-actions {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    flex: 1;
+
+    max-width: 650px;
+}
+
+body:has(.scheme-details-grid) #searchDepartment {
+    width: 100%;
+    height: 42px;
+
+    padding: 0 14px;
+
+    border: 1px solid #d0d5dd;
+    border-radius: 8px;
+
+    background: #ffffff;
+
+    color: #344054;
+
+    font-size: 13px;
+
+    outline: none;
+
+    box-sizing: border-box;
+
+    transition: 0.2s ease;
+}
+
+body:has(.scheme-details-grid) #searchDepartment::placeholder {
+    color: #98a2b3;
+}
+
+body:has(.scheme-details-grid) #searchDepartment:focus {
+    border-color: #148a55;
+
+    box-shadow: 0 0 0 3px rgba(20, 138, 85, 0.10);
+}
+
+
+/* =========================================
+   UPDATE BUTTON
+========================================= */
+
+body:has(.scheme-details-grid) #updateSchemeDetails {
+    height: 42px;
+
+    padding: 0 20px;
+
+    border: 1px solid #148a55;
+    border-radius: 8px;
+
+    background: #148a55;
+
+    color: #ffffff;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    white-space: nowrap;
+
+    transition: 0.2s ease;
+}
+
+body:has(.scheme-details-grid) #updateSchemeDetails:hover {
+    background: #107547;
+
+    border-color: #107547;
+
+    transform: translateY(-1px);
+
+    box-shadow: 0 4px 10px rgba(20, 138, 85, 0.15);
+}
+
+body:has(.scheme-details-grid) #updateSchemeDetails:active {
+    transform: translateY(0);
+}
+
+
+/* =========================================
+   RESPONSIVE HEADER
+========================================= */
+
+@media (max-width: 900px) {
+
+    body:has(.scheme-details-grid) .page-header {
+        align-items: stretch;
+
+        flex-direction: column;
+
+        gap: 14px;
+    }
+
+    body:has(.scheme-details-grid) .scheme-details-actions {
+        max-width: none;
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    body:has(.scheme-details-grid) .scheme-details-actions {
+        flex-direction: column;
+
+        align-items: stretch;
+    }
+
+    body:has(.scheme-details-grid) #searchDepartment,
+    body:has(.scheme-details-grid) #updateSchemeDetails {
+        width: 100%;
     }
 
 }

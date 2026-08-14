@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Academic Year Management</title>
+
+    <!-- Bootstrap Icons -->
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    >
+
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="css/academic-year.css">
+</head>
+
+<body>
+
+<div class="app-layout">
+
+    <!-- =========================================
+         SIDEBAR
+    ========================================== -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-logo">
+            AI Timetable
+        </div>
+
+
+        <nav class="sidebar-nav">
+
+            <a href="dashboard.html" class="sidebar-link">
+                <i class="bi bi-speedometer2"></i>
+                <span>Dashboard</span>
+            </a>
+
+
+            <a href="department.html" class="sidebar-link">
+                <i class="bi bi-building"></i>
+                <span>Department</span>
+            </a>
+
+
+            <a href="scheme.html" class="sidebar-link">
+                <i class="bi bi-journal-bookmark"></i>
+                <span>Scheme</span>
+            </a>
+
+
+            <!-- ACTIVE -->
+            <a href="academic-year.html"
+               class="sidebar-link active">
+
+                <i class="bi bi-calendar3"></i>
+
+                <span>Academic Year</span>
+
+            </a>
+
+
+            <a href="subject.html" class="sidebar-link">
+                <i class="bi bi-book"></i>
+                <span>Subject</span>
+            </a>
+
+
+            <a href="faculty.html" class="sidebar-link">
+                <i class="bi bi-person-badge"></i>
+                <span>Faculty</span>
+            </a>
+
+
+            <a href="faculty-subject-assignment.html"
+               class="sidebar-link">
+
+                <i class="bi bi-diagram-3"></i>
+
+                <span>Faculty Subject Assignment</span>
+
+            </a>
+
+
+            <a href="timetable-constraints.html"
+               class="sidebar-link">
+
+                <i class="bi bi-sliders"></i>
+
+                <span>Timetable Constraints</span>
+
+            </a>
+
+
+            <a href="generate-timetable.html"
+               class="sidebar-link">
+
+                <i class="bi bi-calendar-plus"></i>
+
+                <span>Generate Timetable</span>
+
+            </a>
+
+
+            <a href="view-timetable.html"
+               class="sidebar-link">
+
+                <i class="bi bi-calendar3"></i>
+
+                <span>View Timetable</span>
+
+            </a>
+
+        </nav>
+
+
+        <!-- LOGOUT -->
+
+        <div class="sidebar-bottom">
+
+            <a href="#" class="sidebar-link">
+
+                <i class="bi bi-box-arrow-right"></i>
+
+                <span>Logout</span>
+
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =========================================
+         MAIN CONTENT
+    ========================================== -->
+
+    <main class="main-content">
+
+
+        <!-- PAGE HEADER -->
+
+        <div class="page-header">
+
+            <div>
+
+                <h1>
+                    Academic Year Management
+                </h1>
+
+                <p>
+                    Manage academic years for the timetable system.
+                </p>
+
+            </div>
+
+
+            <div class="admin-info">
+
+                <i class="bi bi-person-circle"></i>
+
+                <span>Admin</span>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================
+             SEARCH + ADD
+        ====================================== -->
+
+        <div class="toolbar">
+
+            <div class="search-box">
+
+                <i class="bi bi-search"></i>
+
+                <input
+                    type="text"
+                    id="searchAcademicYear"
+                    placeholder="Search Academic Year"
+                >
+
+            </div>
+
+
+            <button
+                type="button"
+                id="addAcademicYearBtn"
+                class="add-btn">
+
+                <i class="bi bi-plus-circle"></i>
+
+                Add Academic Year
+
+            </button>
+
+        </div>
+
+
+        <!-- =====================================
+             TABLE
+        ====================================== -->
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>ID</th>
+
+                        <th>Academic Year</th>
+
+                        <th>Status</th>
+
+                        <th>Action</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="academicYearTableBody">
+
+                    <!-- Data will come from JavaScript -->
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+    </main>
+
+</div>
+
+
+<!-- JavaScript -->
+
+<script src="js/academic-year.js"></script>
+
+</body>
+
+</html>

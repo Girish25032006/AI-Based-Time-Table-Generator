@@ -215,3 +215,58 @@
     }
 
 }
+/* =========================================
+   VIEW DETAIL BUTTON
+========================================= */
+
+.scheme-view-btn {
+    height: 34px;
+
+    padding: 0 14px;
+
+    border: 1px solid #148a55;
+    border-radius: 7px;
+
+    background: #ffffff;
+    color: #148a55;
+
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+
+    white-space: nowrap;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.15s ease;
+}
+
+
+/* Hover */
+
+.scheme-view-btn:hover {
+    background: #eaf7f0;
+
+    color: #107547;
+
+    border-color: #107547;
+
+    transform: translateY(-1px);
+}
+
+
+/* Click */
+
+.scheme-view-btn:active {
+    transform: translateY(0);
+}

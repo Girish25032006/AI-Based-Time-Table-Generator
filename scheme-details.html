@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Scheme Details</title>
+
+    <link
+        rel="stylesheet"
+        href="css/style.css">
+
+    <link
+        rel="stylesheet"
+        href="css/scheme-details.css">
+    <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+</head>
+
+<body>
+
+    <div class="app-container">
+
+        <!-- SIDEBAR -->
+
+        <aside class="sidebar">
+
+            <div class="sidebar-logo">
+                <h2>AI Timetable</h2>
+            </div>
+
+            <nav class="sidebar-menu">
+
+                <a href="dashboard.html">
+                    <i class="bi bi-speedometer2"></i>
+                    Dashboard
+                </a>
+
+                <a href="department.html">
+                    <i class="bi bi-building"></i>
+                    Department
+                </a>
+
+                <a href="scheme.html" class="active">
+                    <i class="bi bi-journal-bookmark"></i>
+                    Scheme
+                </a>
+
+                <a href="subject.html">
+                    <i class="bi bi-book"></i>
+                    Subject
+                </a>
+
+                <a href="faculty.html">
+                    <i class="bi bi-person-badge"></i>
+                    Faculty
+                </a>
+
+                <a href="faculty-subject-assignment.html">
+                    <i class="bi bi-diagram-3"></i>
+                    Faculty Subject Assignment
+                </a>
+
+                <a href="timetable-constraints.html">
+                    <i class="bi bi-sliders"></i>
+                    Timetable Constraints
+                </a>
+
+                <a href="generate-timetable.html">
+                    <i class="bi bi-calendar-plus"></i>
+                    Generate Timetable
+                </a>
+
+                <a href="view-timetable.html">
+                    <i class="bi bi-table"></i>
+                    View Timetable
+                </a>
+
+            </nav>
+
+            <div class="sidebar-bottom">
+
+                <a href="#">
+                    <i class="bi bi-box-arrow-right"></i>
+                    Logout
+                </a>
+
+            </div>
+
+        </aside>
+
+
+        <!-- MAIN CONTENT -->
+
+        <main class="main-content">
+
+            <!-- HEADER -->
+
+            <div class="page-header">
+
+                <div>
+
+                    <h1>
+                        Scheme Details
+                    </h1>
+
+                    <p id="schemeTitle">
+                        Loading scheme...
+                    </p>
+
+                </div>
+
+                <div class="admin-profile">
+
+                    <i class="bi bi-person-circle"></i>
+
+                    <span>Admin</span>
+
+                </div>
+
+            </div>
+
+
+            <!-- CONTENT -->
+
+            <div class="scheme-details-container">
+
+                <div
+                    id="schemeDetails"
+                    class="scheme-details-grid">
+
+                    <!-- Departments will load here -->
+
+                </div>
+
+            </div>
+
+        </main>
+
+    </div>
+
+
+    <script src="js/scheme-details.js"></script>
+
+</body>
+
+</html>

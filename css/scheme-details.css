@@ -1,0 +1,193 @@
+/* =========================================
+   SCHEME DETAILS PAGE
+========================================= */
+
+.scheme-details-container {
+    width: 100%;
+}
+
+.scheme-details-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+
+/* =========================================
+   DEPARTMENT DETAIL BOX
+========================================= */
+
+.scheme-department-box {
+    background: #ffffff;
+    border: 1px solid #e1e8e4;
+    border-radius: 14px;
+    padding: 20px;
+    min-height: 170px;
+
+    display: flex;
+    flex-direction: column;
+
+    position: relative;
+    box-sizing: border-box;
+}
+
+
+/* =========================================
+   TOP SECTION
+========================================= */
+
+.scheme-department-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+
+/* =========================================
+   ICON
+========================================= */
+
+.scheme-department-icon {
+    width: 60px;
+    height: 60px;
+
+    flex-shrink: 0;
+
+    border-radius: 14px;
+    background: #eaf7f0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.scheme-department-icon i {
+    font-size: 29px;
+    color: #148a55;
+}
+
+
+/* =========================================
+   DEPARTMENT INFORMATION
+========================================= */
+
+.scheme-department-info {
+    padding-top: 2px;
+}
+
+.scheme-department-code {
+    color: #148a55;
+    font-size: 21px;
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.scheme-department-name {
+    color: #344054;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+
+/* =========================================
+   PDF SECTION
+========================================= */
+
+.scheme-pdf-section {
+    margin-top: auto;
+    padding-top: 18px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 10px;
+}
+
+.scheme-pdf-name {
+    color: #667085;
+    font-size: 13px;
+
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.scheme-pdf-name i {
+    color: #148a55;
+    font-size: 17px;
+}
+
+
+/* =========================================
+   DOWNLOAD BUTTON
+========================================= */
+
+.scheme-download-btn {
+    height: 36px;
+    padding: 0 14px;
+
+    border-radius: 7px;
+    border: 1px solid #148a55;
+
+    background: #148a55;
+    color: #ffffff;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    text-decoration: none;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+
+    cursor: pointer;
+}
+
+.scheme-download-btn:hover {
+    background: #107547;
+    color: #ffffff;
+}
+
+
+/* =========================================
+   NO PDF
+========================================= */
+
+.scheme-no-pdf {
+    color: #98a2b3;
+    font-size: 13px;
+
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 1000px) {
+
+    .scheme-details-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+}
+
+
+@media (max-width: 650px) {
+
+    .scheme-details-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .scheme-pdf-section {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+}

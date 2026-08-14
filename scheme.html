@@ -14,6 +14,7 @@
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/scheme.css">
 
 </head>
 
@@ -126,48 +127,33 @@
 
             <div class="card-body">
 
-                <div class="d-flex justify-content-between mb-3">
+                <div class="scheme-toolbar">
 
-                    <input
-                        type="text"
-                        id="searchScheme"
-                        class="form-control w-50"
-                        placeholder="Search Scheme">
+    <input
+        type="text"
+        id="searchScheme"
+        class="form-control"
+        placeholder="Search Scheme">
 
-                    <button
-                        class="btn btn-primary"
-                        data-bs-toggle="modal"
-                        data-bs-target="#schemeModal">
+    <button
+        id="updateScheme"
+        class="scheme-action-btn">
+        Update
+    </button>
 
-                        <i class="bi bi-plus-circle"></i>
+    <button
+        class="scheme-action-btn"
+        data-bs-toggle="modal"
+        data-bs-target="#schemeModal">
 
-                        Add Scheme
+        <i class="bi bi-plus-circle"></i>
+        Add Scheme
 
-                    </button>
+    </button>
 
-                </div>
+</div>
 
-                <table class="table table-hover table-bordered">
-
-                    <thead class="table-primary">
-
-                        <tr>
-
-                            <th>ID</th>
-                            <th>Scheme</th>
-                            
-                            <th width="150">Action</th>
-
-                        </tr>
-
-                    </thead>
-
-                    <tbody id="schemeTableBody">
-
-                        
-                    </tbody>
-
-                </table>
+               <div id="schemeTableBody" class="scheme-grid"></div>
                         </div>
     </div>
 

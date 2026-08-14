@@ -11,34 +11,70 @@ let editIndex = -1;
 // Load Table
 function loadSchemes() {
 
-    const tableBody = document.getElementById("schemeTableBody");
+    const container =
+        document.getElementById("schemeTableBody");
 
-    tableBody.innerHTML = "";
+    container.innerHTML = "";
 
     schemes.forEach((scheme, index) => {
 
-        tableBody.innerHTML += `
-            <tr>
-                <td>${scheme.scheme_id}</td>
-                <td>${scheme.scheme_year}</td>
-                <td>
+        container.innerHTML += `
+
+            <div class="scheme-box">
+
+                <div class="scheme-icon">
+
+                    <i class="bi bi-journal-bookmark-fill"></i>
+
+                </div>
+
+                <div class="scheme-info">
+
+                    <div class="scheme-year">
+                        ${scheme.scheme_year}
+                    </div>
+
+                    <div class="scheme-label">
+                        Scheme
+                    </div>
+
+                </div>
+
+                <div class="scheme-actions">
+
                     <button
-                        class="btn btn-warning btn-sm"
-                        onclick="editScheme(${index})">
-                        Edit
+                        class="scheme-view-btn"
+                        onclick="viewSchemeDetails(${scheme.scheme_id})">
+
+                        View Detail
+
                     </button>
 
                     <button
-                        class="btn btn-danger btn-sm"
-                        onclick="deleteScheme(${index})">
-                        Delete
+                        class="scheme-edit-btn"
+                        onclick="editScheme(${index})">
+
+                        Edit
+
                     </button>
-                </td>
-            </tr>
+
+                    <button
+                        class="scheme-delete-btn"
+                        onclick="deleteScheme(${index})">
+
+                        Delete
+
+                    </button>
+
+                </div>
+
+            </div>
+
         `;
 
     });
 
+    updateSchemeButtons();
 }
 
 
@@ -133,23 +169,34 @@ async function deleteScheme(index) {
     await fetchSchemes();
 
 }
-document.getElementById("searchScheme").addEventListener("keyup", function () {
+document
+    .getElementById("searchScheme")
+    .addEventListener("input", function () {
 
-    const value = this.value.toLowerCase();
+        const value =
+            this.value.toLowerCase().trim();
 
-    const rows = document.querySelectorAll("#schemeTableBody tr");
+        const boxes =
+            document.querySelectorAll(".scheme-box");
 
-    rows.forEach(row => {
+        boxes.forEach(box => {
 
-        if (row.textContent.toLowerCase().includes(value)) {
-            row.style.display = "";
-        } else {
-            row.style.display = "none";
-        }
+            const text =
+                box.textContent.toLowerCase();
+
+            if (text.includes(value)) {
+
+                box.style.display = "";
+
+            } else {
+
+                box.style.display = "none";
+
+            }
+
+        });
 
     });
-
-});
 
 async function fetchSchemes() {
 
@@ -161,4 +208,76 @@ async function fetchSchemes() {
 
 }
 
+
 fetchSchemes();
+
+
+/* =========================
+   UPDATE / SAVE MODE
+========================= */
+
+let updateMode = false;
+
+const updateSchemeButton =
+    document.getElementById("updateScheme");
+
+
+function updateSchemeButtons() {
+
+    const editButtons =
+        document.querySelectorAll(".scheme-edit-btn");
+
+    const deleteButtons =
+        document.querySelectorAll(".scheme-delete-btn");
+
+
+    editButtons.forEach(button => {
+
+        button.style.display =
+            updateMode ? "flex" : "none";
+
+    });
+
+
+    deleteButtons.forEach(button => {
+
+        button.style.display =
+            updateMode ? "flex" : "none";
+
+    });
+
+}
+
+
+/* =========================
+   UPDATE BUTTON
+========================= */
+
+updateSchemeButton.addEventListener(
+    "click",
+    function () {
+
+        updateMode = !updateMode;
+
+
+        if (updateMode) {
+
+            this.textContent = "Save";
+
+        } else {
+
+            this.textContent = "Update";
+
+        }
+
+
+        updateSchemeButtons();
+
+    }
+);
+function viewSchemeDetails(schemeId) {
+
+    window.location.href =
+        `scheme-details.html?scheme_id=${schemeId}`;
+
+}

@@ -1,0 +1,217 @@
+/* =========================================
+   SCHEME PAGE
+========================================= */
+
+.scheme-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    margin-bottom: 16px;
+}
+
+.scheme-toolbar .form-control {
+    flex: 1;
+    height: 44px;
+    border: 1px solid #d5ddd9;
+    border-radius: 10px;
+    padding: 0 14px;
+    font-size: 14px;
+    box-shadow: none;
+}
+
+.scheme-toolbar .form-control:focus {
+    border-color: #148a55;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(20, 138, 85, 0.08);
+}
+
+.scheme-action-btn {
+    height: 44px;
+    min-width: 108px;
+    padding: 0 18px;
+    border: none;
+    border-radius: 9px;
+    background: #148a55;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.scheme-action-btn:hover {
+    background: #107547;
+}
+
+
+/* =========================================
+   SCHEME GRID
+========================================= */
+
+.scheme-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+
+/* =========================================
+   SCHEME BOX
+========================================= */
+
+.scheme-box {
+    min-height: 150px;
+    padding: 20px;
+    background: #ffffff;
+    border: 1px solid #e1e8e4;
+    border-radius: 14px;
+
+    display: flex;
+    align-items: flex-start;
+
+    position: relative;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================
+   SCHEME ICON
+========================================= */
+
+.scheme-icon {
+    width: 62px;
+    height: 62px;
+
+    flex-shrink: 0;
+
+    border-radius: 14px;
+    background: #eaf7f0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin-right: 18px;
+}
+
+.scheme-icon i {
+    font-size: 30px;
+    color: #148a55;
+}
+
+
+/* =========================================
+   SCHEME INFORMATION
+========================================= */
+
+.scheme-info {
+    padding-top: 4px;
+}
+
+.scheme-year {
+    color: #148a55;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.scheme-label {
+    margin-top: 7px;
+    color: #344054;
+    font-size: 14px;
+}
+
+
+/* =========================================
+   EDIT / DELETE AREA
+========================================= */
+
+.scheme-actions {
+    position: absolute;
+
+    right: 18px;
+    bottom: 18px;
+
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+
+/* =========================================
+   EDIT BUTTON
+========================================= */
+
+.scheme-edit-btn,
+.scheme-delete-btn {
+    height: 34px;
+    min-width: 62px;
+
+    padding: 0 12px;
+
+    border-radius: 7px;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+}
+
+
+/* Edit */
+
+.scheme-edit-btn {
+    background: white;
+    color: #148a55;
+    border: 1px solid #148a55;
+}
+
+
+/* Delete */
+
+.scheme-delete-btn {
+    background: #148a55;
+    color: white;
+    border: 1px solid #148a55;
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 1000px) {
+
+    .scheme-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+}
+
+
+@media (max-width: 650px) {
+
+    .scheme-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .scheme-toolbar {
+        flex-wrap: wrap;
+    }
+
+    .scheme-toolbar .form-control {
+        width: 100%;
+        flex-basis: 100%;
+    }
+
+}

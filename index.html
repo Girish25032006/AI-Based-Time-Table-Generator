@@ -14,83 +14,79 @@
 
 <body>
 
-<div class="container-fluid vh-100">
-    <div class="row h-100">
+    <div class="login-page">
 
-        <!-- Left Side -->
-        <div class="col-lg-7 d-none d-lg-flex left-panel">
-            <div class="text-center text-white">
-                <h1 class="display-4 fw-bold">
-                    AI Based Automatic Timetable Generation System
-                </h1>
+        <!-- Background Overlay -->
+        <div class="background-overlay"></div>
 
-                <p class="lead mt-4">
-                    Generate conflict-free timetables efficiently using intelligent scheduling.
-                </p>
+        <!-- Login Card -->
+        <div class="login-card">
+
+            <!-- Logo -->
+            <div class="login-logo">
+                <img src="images/skit_logo_img.png" alt="College Logo">
             </div>
-        </div>
 
-        <!-- Right Side -->
-        <div class="col-lg-5 d-flex align-items-center justify-content-center">
+            <!-- Title -->
+            <h2>AI Academic Scheduling System</h2>
 
-            <div class="login-card">
+            <p class="login-subtitle">
+                Admin Portal
+            </p>
 
-                <div class="text-center mb-4">
+            <!-- Login Form -->
+            <form id="loginForm">
 
-                    <img src="images/logo.jpg"
-                         width="90"
-                         alt="Logo">
+                <div class="input-group-custom">
+                    <label>Username</label>
 
-                    <h3 class="mt-3 fw-bold">
-                        Admin Login
-                    </h3>
+                    <input
+                        type="text"
+                        class="form-control"
+                        placeholder="Enter Username"
+                        required>
+                </div>
 
-                    <p class="text-muted">
-                        Sign in to continue
-                    </p>
+                <div class="input-group-custom">
+                    <label>Password</label>
+
+                    <input
+                        type="password"
+                        class="form-control"
+                        placeholder="Enter Password"
+                        required>
+                </div>
+
+                <!-- Remember / Forgot -->
+                <div class="login-options">
+
+                    <label>
+                        <input type="checkbox">
+                        Remember Me
+                    </label>
+
+                    <a href="#">Forgot Password?</a>
 
                 </div>
 
-                <form id="loginForm">
+                <!-- Login Button -->
+                <button type="submit" class="login-btn">
+                    Sign In <span>→</span>
+                </button>
 
-                    <div class="mb-3">
-                        <label class="form-label">Username</label>
+            </form>
 
-                        <input
-                                type="text"
-                                class="form-control"
-                                placeholder="Enter Username"
-                                required>
-                    </div>
-
-                    <div class="mb-4">
-                        <label class="form-label">Password</label>
-
-                        <input
-                                type="password"
-                                class="form-control"
-                                placeholder="Enter Password"
-                                required>
-                    </div>
-
-                    <button
-                            type="submit"
-                            class="btn btn-primary w-100">
-
-                        Login
-
-                    </button>
-
-                </form>
-
+            <!-- Footer -->
+            <div class="login-footer">
+                <p>AI Timetable Generator</p>
+                <small>College Academic Portal</small>
             </div>
 
         </div>
 
     </div>
-</div>
 
-<script src="js/script.js"></script>
+    <script src="js/script.js"></script>
 
 </body>
 </html>

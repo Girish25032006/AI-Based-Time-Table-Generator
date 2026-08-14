@@ -25,7 +25,14 @@
     <div class="sidebar">
 
         <div class="logo">
-            <h3>AI Timetable</h3>
+
+            <img src="images/logo.jpg" alt="SKIT Logo">
+
+            <div>
+                <h3>SKIT</h3>
+                <small>AI Academic Scheduling</small>
+            </div>
+
         </div>
 
         <ul class="nav flex-column">
@@ -110,9 +117,12 @@
 
         <nav class="navbar navbar-light bg-white shadow-sm rounded mb-4 px-4">
 
-            <h4 class="mb-0">
-                Dashboard
-            </h4>
+            <div>
+                <h2 class="welcome-title">Welcome, Admin</h2>
+                <p class="welcome-subtitle">
+                    Manage the entire academic scheduling system.
+                </p>
+            </div>
 
             <div>
                 <i class="bi bi-person-circle fs-4"></i>
@@ -130,8 +140,14 @@
             <div class="col-md-4">
                 <div class="card dashboard-card">
                     <div class="card-body">
+
+                        <div class="dashboard-icon">
+                            <i class="bi bi-building"></i>
+                        </div>
+
                         <h6>Departments</h6>
-                        <h2>6</h2>
+                        <h2 id="departmentCount">0</h2>
+
                     </div>
                 </div>
             </div>
@@ -139,17 +155,28 @@
             <div class="col-md-4">
                 <div class="card dashboard-card">
                     <div class="card-body">
+
+                        <div class="dashboard-icon">
+                            <i class="bi bi-journal-bookmark"></i>
+                        </div>
+
                         <h6>Schemes</h6>
-                        <h2>2</h2>
+                        <h2 id="schemeCount">0</h2>
+
                     </div>
                 </div>
             </div>
-
             <div class="col-md-4">
                 <div class="card dashboard-card">
                     <div class="card-body">
+
+                        <div class="dashboard-icon">
+                            <i class="bi bi-book"></i>
+                        </div>
+
                         <h6>Subjects</h6>
-                        <h2>320</h2>
+                        <h2 id="subjectCount">0</h2>
+
                     </div>
                 </div>
             </div>
@@ -157,8 +184,14 @@
             <div class="col-md-4">
                 <div class="card dashboard-card">
                     <div class="card-body">
+
+                        <div class="dashboard-icon">
+                            <i class="bi bi-people"></i>
+                        </div>
+
                         <h6>Faculty</h6>
-                        <h2>45</h2>
+                        <h2 id="facultyCount">0</h2>
+
                     </div>
                 </div>
             </div>
@@ -166,17 +199,28 @@
             <div class="col-md-4">
                 <div class="card dashboard-card">
                     <div class="card-body">
+
+                        <div class="dashboard-icon">
+                            <i class="bi bi-calendar-check"></i>
+                        </div>
+
                         <h6>Generated Timetables</h6>
-                        <h2>8</h2>
+                        <h2 id="timetableCount">0</h2>
+
                     </div>
                 </div>
             </div>
-
             <div class="col-md-4">
                 <div class="card dashboard-card">
                     <div class="card-body">
+
+                        <div class="dashboard-icon">
+                            <i class="bi bi-clock-history"></i>
+                        </div>
+
                         <h6>Pending</h6>
-                        <h2>0</h2>
+                        <h2 id="pendingCount">0</h2>
+
                     </div>
                 </div>
             </div>
@@ -185,29 +229,186 @@
 
         <!-- Quick Actions -->
 
-        <div class="mt-5">
+        <!-- Quick Actions -->
 
-            <h4 class="mb-3">
-                Quick Actions
-            </h4>
+        <!-- Dashboard Lower Section -->
 
-            <button class="btn btn-primary me-2">
-                Add Department
-            </button>
+<div class="dashboard-lower-section">
 
-            <button class="btn btn-success me-2">
-                Add Faculty
-            </button>
+    <!-- Quick Actions -->
 
-            <button class="btn btn-warning me-2">
-                Add Subject
-            </button>
+    <div class="quick-actions-section">
 
-            <button class="btn btn-danger">
-                Generate Timetable
-            </button>
+        <h4>Quick Actions</h4>
+
+        <div class="quick-actions-grid">
+
+            <a href="department.html" class="quick-action-card">
+                <i class="bi bi-building"></i>
+                <span>Add Department</span>
+            </a>
+
+            <a href="faculty.html" class="quick-action-card">
+                <i class="bi bi-person-plus"></i>
+                <span>Add Faculty</span>
+            </a>
+
+            <a href="subject.html" class="quick-action-card">
+                <i class="bi bi-file-earmark-plus"></i>
+                <span>Add Subject</span>
+            </a>
+
+            <a href="generate-timetable.html" class="quick-action-card">
+                <i class="bi bi-calendar-check"></i>
+                <span>Generate Timetable</span>
+            </a>
 
         </div>
+
+    </div>
+    
+
+    <!-- Recent Timetables -->
+
+    <div class="recent-timetables-section">
+
+        <div class="section-header">
+
+            <h4>Recent Timetables</h4>
+
+            <a href="view-timetable.html">
+                View All
+            </a>
+
+        </div>
+
+
+        <div class="timetable-item">
+
+            <div>
+                <strong>Computer Science - 5th Sem</strong>
+
+                <small>
+                    Generated on 02 May 2026
+                </small>
+            </div>
+
+            <span class="status-badge">
+                Published
+            </span>
+
+        </div>
+
+
+        <div class="timetable-item">
+
+            <div>
+                <strong>AI & ML - 3rd Sem</strong>
+
+                <small>
+                    Generated on 01 May 2026
+                </small>
+            </div>
+
+            <span class="status-badge">
+                Published
+            </span>
+
+        </div>
+
+
+        <div class="timetable-item">
+
+            <div>
+                <strong>Electronics - 7th Sem</strong>
+
+                <small>
+                    Generated on 30 Apr 2026
+                </small>
+            </div>
+
+            <span class="status-badge">
+                Published
+            </span>
+
+        </div>
+
+
+        <div class="timetable-item">
+
+            <div>
+                <strong>Information Science - 5th Sem</strong>
+
+                <small>
+                    Generated on 28 Apr 2026
+                </small>
+            </div>
+
+            <span class="status-badge">
+                Published
+            </span>
+
+        </div>
+
+    </div>
+    
+
+</div>
+
+    </div>
+
+</div>
+<!-- =========================
+     AI CHAT
+========================= -->
+
+<!-- Floating AI Button -->
+<button id="aiChatButton" class="ai-chat-button" title="AI Assistant">
+    <i class="bi bi-robot"></i>
+</button>
+
+
+<!-- AI Chat Window -->
+<div id="aiChatWindow" class="ai-chat-window">
+
+    <!-- Chat Header -->
+    <div class="ai-chat-header">
+
+        <div>
+            <strong>AI Assistant</strong>
+            <small>How can I help you?</small>
+        </div>
+
+        <button id="closeAiChat" class="ai-close-button">
+            <i class="bi bi-x-lg"></i>
+        </button>
+
+    </div>
+
+
+    <!-- Chat Messages -->
+    <div id="aiChatMessages" class="ai-chat-messages">
+
+        <div class="ai-message">
+            Hi Admin! 👋<br>
+            How can I help you with the academic scheduling system?
+        </div>
+
+    </div>
+
+
+    <!-- Chat Input -->
+    <div class="ai-chat-input">
+
+        <input
+            type="text"
+            id="aiChatInput"
+            placeholder="Ask me anything..."
+        >
+
+        <button id="aiSendButton">
+            <i class="bi bi-send"></i>
+        </button>
 
     </div>
 

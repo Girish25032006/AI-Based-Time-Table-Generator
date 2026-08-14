@@ -335,7 +335,19 @@ async function saveTimetable() {
                 "Content-Type": "application/json"
             },
 
-            body: JSON.stringify(window.generatedTimetable)
+            body: JSON.stringify({
+
+                department: document.getElementById("generateDepartment").value,
+
+                scheme: document.getElementById("generateScheme").value,
+
+                academic_year: document.getElementById("generateAcademicYear").value,
+
+                semester_type: document.getElementById("generateSemesterType").value,
+
+                timetable: window.generatedTimetable.timetable
+
+            })
         }
     );
 

@@ -1,0 +1,954 @@
+/* =========================================
+   ACADEMIC YEAR PAGE
+========================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f8faf9;
+    color: #172b4d;
+}
+
+
+/* =========================================
+   MAIN LAYOUT
+========================================= */
+
+.app-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+
+/* =========================================
+   SIDEBAR
+========================================= */
+
+.sidebar {
+    width: 220px;
+    min-height: 100vh;
+
+    background: #ffffff;
+    border-right: 1px solid #e5e7eb;
+
+    display: flex;
+    flex-direction: column;
+
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+}
+
+
+/* Logo */
+
+.sidebar-logo {
+    height: 70px;
+
+    display: flex;
+    align-items: center;
+
+    padding: 0 20px;
+
+    border-bottom: 1px solid #edf0ef;
+
+    color: #087f4f;
+
+    font-size: 17px;
+    font-weight: 700;
+}
+
+
+/* Navigation */
+
+.sidebar-nav {
+    padding: 18px 10px;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 5px;
+}
+
+
+/* Sidebar links */
+
+.sidebar-link {
+    min-height: 42px;
+
+    padding: 0 14px;
+
+    border-radius: 9px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 13px;
+
+    color: #344054;
+
+    text-decoration: none;
+
+    font-size: 13px;
+    font-weight: 500;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
+}
+
+
+.sidebar-link i {
+    width: 18px;
+
+    font-size: 16px;
+
+    color: #148a55;
+}
+
+
+/* Hover */
+
+.sidebar-link:hover {
+    background: #eef8f3;
+
+    color: #148a55;
+}
+
+
+/* Active */
+
+.sidebar-link.active {
+    background: #148a55;
+
+    color: #ffffff;
+
+    font-weight: 600;
+}
+
+
+.sidebar-link.active i {
+    color: #ffffff;
+}
+
+
+/* Bottom */
+
+.sidebar-bottom {
+    margin-top: auto;
+
+    padding: 14px 10px;
+
+    border-top: 1px solid #edf0ef;
+}
+
+
+/* =========================================
+   MAIN CONTENT
+========================================= */
+
+.main-content {
+    margin-left: 220px;
+
+    width: calc(100% - 220px);
+
+    min-height: 100vh;
+
+    padding: 28px 30px;
+}
+
+
+/* =========================================
+   PAGE HEADER
+========================================= */
+
+.page-header {
+    min-height: 78px;
+
+    padding: 20px 22px;
+
+    margin-bottom: 22px;
+
+    background: #ffffff;
+
+    border: 1px solid #e6ebe8;
+
+    border-radius: 14px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    box-shadow:
+        0 2px 8px rgba(16, 24, 40, 0.04);
+}
+
+
+.page-header h1 {
+    margin: 0 0 5px;
+
+    font-size: 22px;
+
+    color: #172b4d;
+}
+
+
+.page-header p {
+    margin: 0;
+
+    color: #667085;
+
+    font-size: 13px;
+}
+
+
+/* Admin */
+
+.admin-info {
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+    color: #172b4d;
+
+    font-size: 14px;
+
+    font-weight: 600;
+}
+
+
+.admin-info i {
+    color: #148a55;
+
+    font-size: 22px;
+}
+
+
+/* =========================================
+   TOOLBAR
+========================================= */
+
+.toolbar {
+    display: flex;
+
+    align-items: center;
+
+    gap: 14px;
+
+    margin-bottom: 16px;
+}
+
+
+/* Search */
+
+.search-box {
+    flex: 1;
+
+    height: 44px;
+
+    position: relative;
+}
+
+
+.search-box i {
+    position: absolute;
+
+    left: 14px;
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    color: #98a2b3;
+
+    font-size: 15px;
+}
+
+
+.search-box input {
+    width: 100%;
+    height: 100%;
+
+    padding: 0 14px 0 40px;
+
+    border: 1px solid #d0d5dd;
+
+    border-radius: 9px;
+
+    outline: none;
+
+    background: #ffffff;
+
+    color: #344054;
+
+    font-size: 13px;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.search-box input::placeholder {
+    color: #98a2b3;
+}
+
+
+.search-box input:focus {
+    border-color: #148a55;
+
+    box-shadow:
+        0 0 0 3px rgba(20, 138, 85, 0.10);
+}
+
+
+/* =========================================
+   ADD BUTTON
+========================================= */
+
+.add-btn {
+    height: 44px;
+
+    padding: 0 17px;
+
+    border: 1px solid #148a55;
+
+    border-radius: 9px;
+
+    background: #148a55;
+
+    color: #ffffff;
+
+    font-family: inherit;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 7px;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.15s ease;
+}
+
+
+.add-btn i {
+    font-size: 15px;
+}
+
+
+.add-btn:hover {
+    background: #107547;
+
+    box-shadow:
+        0 3px 8px rgba(20, 138, 85, 0.16);
+
+    transform: translateY(-1px);
+}
+
+
+.add-btn:active {
+    transform: translateY(0);
+}
+
+
+/* =========================================
+   TABLE CONTAINER
+========================================= */
+
+.table-container {
+    width: 100%;
+
+    background: #ffffff;
+
+    border: 1px solid #e1e8e4;
+
+    border-radius: 12px;
+
+    overflow-x: auto;
+
+    box-shadow:
+        0 2px 8px rgba(16, 24, 40, 0.03);
+}
+
+
+/* =========================================
+   TABLE
+========================================= */
+
+table {
+    width: 100%;
+
+    border-collapse: collapse;
+
+    min-width: 650px;
+}
+
+
+/* Table Header */
+
+thead {
+    background: #f2f6fc;
+}
+
+
+th {
+    height: 44px;
+
+    padding: 0 14px;
+
+    text-align: left;
+
+    border-bottom: 1px solid #dfe5ec;
+
+    color: #344054;
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    white-space: nowrap;
+}
+
+
+/* Table Body */
+
+td {
+    height: 58px;
+
+    padding: 10px 14px;
+
+    border-bottom: 1px solid #eaecf0;
+
+    color: #344054;
+
+    font-size: 13px;
+
+    white-space: nowrap;
+}
+
+
+tbody tr:last-child td {
+    border-bottom: none;
+}
+
+
+tbody tr:hover {
+    background: #f9fbfa;
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 900px) {
+
+    .sidebar {
+        width: 190px;
+    }
+
+    .main-content {
+        margin-left: 190px;
+
+        width: calc(100% - 190px);
+
+        padding: 22px;
+    }
+
+    .toolbar {
+        flex-direction: column;
+
+        align-items: stretch;
+    }
+
+    .add-btn {
+        width: 100%;
+    }
+
+}
+
+
+@media (max-width: 650px) {
+
+    .sidebar {
+        width: 70px;
+    }
+
+    .sidebar-logo {
+        justify-content: center;
+
+        padding: 0;
+
+        font-size: 0;
+    }
+
+    .sidebar-logo::after {
+        content: "AI";
+
+        font-size: 18px;
+    }
+
+    .sidebar-link {
+        justify-content: center;
+
+        padding: 0;
+    }
+
+    .sidebar-link span {
+        display: none;
+    }
+
+    .sidebar-link {
+        gap: 0;
+    }
+
+    .main-content {
+        margin-left: 70px;
+
+        width: calc(100% - 70px);
+
+        padding: 18px;
+    }
+
+    .page-header {
+        align-items: flex-start;
+
+        gap: 15px;
+
+        flex-direction: column;
+    }
+
+}
+
+/* =========================================
+   ACADEMIC YEAR GRID
+========================================= */
+.academic-year-grid {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    align-items: stretch;
+}
+
+
+/* =========================================
+   ACADEMIC YEAR CARD
+========================================= */
+
+.academic-year-card {
+    min-height: 150px;
+    height: 150px;
+
+    padding: 18px;
+
+    background: #ffffff;
+
+    border: 1px solid #e1e8e4;
+
+    border-radius: 14px;
+
+    box-sizing: border-box;
+
+    display: flex;
+    flex-direction: column;
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        border-color 0.2s ease;
+}
+
+
+.academic-year-card:hover {
+    border-color: #cddfd5;
+
+    box-shadow:
+        0 6px 18px rgba(16, 24, 40, 0.07);
+
+    transform: translateY(-2px);
+}
+
+
+/* =========================================
+   CARD TOP
+========================================= */
+
+.academic-year-card-top {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 12px;
+}
+
+
+/* =========================================
+   CALENDAR ICON
+========================================= */
+
+.academic-year-icon {
+    width: 52px;
+    height: 52px;
+
+    flex-shrink: 0;
+
+    border-radius: 13px;
+
+    background: #eaf7f0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+}
+
+
+.academic-year-icon i {
+    font-size: 24px;
+
+    color: #148a55;
+}
+
+
+/* =========================================
+   STATUS
+========================================= */
+
+.academic-year-status {
+    height: 27px;
+
+    padding: 0 9px;
+
+    border-radius: 20px;
+
+    background: #eaf7f0;
+
+    color: #148a55;
+
+    font-size: 11px;
+
+    font-weight: 600;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 6px;
+}
+
+
+.status-dot {
+    width: 6px;
+    height: 6px;
+
+    border-radius: 50%;
+
+    background: #148a55;
+}
+
+
+/* =========================================
+   CARD CONTENT
+========================================= */
+
+.academic-year-card-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+}
+
+
+.academic-year-value {
+    color: #172b4d;
+
+    font-size: 22px;
+
+    font-weight: 700;
+
+    line-height: 1.2;
+}
+
+
+.academic-year-label {
+    margin-top: 5px;
+
+    color: #667085;
+
+    font-size: 13px;
+}
+
+
+/* =========================================
+   CARD ACTIONS
+========================================= */
+
+.academic-year-card-actions {
+    margin-top: auto;
+
+    padding-top: 18px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+}
+
+
+/* =========================================
+   EDIT BUTTON
+========================================= */
+
+.academic-year-edit-btn,
+.academic-year-delete-btn {
+    height: 34px;
+
+    padding: 0 12px;
+
+    border-radius: 7px;
+
+    font-family: inherit;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 6px;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.15s ease;
+}
+
+
+.academic-year-edit-btn {
+    border: 1px solid #148a55;
+
+    background: #ffffff;
+
+    color: #148a55;
+}
+
+
+.academic-year-edit-btn:hover {
+    background: #eaf7f0;
+
+    color: #107547;
+
+    transform: translateY(-1px);
+}
+
+
+/* =========================================
+   DELETE BUTTON
+========================================= */
+
+.academic-year-delete-btn {
+    border: 1px solid #f04438;
+
+    background: #ffffff;
+
+    color: #d92d20;
+}
+
+
+.academic-year-delete-btn:hover {
+    background: #fff4f3;
+
+    color: #b42318;
+
+    transform: translateY(-1px);
+}
+
+
+/* =========================================
+   EMPTY / ERROR STATE
+========================================= */
+
+.academic-year-empty {
+    width: 100%;
+
+    min-height: 220px;
+
+    grid-column: 1 / -1;
+
+    background: #ffffff;
+
+    border: 1px dashed #d0d5dd;
+
+    border-radius: 14px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    color: #98a2b3;
+}
+
+
+.academic-year-empty i {
+    font-size: 30px;
+
+    margin-bottom: 10px;
+}
+
+
+.academic-year-empty p {
+    margin: 0;
+
+    font-size: 13px;
+}
+
+
+/* =========================================
+   RESPONSIVE GRID
+========================================= */
+
+@media (max-width: 1100px) {
+
+    .academic-year-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+
+@media (max-width: 650px) {
+
+    .academic-year-grid {
+        grid-template-columns: 1fr;
+
+        gap: 14px;
+    }
+
+
+    .academic-year-card {
+        min-height: 190px;
+
+        padding: 18px;
+    }
+
+}
+/* =========================================
+   UPDATE MODE
+========================================= */
+
+.academic-year-card-actions {
+    display: none;
+
+    margin-top: auto;
+
+    padding-top: 18px;
+
+    justify-content: flex-end;
+
+    gap: 8px;
+}
+
+
+/* Show Edit/Delete only after Update is clicked */
+
+.academic-year-update-mode
+.academic-year-card-actions {
+    display: flex;
+}
+
+
+/* Update button active */
+
+.update-btn {
+    height: 44px;
+
+    padding: 0 18px;
+
+    border: 1px solid #148a55;
+
+    border-radius: 9px;
+
+    background: #ffffff;
+
+    color: #148a55;
+
+    font-family: inherit;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 7px;
+
+    cursor: pointer;
+
+    transition: all 0.2s ease;
+}
+
+
+.update-btn:hover {
+    background: #eaf7f0;
+}
+
+
+.update-btn.active {
+    background: #148a55;
+
+    color: #ffffff;
+}
+
+.academic-year-card-actions {
+    display: none;
+
+    margin-top: auto;
+
+    justify-content: flex-end;
+
+    gap: 8px;
+}
+
+.academic-year-update-mode
+.academic-year-card-actions {
+    display: flex;
+}

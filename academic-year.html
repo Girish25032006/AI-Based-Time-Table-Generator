@@ -173,31 +173,47 @@
              SEARCH + ADD
         ====================================== -->
 
-        <div class="toolbar">
-
-            <div class="search-box">
-
-                <i class="bi bi-search"></i>
-
-                <input
-                    type="text"
-                    id="searchAcademicYear"
-                    placeholder="Search Academic Year"
-                >
-
-            </div>
 
 
-            <button
-                type="button"
-                id="addAcademicYearBtn"
-                class="add-btn">
+            <div class="toolbar">
 
-                <i class="bi bi-plus-circle"></i>
+              <div class="search-box">
 
-                Add Academic Year
+                  <i class="bi bi-search"></i>
 
-            </button>
+                  <input
+                      type="text"
+                      id="searchAcademicYear"
+                      placeholder="Search Academic Year"
+                  >
+
+              </div>
+
+
+              <button
+                  type="button"
+                  id="updateAcademicYearBtn"
+                  class="update-btn">
+
+                  <i class="bi bi-pencil-square"></i>
+
+                  Update
+
+              </button>
+
+
+              <button
+                  type="button"
+                  id="addAcademicYearBtn"
+                  class="add-btn">
+
+                  <i class="bi bi-plus-circle"></i>
+
+                  Add Academic Year
+
+              </button>
+
+          </div>
 
         </div>
 
@@ -206,36 +222,17 @@
              TABLE
         ====================================== -->
 
-        <div class="table-container">
+        <!-- =====================================
+              ACADEMIC YEAR CARDS
+          ====================================== -->
 
-            <table>
+          <div
+              id="academicYearGrid"
+              class="academic-year-grid">
 
-                <thead>
+              <!-- Academic year cards will be loaded here -->
 
-                    <tr>
-
-                        <th>ID</th>
-
-                        <th>Academic Year</th>
-
-                        <th>Status</th>
-
-                        <th>Action</th>
-
-                    </tr>
-
-                </thead>
-
-
-                <tbody id="academicYearTableBody">
-
-                    <!-- Data will come from JavaScript -->
-
-                </tbody>
-
-            </table>
-
-        </div>
+          </div>
 
 
     </main>

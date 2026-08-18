@@ -390,3 +390,49 @@ document
         );
 
     });
+
+// =========================================
+// ACADEMIC YEAR CARD SEARCH
+// =========================================
+
+const academicYearSearch =
+    document.getElementById("searchAcademicYear");
+
+if (academicYearSearch) {
+
+    academicYearSearch.addEventListener(
+        "input",
+        function () {
+
+            const searchValue =
+                this.value.trim().toLowerCase();
+
+            const cards =
+                document.querySelectorAll(
+                    "#academicYearGrid .academic-year-card"
+                );
+
+            cards.forEach(function (card) {
+
+                const cardText =
+                    card.textContent.toLowerCase();
+
+                if (
+                    searchValue === "" ||
+                    cardText.includes(searchValue)
+                ) {
+
+                    card.style.display = "flex";
+
+                } else {
+
+                    card.style.display = "none";
+
+                }
+
+            });
+
+        }
+    );
+
+}

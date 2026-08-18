@@ -270,3 +270,16 @@
 .scheme-view-btn:active {
     transform: translateY(0);
 }
+
+/* Scheme Update Button */
+#updateScheme {
+    background: #ffffff !important;
+    color: #148a55 !important;
+    border: 1px solid #148a55 !important;
+    border-radius: 9px !important;
+}
+
+#updateScheme:hover {
+    background: #eaf7f0 !important;
+    color: #148a55 !important;
+}

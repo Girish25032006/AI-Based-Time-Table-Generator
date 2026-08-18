@@ -14,6 +14,7 @@
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/subject.css">
 
 </head>
 
@@ -112,56 +113,115 @@
 
     <div class="main-content">
 
-        <nav class="navbar bg-white shadow-sm rounded px-4 mb-4">
+        <div class="subject-page-header">
 
-            <h4>Subject Management</h4>
+    <div>
+       
 
+        <h2>Subjects Directory</h2>
+
+        <p>Manage and organize subjects offered by departments.</p>
+    </div>
+
+    <div class="subject-admin">
+        <i class="bi bi-person-circle"></i>
+        <b>Admin</b>
+    </div>
+
+        </div>
+        <div class="subject-stats-row">
+
+        <div class="subject-stat-card">
+            <div class="stat-icon">
+                <i class="bi bi-book"></i>
+            </div>
             <div>
+                <h3 id="totalSubjects">0</h3>
+                <p>Total Subjects</p>
+                <span>Across all departments</span>
+            </div>
+        </div>
 
-                <i class="bi bi-person-circle fs-4"></i>
+    <div class="subject-stat-card">
+        <div class="stat-icon">
+            <i class="bi bi-book"></i>
+        </div>
+        <div>
+            <h3 id="theorySubjects">0</h3>
+            <p>Theory Subjects</p>
+            <span>From imported subject hours</span>
+        </div>
+    </div>
 
-                <b class="ms-2">Admin</b>
+    <div class="subject-stat-card">
+        <div class="stat-icon purple">
+            <i class="bi bi-journal-code"></i>
+        </div>
+        <div>
+            <h3 id="labSubjects">0</h3>
+            <p>Lab Subjects</p>
+            <span>Includes practical subjects</span>
+        </div>
+    </div>
+    <div class="subject-stat-card">
+    <div class="stat-icon integrated">
+        <i class="bi bi-layers"></i>
+    </div>
+    <div>
+        <h3 id="integratedSubjects">0</h3>
+        <p>Integrated Subjects</p>
+        <span>Includes theory and practical</span>
+    </div>
+</div>
 
+</div>
+        <div class="subject-chart-card">
+
+            <div class="subject-chart-header">
+                <div>
+                    <h5>Subject Type Distribution</h5>
+                    <p>Based on selected filters</p>
+                </div>
             </div>
 
-        </nav>
+            <div class="subject-chart-container">
+                <canvas id="subjectTypeChart"></canvas>
+            </div>
+
+        </div>
 
         <!-- Filters -->
 
-        <div class="row mb-3">
+        <div class="subject-filter-row">
 
-    <div class="col-md-4">
-        <label class="form-label">Department</label>
-        <select class="form-select" id="filterDepartment">
-            <option value="">All Departments</option>
-            
-        </select>
-    </div>
+    <select class="form-select" id="filterDepartment">
+        <option value="">All Departments</option>
+    </select>
 
-    <div class="col-md-4">
-        <label class="form-label">Scheme</label>
-        <select class="form-select" id="filterScheme">
-            <option value="">All Schemes</option>
-            
-        </select>
-    </div>
+    <select class="form-select" id="filterScheme">
+        <option value="">All Schemes</option>
+    </select>
 
-    <div class="col-md-4">
-        <label class="form-label">Semester</label>
-        <select class="form-select" id="filterSemester">
-            <option value="">All Semesters</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-            <option value="6">6</option>
-            <option value="7">7</option>
-            <option value="8">8</option>
-        </select>
-    </div>
+    <select class="form-select" id="filterSemester">
+        <option value="">All Semesters</option>
+        <option value="1">Semester 1</option>
+        <option value="2">Semester 2</option>
+        <option value="3">Semester 3</option>
+        <option value="4">Semester 4</option>
+        <option value="5">Semester 5</option>
+        <option value="6">Semester 6</option>
+        <option value="7">Semester 7</option>
+        <option value="8">Semester 8</option>
+    </select>
 
-</div>
+    <select class="form-select" id="filterType">
+        <option value="">All Types</option>
+        <option value="Theory">Theory</option>
+        <option value="Lab">Lab</option>
+        <option value="Integrated">Integrated</option>
+    </select>
+
+        </div>
 
         <!-- Subject Table -->
 
@@ -169,30 +229,47 @@
 
             <div class="card-body">
 
-                <div class="d-flex justify-content-between mb-3">
+                <div class="subject-action-row">
 
-                    <input
-                        type="text"
-                        class="form-control w-50"
-                        id="searchSubject"
-                        placeholder="Search Subject">
+    <div class="subject-search-box">
+        <i class="bi bi-search"></i>
 
-                    <button
-                        class="btn btn-primary"
-                        data-bs-toggle="modal"
-                        data-bs-target="#subjectModal">
+        <input
+            type="text"
+            id="searchSubject"
+            placeholder="Search subjects...">
+    </div>
 
-                        <i class="bi bi-plus-circle"></i>
+    <div class="subject-action-buttons">
 
-                        Add Subject
+        <button
+            class="subject-add-btn"
+            data-bs-toggle="modal"
+            data-bs-target="#subjectModal">
 
-                    </button>
+            <i class="bi bi-plus-circle"></i>
+            Add New Subject
+
+        </button>
+
+        <button
+            id="importSubjectsBtn"
+            class="subject-import-btn"
+            type="button">
+
+            <i class="bi bi-file-earmark-pdf"></i>
+            Import Subjects
+
+        </button>
+        <input type="file" id="subjectPdfInput" accept=".pdf" hidden>
+
+    </div>
 
                 </div>
 
-                <table class="table table-hover table-bordered">
+                <table class="table table-hover table-bordered subject-table">
 
-                    <thead class="table-primary">
+    <thead>
 
 <tr>
 
@@ -390,19 +467,7 @@
                                 <option value="C">Chemistry Cycle</option>
                             </select>
                         </div>
-                        <div class="col-md-4 mb-3" id="groupField">
-
-                            <label class="form-label">
-                                Group
-                            </label>
-
-                            <input
-                                type="number"
-                                id="groupId"
-                                class="form-control"
-                                placeholder="1">
-
-                        </div>
+                        
                         <div class="col-md-4 mb-3" id="optionalField">
 
                             <label class="form-label">
@@ -418,18 +483,7 @@
                             </select>
 
                         </div>
-                        <div class="col-md-4 mb-3" id="optionGroupField">
-                            <label class="form-label">
-                                Option Group
-                            </label>
-
-                            <input
-                                type="number"
-                                id="optionGroupId"
-                                class="form-control"
-                                placeholder="1">
-
-                        </div>
+                        
 
                         
 
@@ -464,10 +518,99 @@
         </div>
 
 </div>
+<!-- Import Subjects Preview Modal -->
+
+<div class="modal fade" id="importPreviewModal" tabindex="-1">
+
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title">
+                    <i class="bi bi-file-earmark-check"></i>
+                    Imported Subjects Preview
+                </h5>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal">
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <div class="alert alert-info">
+                    Review the extracted subjects before importing them into the database.
+                </div>
+
+                <div class="table-responsive">
+
+                    <table class="table table-bordered table-hover">
+
+                        <thead>
+                           <tr>
+                                <th>Code</th>
+                                <th>Subject Name</th>
+                                <th>Department Code</th>
+                                <th>Scheme</th>
+                                <th>Semester</th>
+                                <th>Lecture</th>
+                                <th>Tutorial</th>
+                                <th>Practical</th>
+                                <th>Credits</th>
+                                <th>Cycle</th>
+                                <th>Optional</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="importPreviewTableBody">
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <span class="me-auto text-muted" id="importPreviewCount">
+                    0 subjects
+                </span>
+
+                <button
+                    type="button"
+                    class="btn btn-secondary"
+                    data-bs-dismiss="modal">
+                    Cancel
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    id="confirmImportBtn">
+                    <i class="bi bi-database-add"></i>
+                    Import Subjects
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
 
 <!-- Bootstrap JS -->
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <script src="js/subject.js"></script>
 </body>
 

@@ -1,0 +1,518 @@
+/* =========================
+   SUBJECT PAGE HEADER
+========================= */
+
+.subject-page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 25px;
+}
+
+.subject-breadcrumb {
+    color: #8a9290;
+    font-size: 13px;
+    margin-bottom: 6px;
+}
+
+.subject-breadcrumb span {
+    margin: 0 6px;
+    color: #b0b8b4;
+}
+
+.subject-page-header h2 {
+    margin: 0;
+
+    color: #111827;
+
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.subject-page-header p {
+    margin: 6px 0 0;
+
+    color: #6b7280;
+
+    font-size: 14px;
+}
+
+.subject-admin {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    color: #374151;
+
+    font-size: 14px;
+}
+
+.subject-admin i {
+    color: #168653;
+    font-size: 24px;
+}
+
+/* =========================
+   SUBJECT STATISTICS
+========================= */
+
+.subject-stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+
+    margin-bottom: 18px;
+}
+
+.subject-stat-card {
+    min-height: 110px;
+
+    background: #ffffff;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+
+    padding: 18px;
+
+    display: flex;
+    align-items: center;
+    gap: 14px;
+
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.stat-icon {
+    width: 42px;
+    height: 42px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #e8f7ef;
+    color: #168653;
+
+    border-radius: 9px;
+
+    font-size: 20px;
+}
+
+.stat-icon.purple {
+    background: #f2eafe;
+    color: #8b5cf6;
+}
+
+.subject-stat-card h3 {
+    margin: 0 0 3px;
+
+    color: #111827;
+
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.subject-stat-card p {
+    margin: 0;
+
+    color: #374151;
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.subject-stat-card span {
+    display: block;
+
+    margin-top: 4px;
+
+    color: #9ca3af;
+
+    font-size: 11px;
+}
+
+/* =========================
+   SUBJECT FILTERS
+========================= */
+
+.subject-filter-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 12px;
+
+    margin-bottom: 14px;
+}
+
+.subject-filter-row .form-select {
+    height: 42px;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+
+    padding: 0 14px;
+
+    color: #374151;
+    background-color: #ffffff;
+
+    font-size: 13px;
+
+    box-shadow: none;
+}
+
+.subject-filter-row .form-select:focus {
+    border-color: #168653;
+
+    box-shadow: 0 0 0 2px rgba(22, 134, 83, 0.08);
+}
+/* =========================
+   SUBJECT SEARCH + ACTIONS
+========================= */
+
+.subject-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
+    margin-bottom: 14px;
+}
+
+.subject-search {
+    flex: 1;
+    position: relative;
+}
+
+.subject-search input {
+    width: 100%;
+    height: 42px;
+
+    padding: 0 14px 0 40px;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+
+    font-size: 13px;
+    color: #374151;
+
+    outline: none;
+}
+
+.subject-search input:focus {
+    border-color: #168653;
+    box-shadow: 0 0 0 2px rgba(22, 134, 83, 0.08);
+}
+
+.subject-action-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.subject-action-buttons button {
+    height: 42px;
+
+    padding: 0 18px;
+
+    border-radius: 8px;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+.subject-add-btn {
+    background: #168653;
+    color: #ffffff;
+    border: 1px solid #168653;
+}
+
+.subject-add-btn:hover {
+    background: #0d7045;
+}
+
+.subject-import-btn {
+    background: #ffffff;
+    color: #374151;
+    border: 1px solid #d1d5db;
+}
+
+.subject-import-btn:hover {
+    border-color: #168653;
+    color: #168653;
+}
+
+/* =========================
+   SUBJECT FILTERS
+========================= */
+
+.subject-filter-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.subject-filter-row .form-select {
+    height: 38px;
+    border: 1px solid #d9e0e5;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #334155;
+    background-color: #fff;
+}
+
+
+/* =========================
+   SUBJECT ACTION ROW
+========================= */
+
+.subject-action-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.subject-search-box {
+    position: relative;
+    width: 100%;
+    max-width: none;
+}
+
+.subject-search-box i {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #64748b;
+    font-size: 14px;
+}
+
+.subject-search-box input {
+    width: 100%;
+    height: 38px;
+    padding: 0 12px 0 32px;
+    border: 1px solid #d9e0e5;
+    border-radius: 8px;
+    font-size: 13px;
+    outline: none;
+}
+
+.subject-search-box input:focus {
+    border-color: #148a55;
+    box-shadow: 0 0 0 2px rgba(20, 138, 85, 0.08);
+}
+
+
+/* =========================
+   SUBJECT ACTION BUTTONS
+========================= */
+
+/* =========================
+   SUBJECT ACTION BUTTONS
+========================= */
+
+.subject-action-buttons {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.subject-add-btn,
+.subject-import-btn {
+    height: 42px !important;
+    min-width: 125px;
+
+    padding: 0 16px !important;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+
+    border-radius: 9px !important;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+/* Add New Subject */
+.subject-add-btn {
+    background: #168653 !important;
+    color: #ffffff !important;
+    border: 1px solid #168653 !important;
+}
+
+.subject-add-btn:hover {
+    background: #0d7045 !important;
+    border-color: #0d7045 !important;
+}
+
+/* Import Subjects */
+.subject-import-btn {
+    background: #ffffff !important;
+    color: #374151 !important;
+    border: 1px solid #148a55 !important;
+}
+
+.subject-import-btn:hover {
+    background: #f0fdf4 !important;
+    color: #148a55 !important;
+    border-color: #148a55 !important;
+}
+.stat-icon.integrated {
+    background: #fff4d6;
+    color: #d89b00;
+}
+
+/* =========================
+   SUBJECT TYPE CHART
+========================= */
+
+.subject-chart-card {
+    width: 100%;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 18px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    
+}
+
+.subject-chart-header h5 {
+    margin: 0;
+
+    color: #111827;
+
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.subject-chart-header p {
+    margin: 4px 0 0;
+
+    color: #9ca3af;
+
+    font-size: 12px;
+}
+
+.subject-chart-container {
+    width: 220px;
+    height: 220px;
+
+    margin: 10px auto 0;
+}
+.subject-chart-container canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+
+/* =========================
+   SUBJECT TABLE ACTIONS
+========================= */
+
+.subject-table .edit-btn,
+.subject-table .delete-btn {
+    height: 34px;
+    min-width: 34px;
+
+    padding: 0 10px;
+
+    border-radius: 7px;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+/* Edit */
+.subject-table .edit-btn {
+    background: #ffffff;
+    color: #148a55;
+
+    border: 1px solid #148a55;
+}
+
+.subject-table .edit-btn:hover {
+    background: #eaf7f0;
+    color: #107547;
+}
+
+/* Delete */
+.subject-table .delete-btn {
+    background: #ffffff;
+    color: #dc3545;
+
+    border: 1px solid #dc3545;
+}
+
+.subject-table .delete-btn:hover {
+    background: #fff1f2;
+    color: #b42318;
+}
+
+/* =========================
+   SUBJECT TABLE
+========================= */
+
+.subject-table {
+    width: 100%;
+    margin-bottom: 0;
+
+    border-collapse: separate;
+    border-spacing: 0;
+
+    font-size: 13px;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.subject-table thead th {
+    background: #168653 !important;
+    color: #ffffff !important;
+
+    border: none !important;
+
+    padding: 13px 12px;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+.subject-table tbody td {
+    padding: 12px;
+
+    color: #374151;
+
+    border-color: #edf1ee !important;
+
+    vertical-align: middle;
+}
+
+.subject-table tbody tr:hover {
+    background: #f7faf8;
+}

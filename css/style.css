@@ -1501,6 +1501,10 @@ body{
    TOP BUTTONS
 ========================= */
 
+/* =========================
+   TOP BUTTONS
+========================= */
+
 .department-action-btn {
     height: 44px !important;
     min-width: 125px !important;
@@ -1512,19 +1516,138 @@ body{
     justify-content: center;
     gap: 6px;
 
-    border: none !important;
-    border-radius: 8px !important;
+    border-radius: 9px !important;
 
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: .2s;
+}
+
+
+/* Update button */
+
+#updateDepartment {
+    height: 52px !important;
+    min-width: 150px !important;
+
+    padding: 0 24px !important;
+
+    background: #eaf7f0 !important;
+    color: #168653 !important;
+
+    border: 1px solid #148a55 !important;
+    border-radius: 18px !important;
+
+    font-size: 18px !important;
+    font-weight: 700 !important;
+
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 10px !important;
+
+    cursor: pointer;
+}
+
+#updateDepartment:hover {
+    background: #eaf7f0 !important;
+}
+
+
+/* Add Department button */
+.btn-add-department {
+    background: #148a55 !important;
+    color: #ffffff !important;
+    border: 1px solid #148a55 !important;
+}
+
+.btn-add-department:hover {
+    background: #107547 !important;
+}
+
+#updateDepartmentBtn:hover {
+    background: #eaf7f0 !important;
+}
+
+
+/* Add Department button */
+#addDepartmentBtn {
+    background: #148a55 !important;
+    color: #ffffff !important;
+    border: 1px solid #148a55 !important;
+}
+
+#addDepartmentBtn:hover {
+    background: #107547 !important;
+}
+
+
+/* Update button */
+
+#updateDepartmentBtn {
+    background: #ffffff !important;
+    color: #168653 !important;
+    border: 1px solid #168653 !important;
+}
+
+#updateDepartmentBtn:hover {
+    background: #eef8f2 !important;
+}
+
+
+/* Add Department button */
+
+#addDepartmentBtn {
     background: #168653 !important;
     color: #ffffff !important;
-
-    font-size: 14px;
-    font-weight: 600;
+    border: 1px solid #168653 !important;
 }
 
-.department-action-btn:hover {
+/* =========================
+   TOP BUTTONS
+========================= */
+
+.department-action-btn {
+    height: 44px !important;
+    min-width: 125px !important;
+    padding: 0 18px !important;
+
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+
+    border-radius: 9px !important;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+    transition: .2s;
+}
+
+
+/* Update */
+
+
+
+
+/* Add Department */
+
+.btn-add-department {
+    background: #168653 !important;
+    color: #ffffff !important;
+    border: 1px solid #168653 !important;
+}
+
+.btn-add-department:hover {
     background: #0d7045 !important;
 }
+
+
 
 
 /* =========================

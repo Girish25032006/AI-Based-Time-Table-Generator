@@ -27,6 +27,7 @@ async function fetchDepartments() {
         departments = await response.json();
 
         loadDepartmentDropdown();
+
         displayDepartmentCards();
 
     } catch (error) {
@@ -53,8 +54,9 @@ function loadDepartmentDropdown() {
         return;
     }
 
-    dropdown.innerHTML =
-        '<option value="">Select Department</option>';
+    dropdown.innerHTML = `
+        <option value="">Select Department</option>
+    `;
 
     departments.forEach(department => {
 
@@ -85,13 +87,15 @@ async function fetchFaculties() {
 
         faculties = await response.json();
 
-        /*
-         * If user is currently viewing a department,
-         * refresh that department.
-         */
         if (selectedDepartmentCode) {
 
-            displayDepartmentFaculty(selectedDepartmentCode);
+            displayDepartmentFaculty(
+                selectedDepartmentCode
+            );
+
+        } else {
+
+            displayDepartmentCards();
 
         }
 
@@ -115,11 +119,20 @@ function displayDepartmentCards() {
     const container =
         document.getElementById("facultyDepartmentCards");
 
+    const departmentView =
+        document.getElementById("facultyDepartmentView");
+
     if (!container) {
         return;
     }
 
     selectedDepartmentCode = null;
+
+    container.style.display = "";
+
+    if (departmentView) {
+        departmentView.style.display = "none";
+    }
 
     container.innerHTML = "";
 
@@ -141,13 +154,12 @@ function displayDepartmentCards() {
 
     departments.forEach(department => {
 
-        /*
-         * Count faculty belonging to this department
-         */
-        const facultyCount = faculties.filter(
-            faculty =>
-                faculty.department_code === department.department_code
-        ).length;
+        const facultyCount =
+            faculties.filter(
+                faculty =>
+                    faculty.department_code ===
+                    department.department_code
+            ).length;
 
 
         container.innerHTML += `
@@ -163,8 +175,8 @@ function displayDepartmentCards() {
                             <div
                                 class="rounded p-3 me-3"
                                 style="
-                                    background-color: #e8f5ee;
-                                    color: #087f3f;
+                                    background-color:#e8f5ee;
+                                    color:#087f3f;
                                 "
                             >
 
@@ -178,11 +190,15 @@ function displayDepartmentCards() {
                                     class="mb-1"
                                     style="color:#087f3f;"
                                 >
-                                    ${department.department_code}
+                                    ${escapeHtml(
+                                        department.department_code
+                                    )}
                                 </h5>
 
                                 <small class="text-muted">
-                                    ${department.department_name}
+                                    ${escapeHtml(
+                                        department.department_name
+                                    )}
                                 </small>
 
                             </div>
@@ -206,11 +222,17 @@ function displayDepartmentCards() {
                         <button
                             type="button"
                             class="btn btn-success w-100"
-                            style="color: white !important;"
-                            onclick="viewDepartmentFaculty('${department.department_code}')"
+                            onclick="viewDepartmentFaculty(
+                                '${escapeJs(
+                                    department.department_code
+                                )}'
+                            )"
                         >
+
                             <i class="bi bi-eye me-1"></i>
+
                             View Details
+
                         </button>
 
                     </div>
@@ -227,14 +249,17 @@ function displayDepartmentCards() {
 
 
 // ============================================================
-// VIEW PARTICULAR DEPARTMENT FACULTY
+// VIEW PARTICULAR DEPARTMENT
 // ============================================================
 
 function viewDepartmentFaculty(departmentCode) {
 
-    selectedDepartmentCode = departmentCode;
+    selectedDepartmentCode =
+        departmentCode;
 
-    displayDepartmentFaculty(departmentCode);
+    displayDepartmentFaculty(
+        departmentCode
+    );
 
 }
 
@@ -245,18 +270,27 @@ function viewDepartmentFaculty(departmentCode) {
 
 function displayDepartmentFaculty(departmentCode) {
 
-    const container =
-        document.getElementById("facultyDepartmentCards");
+    const cards =
+        document.getElementById(
+            "facultyDepartmentCards"
+        );
 
-    if (!container) {
+    const departmentView =
+        document.getElementById(
+            "facultyDepartmentView"
+        );
+
+    if (!cards || !departmentView) {
         return;
     }
 
 
-    const department = departments.find(
-        dept =>
-            dept.department_code === departmentCode
-    );
+    const department =
+        departments.find(
+            dept =>
+                dept.department_code ===
+                departmentCode
+        );
 
 
     if (!department) {
@@ -264,125 +298,61 @@ function displayDepartmentFaculty(departmentCode) {
     }
 
 
+    const departmentFaculty =
+        faculties.filter(
+            faculty =>
+                faculty.department_code ===
+                departmentCode
+        );
+
+
     /*
-     * Get only faculty belonging to selected department
+     * Hide department cards.
      */
-    const departmentFaculty = faculties.filter(
-        faculty =>
-            faculty.department_code === departmentCode
-    );
+    cards.style.display = "none";
 
 
-    container.innerHTML = `
-
-        <div class="col-12">
-
-            <div class="d-flex justify-content-between align-items-center mb-3">
-
-                <div>
-
-                    <button
-                        type="button"
-                        class="btn btn-success btn-sm mb-2"
-                        style="color: white !important;"
-                        onclick="displayDepartmentCards()"
-                    >
-                        <i class="bi bi-arrow-left"></i>
-                        Back to Departments
-                    </button>
-
-                    <h5 class="mb-1">
-
-                        ${department.department_code}
-                        Faculty
-
-                    </h5>
-
-                    <p class="text-muted mb-0">
-
-                        ${department.department_name}
-
-                    </p>
-
-                </div>
-
-            </div>
+    /*
+     * Show selected department view.
+     */
+    departmentView.style.display = "";
 
 
-            <div class="card shadow-sm">
-
-                <div class="card-body">
-
-                    <div
-                        class="d-flex justify-content-between align-items-center mb-3"
-                    >
-
-                        <div>
-
-                            <strong>
-                                Faculty Members
-                            </strong>
-
-                            <span class="badge bg-success ms-2">
-                                ${departmentFaculty.length}
-                            </span>
-
-                        </div>
+    /*
+     * Update department information.
+     */
+    document.getElementById(
+        "selectedDepartmentTitle"
+    ).textContent =
+        `${department.department_code} Faculty`;
 
 
-                        <input
-                            type="text"
-                            id="departmentFacultySearch"
-                            class="form-control"
-                            style="max-width:300px;"
-                            placeholder="Search Faculty"
-                            onkeyup="searchDepartmentFaculty()"
-                        >
-
-                    </div>
+    document.getElementById(
+        "selectedDepartmentDescription"
+    ).textContent =
+        department.department_name;
 
 
-                    <div class="table-responsive">
-
-                        <table class="table table-hover table-bordered">
-
-                            <thead class="table-success">
-
-                                <tr>
-
-                                    <th>ID</th>
-                                    <th>Faculty Name</th>
-                                    <th>Designation</th>
-                                    <th>Workload</th>
-                                    <th>Status</th>
-                                    <th style="width:150px;">
-                                        Action
-                                    </th>
-
-                                </tr>
-
-                            </thead>
+    document.getElementById(
+        "selectedFacultyCount"
+    ).textContent =
+        departmentFaculty.length;
 
 
-                            <tbody id="departmentFacultyTableBody">
+    /*
+     * Clear search.
+     */
+    const search =
+        document.getElementById(
+            "facultySearch"
+        );
 
-                            </tbody>
-
-                        </table>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    `;
+    if (search) {
+        search.value = "";
+    }
 
 
     renderDepartmentFacultyTable(
-        departmentCode,
         departmentFaculty
     );
 
@@ -390,17 +360,47 @@ function displayDepartmentFaculty(departmentCode) {
 
 
 // ============================================================
-// RENDER SELECTED DEPARTMENT FACULTY TABLE
+// SHOW ALL DEPARTMENTS
+// ============================================================
+
+function showFacultyDepartments() {
+
+    selectedDepartmentCode = null;
+
+    const departmentView =
+        document.getElementById(
+            "facultyDepartmentView"
+        );
+
+    const cards =
+        document.getElementById(
+            "facultyDepartmentCards"
+        );
+
+    if (departmentView) {
+        departmentView.style.display = "none";
+    }
+
+    if (cards) {
+        cards.style.display = "";
+    }
+
+    displayDepartmentCards();
+
+}
+
+
+// ============================================================
+// RENDER FACULTY TABLE
 // ============================================================
 
 function renderDepartmentFacultyTable(
-    departmentCode,
     departmentFaculty
 ) {
 
     const tableBody =
         document.getElementById(
-            "departmentFacultyTableBody"
+            "facultyTableBody"
         );
 
 
@@ -423,8 +423,7 @@ function renderDepartmentFacultyTable(
                     class="text-center text-muted py-4"
                 >
 
-                    No faculty found for
-                    ${departmentCode}.
+                    No faculty found.
 
                 </td>
 
@@ -433,20 +432,16 @@ function renderDepartmentFacultyTable(
         `;
 
         return;
-
     }
 
 
     departmentFaculty.forEach(faculty => {
 
-        /*
-         * Find original index from global faculties array.
-         * This is important for Edit/Delete.
-         */
         const originalIndex =
             faculties.findIndex(
                 item =>
-                    item.faculty_id === faculty.faculty_id
+                    item.faculty_id ===
+                    faculty.faculty_id
             );
 
 
@@ -466,49 +461,84 @@ function renderDepartmentFacultyTable(
 
 
                 <td>
-                    ${faculty.faculty_name}
+                    ${escapeHtml(
+                        faculty.faculty_name
+                    )}
                 </td>
 
 
                 <td>
-                    ${faculty.designation}
+                    ${escapeHtml(
+                        faculty.designation
+                    )}
                 </td>
 
 
                 <td>
-                    ${faculty.max_workload}
+                    ${faculty.max_workload ?? 0}
                 </td>
 
 
                 <td>
 
                     <span class="badge ${statusClass}">
-                        ${faculty.status}
+                        ${escapeHtml(
+                            faculty.status || "Active"
+                        )}
                     </span>
 
                 </td>
 
 
-                <td>
+                <td class="faculty-action-cell">
+
                     <div class="faculty-action-buttons">
 
-                        <button
-                            type="button"
-                            class="btn-edit"
-                            onclick="editFaculty(${originalIndex})"
-                        >
-                            <i class="bi bi-pencil"></i> Edit
-                        </button>
+                        <!-- EDIT -->
 
                         <button
                             type="button"
-                            class="btn-delete"
+                            class="btn btn-sm btn-outline-success"
+                            onclick="editFaculty(${originalIndex})"
+                        >
+
+                            <i class="bi bi-pencil"></i>
+                            Edit
+
+                        </button>
+
+
+                        <!-- DELETE -->
+
+                        <button
+                            type="button"
+                            class="btn btn-sm btn-outline-danger"
                             onclick="deleteFaculty(${originalIndex})"
                         >
-                            <i class="bi bi-trash"></i> Delete
+
+                            <i class="bi bi-trash"></i>
+                            Delete
+
+                        </button>
+
+
+                        <!-- VIEW DETAILS -->
+
+                        <button
+                            type="button"
+                            class="btn btn-sm btn-outline-primary"
+                            onclick="viewFacultyDetails(
+                                ${faculty.faculty_id}
+                            )"
+                        >
+
+                            <i class="bi bi-eye"></i>
+                            View Details
+
                         </button>
 
                     </div>
+
                 </td>
 
             </tr>
@@ -521,14 +551,19 @@ function renderDepartmentFacultyTable(
 
 
 // ============================================================
-// SEARCH FACULTY INSIDE SELECTED DEPARTMENT
+// SEARCH FACULTY
 // ============================================================
 
-function searchDepartmentFaculty() {
+function searchFaculty() {
+
+    if (!selectedDepartmentCode) {
+        return;
+    }
+
 
     const searchInput =
         document.getElementById(
-            "departmentFacultySearch"
+            "facultySearch"
         );
 
 
@@ -543,37 +578,74 @@ function searchDepartmentFaculty() {
             .toLowerCase();
 
 
-    const departmentFaculty =
-        faculties.filter(faculty =>
+    const filteredFaculty =
+        faculties.filter(faculty => {
 
-            faculty.department_code ===
-                selectedDepartmentCode &&
+            if (
+                faculty.department_code !==
+                selectedDepartmentCode
+            ) {
+                return false;
+            }
 
-            (
-                faculty.faculty_name
-                    .toLowerCase()
-                    .includes(search)
+
+            return (
+
+                String(
+                    faculty.faculty_id
+                )
+                .toLowerCase()
+                .includes(search)
 
                 ||
 
-                faculty.designation
-                    .toLowerCase()
-                    .includes(search)
+                String(
+                    faculty.faculty_name || ""
+                )
+                .toLowerCase()
+                .includes(search)
 
                 ||
 
-                faculty.status
-                    .toLowerCase()
-                    .includes(search)
-            )
+                String(
+                    faculty.designation || ""
+                )
+                .toLowerCase()
+                .includes(search)
 
-        );
+                ||
+
+                String(
+                    faculty.status || ""
+                )
+                .toLowerCase()
+                .includes(search)
+
+            );
+
+        });
 
 
     renderDepartmentFacultyTable(
-        selectedDepartmentCode,
-        departmentFaculty
+        filteredFaculty
     );
+
+}
+
+
+// ============================================================
+// VIEW FACULTY DETAILS
+// ============================================================
+
+function viewFacultyDetails(facultyId) {
+
+    if (!facultyId) {
+        return;
+    }
+
+
+    window.location.href =
+        `faculty-details.html?faculty_id=${facultyId}`;
 
 }
 
@@ -615,9 +687,6 @@ async function saveFaculty() {
             .value;
 
 
-    /*
-     * Validation
-     */
     if (
         name === "" ||
         department === "" ||
@@ -633,7 +702,8 @@ async function saveFaculty() {
 
 
     /*
-     * Duplicate faculty name check
+     * Duplicate faculty name
+     * within same department.
      */
     const duplicate =
         faculties.some(
@@ -641,18 +711,24 @@ async function saveFaculty() {
 
                 faculty.faculty_name
                     .toLowerCase() ===
-                    name.toLowerCase()
+                name.toLowerCase()
+
+                &&
+
+                faculty.department_code ===
+                department
 
                 &&
 
                 index !== editIndex
-
         );
 
 
     if (duplicate) {
 
-        alert("Faculty already exists.");
+        alert(
+            "Faculty already exists in this department."
+        );
 
         return;
 
@@ -667,7 +743,7 @@ async function saveFaculty() {
 
         designation: designation,
 
-        max_workload: workload,
+        max_workload: Number(workload),
 
         status: status
 
@@ -682,48 +758,53 @@ async function saveFaculty() {
         /*
          * ADD
          */
+
         if (editFacultyId === null) {
 
-            response = await fetch(
-                API_URL,
-                {
-                    method: "POST",
+            response =
+                await fetch(
+                    API_URL,
+                    {
+                        method: "POST",
 
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
 
-                    body:
-                        JSON.stringify(
-                            facultyData
-                        )
-                }
-            );
+                        body:
+                            JSON.stringify(
+                                facultyData
+                            )
+                    }
+                );
 
         }
+
 
         /*
          * UPDATE
          */
+
         else {
 
-            response = await fetch(
-                `${API_URL}/${editFacultyId}`,
-                {
-                    method: "PUT",
+            response =
+                await fetch(
+                    `${API_URL}/${editFacultyId}`,
+                    {
+                        method: "PUT",
 
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
 
-                    body:
-                        JSON.stringify(
-                            facultyData
-                        )
-                }
-            );
+                        body:
+                            JSON.stringify(
+                                facultyData
+                            )
+                    }
+                );
 
         }
 
@@ -750,22 +831,14 @@ async function saveFaculty() {
         );
 
 
-        /*
-         * Reload faculty
-         */
-        await fetchFaculties();
-
-
         editFacultyId = null;
+
         editIndex = -1;
 
 
         resetFacultyForm();
 
 
-        /*
-         * Close modal
-         */
         const modal =
             bootstrap.Modal.getInstance(
                 document.getElementById(
@@ -775,15 +848,15 @@ async function saveFaculty() {
 
 
         if (modal) {
-
             modal.hide();
-
         }
 
 
+        await fetchFaculties();
+
+
         /*
-         * If viewing a department,
-         * stay on that department.
+         * Stay on same department
          */
         if (selectedDepartmentCode) {
 
@@ -836,42 +909,65 @@ function editFaculty(index) {
         faculty.faculty_id;
 
 
-    document
-        .getElementById("facultyName")
-        .value =
-        faculty.faculty_name;
+    document.getElementById(
+        "facultyName"
+    ).value =
+        faculty.faculty_name || "";
 
 
-    document
-        .getElementById("facultyDepartment")
-        .value =
-        faculty.department_code;
+    document.getElementById(
+        "facultyDepartment"
+    ).value =
+        faculty.department_code || "";
 
 
-    document
-        .getElementById("facultyDesignation")
-        .value =
-        faculty.designation;
+    document.getElementById(
+        "facultyDesignation"
+    ).value =
+        faculty.designation || "";
 
 
-    document
-        .getElementById("facultyWorkload")
-        .value =
-        faculty.max_workload;
+    /*
+     * Recalculate workload based
+     * on designation.
+     */
+    updateFacultyWorkload();
 
 
-    document
-        .getElementById("facultyStatus")
-        .value =
-        faculty.status;
+    document.getElementById(
+        "facultyStatus"
+    ).value =
+        faculty.status || "Active";
 
 
-    document
-        .querySelector(
-            "#facultyModal .btn-primary"
-        )
-        .textContent =
-        "Update Faculty";
+    const title =
+        document.getElementById(
+            "facultyModalTitle"
+        );
+
+
+    if (title) {
+
+        title.textContent =
+            "Edit Faculty";
+
+    }
+
+
+    const saveButton =
+        document.querySelector(
+            "#facultyModal .modal-footer .btn-primary"
+        );
+
+
+    if (saveButton) {
+
+        saveButton.innerHTML = `
+            <i class="bi bi-check-circle"></i>
+            Update Faculty
+        `;
+
+    }
 
 
     const modal =
@@ -898,38 +994,81 @@ function resetFacultyForm() {
     editIndex = -1;
 
 
-    document
-        .getElementById("facultyName")
-        .value = "";
+    const name =
+        document.getElementById(
+            "facultyName"
+        );
+
+    const department =
+        document.getElementById(
+            "facultyDepartment"
+        );
+
+    const designation =
+        document.getElementById(
+            "facultyDesignation"
+        );
+
+    const workload =
+        document.getElementById(
+            "facultyWorkload"
+        );
+
+    const status =
+        document.getElementById(
+            "facultyStatus"
+        );
 
 
-    document
-        .getElementById("facultyDepartment")
-        .value = "";
+    if (name) {
+        name.value = "";
+    }
+
+    if (department) {
+        department.value = "";
+    }
+
+    if (designation) {
+        designation.value = "";
+    }
+
+    if (workload) {
+        workload.value = "";
+    }
+
+    if (status) {
+        status.value = "Active";
+    }
 
 
-    document
-        .getElementById("facultyDesignation")
-        .value = "";
+    const title =
+        document.getElementById(
+            "facultyModalTitle"
+        );
 
 
-    document
-        .getElementById("facultyWorkload")
-        .value = "";
+    if (title) {
+
+        title.textContent =
+            "Add Faculty";
+
+    }
 
 
-    document
-        .getElementById("facultyStatus")
-        .value =
-        "Active";
+    const saveButton =
+        document.querySelector(
+            "#facultyModal .modal-footer .btn-primary"
+        );
 
 
-    document
-        .querySelector(
-            "#facultyModal .btn-primary"
-        )
-        .textContent =
-        "Save Faculty";
+    if (saveButton) {
+
+        saveButton.innerHTML = `
+            <i class="bi bi-check-circle"></i>
+            Save Faculty
+        `;
+
+    }
 
 }
 
@@ -960,9 +1099,7 @@ async function deleteFaculty(index) {
 
 
     if (!confirmDelete) {
-
         return;
-
     }
 
 
@@ -1002,9 +1139,6 @@ async function deleteFaculty(index) {
         await fetchFaculties();
 
 
-        /*
-         * Stay inside selected department
-         */
         if (selectedDepartmentCode) {
 
             displayDepartmentFaculty(
@@ -1032,74 +1166,316 @@ async function deleteFaculty(index) {
 
 
 // ============================================================
-// AUTOMATIC WORKLOAD
+// WORKLOAD CALCULATION
 // ============================================================
 
-document
-    .getElementById("facultyDesignation")
-    .addEventListener(
-        "change",
-        function () {
+function getWorkloadForDesignation(designation) {
 
-            const designation =
-                this.value;
+    if (!designation) {
+        return "";
+    }
 
+    const value = designation
+        .toLowerCase()
+        .trim();
 
-            const workload =
-                document.getElementById(
-                    "facultyWorkload"
-                );
+    // Principal → 6 hours
+    if (value.includes("principal")) {
+        return 6;
+    }
 
+    // HOD / Head → 12 hours
+    if (
+        value.includes("hod") ||
+        value.includes("head")
+    ) {
+        return 12;
+    }
 
-            switch (designation) {
+    // Assistant Professor → 18 hours
+    if (value.includes("assistant professor")) {
+        return 18;
+    }
 
-                case "Assistant Professor":
+    // Associate Professor → 16 hours
+    if (value.includes("associate professor")) {
+        return 16;
+    }
 
-                    workload.value = 18;
+    // Professor → 16 hours
+    if (value.includes("professor")) {
+        return 16;
+    }
 
-                    break;
-
-
-                case "Associate Professor":
-
-                    workload.value = 16;
-
-                    break;
-
-
-                case "Professor":
-
-                    workload.value = 16;
-
-                    break;
-
-
-                case "HOD":
-
-                    workload.value = 12;
-
-                    break;
+    return "";
+}
 
 
-                case "Principal":
+// ============================================================
+// UPDATE WORKLOAD IN FORM
+// ============================================================
 
-                    workload.value = 6;
+function updateFacultyWorkload() {
 
-                    break;
+    const designation =
+        document.getElementById(
+            "facultyDesignation"
+        );
 
 
-                default:
+    const workload =
+        document.getElementById(
+            "facultyWorkload"
+        );
 
-                    workload.value = "";
 
-            }
+    if (!designation || !workload) {
+        return;
+    }
 
-        }
+
+    workload.value =
+        getWorkloadForDesignation(
+            designation.value
+        );
+
+}
+
+
+// ============================================================
+// DESIGNATION CHANGE
+// ============================================================
+
+const designationSelect =
+    document.getElementById(
+        "facultyDesignation"
     );
 
 
+if (designationSelect) {
+
+    designationSelect.addEventListener(
+        "change",
+        updateFacultyWorkload
+    );
+
+}
+
+
 // ============================================================
-// INITIAL LOAD
+// IMPORT FACULTY
+// ============================================================
+
+function openFacultyImport() {
+
+    const fileInput =
+        document.getElementById(
+            "facultyImportFile"
+        );
+
+
+    if (!fileInput) {
+
+        alert(
+            "Faculty import input not found."
+        );
+
+        return;
+
+    }
+
+
+    fileInput.value = "";
+
+    fileInput.click();
+
+}
+
+
+// ============================================================
+// HANDLE FACULTY IMPORT
+// ============================================================
+
+async function handleFacultyImport(event) {
+
+    const file =
+        event.target.files[0];
+
+
+    if (!file) {
+        return;
+    }
+
+
+    /*
+     * Accepted file types
+     */
+
+    const allowedExtensions = [
+        ".pdf",
+        ".png",
+        ".jpg",
+        ".jpeg",
+        ".webp",
+        ".doc",
+        ".docx",
+        ".xls",
+        ".xlsx"
+    ];
+
+
+    const fileName =
+        file.name.toLowerCase();
+
+
+    const validFile =
+        allowedExtensions.some(
+            extension =>
+                fileName.endsWith(extension)
+        );
+
+
+    if (!validFile) {
+
+        alert(
+            "Please select a supported faculty file."
+        );
+
+        return;
+
+    }
+
+
+    /*
+     * IMPORTANT:
+     *
+     * Backend import endpoint will be connected
+     * when we update the backend.
+     */
+
+    const formData =
+        new FormData();
+
+
+    formData.append(
+        "file",
+        file
+    );
+
+
+    try {
+
+        /*
+         * Faculty import endpoint.
+         *
+         * We will verify/update this when
+         * you send the backend file.
+         */
+
+        const response =
+            await fetch(
+                "http://127.0.0.1:5000/faculties/import",
+                {
+                    method: "POST",
+                    body: formData
+                }
+            );
+
+
+        const result =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            alert(
+                result.message ||
+                "Faculty import failed."
+            );
+
+            return;
+
+        }
+
+
+        alert(
+            result.message ||
+            "Faculty imported successfully."
+        );
+
+
+        await fetchFaculties();
+
+
+        if (selectedDepartmentCode) {
+
+            displayDepartmentFaculty(
+                selectedDepartmentCode
+            );
+
+        }
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Faculty import error:",
+            error
+        );
+
+
+        alert(
+            "Unable to import faculty. Backend import API will be connected after backend implementation."
+        );
+
+    }
+
+}
+
+
+// ============================================================
+// HTML SAFETY
+// ============================================================
+
+function escapeHtml(value) {
+
+    if (value === null || value === undefined) {
+        return "";
+    }
+
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
+
+
+// ============================================================
+// JAVASCRIPT STRING SAFETY
+// ============================================================
+
+function escapeJs(value) {
+
+    if (value === null || value === undefined) {
+        return "";
+    }
+
+
+    return String(value)
+        .replace(/\\/g, "\\\\")
+        .replace(/'/g, "\\'")
+        .replace(/"/g, '\\"');
+
+}
+
+
+// ============================================================
+// INITIALIZE FACULTY PAGE
 // ============================================================
 
 async function initializeFacultyPage() {
@@ -1111,6 +1487,8 @@ async function initializeFacultyPage() {
 }
 
 
-// Start page
+// ============================================================
+// START
+// ============================================================
 
 initializeFacultyPage();

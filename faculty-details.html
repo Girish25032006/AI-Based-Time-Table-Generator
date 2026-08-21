@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Faculty Details</title>
+
+    <!-- Bootstrap -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <!-- Common CSS -->
+    <link rel="stylesheet" href="css/style.css">
+
+    <!-- Faculty Details CSS -->
+    <link rel="stylesheet" href="css/faculty-details.css">
+
+</head>
+
+<body>
+
+<div class="d-flex">
+
+
+    <!-- =========================================================
+         SIDEBAR
+    ========================================================== -->
+
+    <div class="sidebar">
+
+        <div class="logo">
+            <h3>AI Timetable</h3>
+        </div>
+
+        <ul class="nav flex-column">
+
+            <li class="nav-item">
+                <a href="dashboard.html" class="nav-link">
+                    <i class="bi bi-speedometer2"></i>
+                    Dashboard
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a href="department.html" class="nav-link">
+                    <i class="bi bi-building"></i>
+                    Department
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a href="scheme.html" class="nav-link">
+                    <i class="bi bi-journal-bookmark"></i>
+                    Scheme
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a href="academic-year.html" class="nav-link">
+                    <i class="bi bi-calendar3"></i>
+                    Academic Year
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a href="subject.html" class="nav-link">
+                    <i class="bi bi-book"></i>
+                    Subject
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a href="faculty.html" class="nav-link active">
+                    <i class="bi bi-person-workspace"></i>
+                    Faculty
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a href="faculty-subject-assignment.html" class="nav-link">
+                    <i class="bi bi-diagram-3"></i>
+                    Faculty Subject Assignment
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a href="timetable-constraints.html" class="nav-link">
+                    <i class="bi bi-sliders"></i>
+                    Timetable Constraints
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a href="generate-timetable.html" class="nav-link">
+                    <i class="bi bi-calendar-week"></i>
+                    Generate Timetable
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a href="view-timetable.html" class="nav-link">
+                    <i class="bi bi-table"></i>
+                    View Timetable
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a href="index.html" class="nav-link text-danger">
+                    <i class="bi bi-box-arrow-right"></i>
+                    Logout
+                </a>
+            </li>
+
+        </ul>
+
+    </div>
+
+
+    <!-- =========================================================
+         MAIN CONTENT
+    ========================================================== -->
+
+    <div class="main-content">
+
+
+        <!-- TOP NAVBAR -->
+
+        <nav class="navbar bg-white shadow-sm rounded px-4 mb-4">
+
+            <div class="d-flex align-items-center gap-3">
+
+    <button
+        type="button"
+        id="editFacultyBtn"
+        class="btn btn-outline-primary"
+        onclick="enableFacultyEdit()">
+
+        <i class="bi bi-pencil"></i>
+        Edit
+
+    </button>
+
+    <button
+        type="button"
+        id="saveFacultyBtn"
+        class="btn btn-success d-none"
+        onclick="saveFacultyDetails()">
+
+        <i class="bi bi-check-lg"></i>
+        Save
+
+    </button>
+
+    <button
+        type="button"
+        id="cancelFacultyBtn"
+        class="btn btn-secondary d-none"
+        onclick="cancelFacultyEdit()">
+
+        <i class="bi bi-x-lg"></i>
+        Cancel
+
+    </button>
+
+
+    <div>
+
+        <i class="bi bi-person-circle fs-4"></i>
+
+        <b class="ms-2">
+            Admin
+        </b>
+
+    </div>
+
+</div>
+
+        </nav>
+
+
+        <!-- =====================================================
+             BACK BUTTON
+        ====================================================== -->
+
+        <div class="mb-3">
+
+            <button
+                type="button"
+                class="btn btn-outline-success"
+                onclick="goBackToFaculty()">
+
+                <i class="bi bi-arrow-left"></i>
+
+                Back to Faculty
+
+            </button>
+
+        </div>
+
+
+        <!-- =====================================================
+             FACULTY PROFILE HEADER
+        ====================================================== -->
+
+        <div class="card shadow-sm faculty-profile-card">
+
+            <div class="card-body">
+
+                <div class="row align-items-center">
+
+
+                    <!-- FACULTY IMAGE -->
+
+                    <!-- FACULTY IMAGE -->
+
+                    <div class="col-md-3 text-center">
+
+                        <div class="faculty-profile-image-wrapper">
+
+                            <!-- Faculty Image -->
+                            <img
+                                id="facultyProfileImage"
+                                src="images/default-faculty.png"
+                                alt="Faculty Image"
+                                class="faculty-profile-image"
+                                onclick="openFacultyImage()">
+
+                            <!-- Add / Change Image Button -->
+                            <button
+                                type="button"
+                                id="facultyImageUploadBtn"
+                                class="faculty-image-upload-btn"
+                                title="Upload Faculty Photo">
+
+                                <i class="bi bi-plus-lg"></i>
+
+                            </button>
+
+                            <!-- Hidden File Input -->
+                            <input
+                                type="file"
+                                id="facultyImageInput"
+                                accept="image/png,image/jpeg,image/jpg,image/webp"
+                                hidden>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- BASIC INFORMATION -->
+
+                    <div class="col-md-9">
+
+                        <h2
+                            id="facultyName"
+                            class="faculty-profile-name">
+
+                            Faculty Name
+
+                        </h2>
+
+
+                        <h5
+                            id="facultyDesignation"
+                            class="faculty-profile-designation">
+
+                            Designation
+
+                        </h5>
+
+
+                        <p
+                            id="facultyDepartment"
+                            class="faculty-profile-department">
+
+                            Department
+
+                        </p>
+
+
+                        <p
+                            id="facultyDescription"
+                            class="faculty-profile-description">
+
+                            Faculty description will appear here.
+
+                        </p>
+
+
+                        <!-- STATUS -->
+
+                        <span
+                            id="facultyStatus"
+                            class="badge bg-success">
+
+                            Active
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             BASIC INFORMATION
+        ====================================================== -->
+
+        <div class="card shadow-sm mt-4">
+
+            <div class="card-body">
+
+                <h5 class="faculty-section-title">
+
+                    <i class="bi bi-person-vcard"></i>
+
+                    Basic Information
+
+                </h5>
+
+
+                <div class="row mt-3">
+
+
+                    <!-- JOINING DATE -->
+
+                    <div class="col-md-4 mb-3">
+
+                        <div class="faculty-info-box">
+
+                            <span class="faculty-info-label">
+
+                                <i class="bi bi-calendar-event"></i>
+
+                                Date of Joining
+
+                            </span>
+
+                            <strong
+                                id="facultyJoinDate">
+
+                                Not Available
+
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- EXPERIENCE -->
+
+                    <div class="col-md-4 mb-3">
+
+                        <div class="faculty-info-box">
+
+                            <span class="faculty-info-label">
+
+                                <i class="bi bi-briefcase"></i>
+
+                                Teaching Experience
+
+                            </span>
+
+                            <strong
+                                id="facultyTeachingExperience">
+
+                                Not Available
+
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- WORKLOAD -->
+
+                    <div class="col-md-4 mb-3">
+
+                        <div class="faculty-info-box">
+
+                            <span class="faculty-info-label">
+
+                                <i class="bi bi-clock"></i>
+
+                                Maximum Workload
+
+                            </span>
+
+                            <strong>
+
+                                <span
+                                    id="facultyWorkload">
+
+                                    0
+
+                                </span>
+
+                                Hours / Week
+
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             QUALIFICATIONS
+        ====================================================== -->
+
+        <div class="card shadow-sm mt-4">
+
+            <div class="card-body">
+
+                <h5 class="faculty-section-title">
+
+                    <i class="bi bi-mortarboard"></i>
+
+                    Qualifications
+
+                </h5>
+
+
+                <div
+                    id="facultyQualifications"
+                    class="faculty-content-section mt-3">
+
+                    <p class="text-muted mb-0">
+                        Qualification information is not available.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             SKILLS
+        ====================================================== -->
+
+        <div class="card shadow-sm mt-4">
+
+            <div class="card-body">
+
+                <h5 class="faculty-section-title">
+
+                    <i class="bi bi-stars"></i>
+
+                    Skills
+
+                </h5>
+
+
+                <div
+                    id="facultySkills"
+                    class="faculty-skills-container mt-3">
+
+                    <span class="text-muted">
+                        Skill information is not available.
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             ACADEMIC CONTRIBUTIONS
+        ====================================================== -->
+
+        <div class="card shadow-sm mt-4 mb-4">
+
+            <div class="card-body">
+
+                <h5 class="faculty-section-title">
+
+                    <i class="bi bi-journal-text"></i>
+
+                    Academic Contributions
+
+                </h5>
+
+
+                <div class="mt-4">
+
+
+                    <!-- BOOKS / IPR / PATENTS -->
+
+                    <div class="faculty-contribution-section">
+
+                        <h6>
+                            <i class="bi bi-book"></i>
+                            Books / IPR / Patents
+                        </h6>
+
+                        <div
+                            id="facultyBooksPatents"
+                            class="faculty-contribution-content">
+
+                            <p class="text-muted">
+                                No information available.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- PROFESSIONAL MEMBERSHIPS -->
+
+                    <div class="faculty-contribution-section">
+
+                        <h6>
+                            <i class="bi bi-people"></i>
+                            Professional Memberships
+                        </h6>
+
+                        <div
+                            id="facultyMemberships"
+                            class="faculty-contribution-content">
+
+                            <p class="text-muted">
+                                No information available.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- CONSULTANCY -->
+
+                    <div class="faculty-contribution-section">
+
+                        <h6>
+                            <i class="bi bi-briefcase"></i>
+                            Consultancy Activities
+                        </h6>
+
+                        <div
+                            id="facultyConsultancy"
+                            class="faculty-contribution-content">
+
+                            <p class="text-muted">
+                                No information available.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- AWARDS -->
+
+                    <div class="faculty-contribution-section">
+
+                        <h6>
+                            <i class="bi bi-award"></i>
+                            Awards
+                        </h6>
+
+                        <div
+                            id="facultyAwards"
+                            class="faculty-contribution-content">
+
+                            <p class="text-muted">
+                                No information available.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- GRANTS -->
+
+                    <div class="faculty-contribution-section">
+
+                        <h6>
+                            <i class="bi bi-cash-stack"></i>
+                            Grants
+                        </h6>
+
+                        <div
+                            id="facultyGrants"
+                            class="faculty-contribution-content">
+
+                            <p class="text-muted">
+                                No information available.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- JOURNAL PAPERS -->
+
+                    <div class="faculty-contribution-section">
+
+                        <h6>
+                            <i class="bi bi-journal-richtext"></i>
+                            Journal Papers
+                        </h6>
+
+
+                        <div class="row">
+
+
+                            <div class="col-md-6">
+
+                                <strong>
+                                    National
+                                </strong>
+
+                                <div
+                                    id="facultyNationalJournals"
+                                    class="faculty-contribution-content">
+
+                                    <p class="text-muted">
+                                        No information available.
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="col-md-6">
+
+                                <strong>
+                                    International
+                                </strong>
+
+                                <div
+                                    id="facultyInternationalJournals"
+                                    class="faculty-contribution-content">
+
+                                    <p class="text-muted">
+                                        No information available.
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- CONFERENCE PAPERS -->
+
+                    <div class="faculty-contribution-section">
+
+                        <h6>
+                            <i class="bi bi-mic"></i>
+                            Conference Papers
+                        </h6>
+
+
+                        <div class="row">
+
+
+                            <div class="col-md-6">
+
+                                <strong>
+                                    National
+                                </strong>
+
+                                <div
+                                    id="facultyNationalConferences"
+                                    class="faculty-contribution-content">
+
+                                    <p class="text-muted">
+                                        No information available.
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="col-md-6">
+
+                                <strong>
+                                    International
+                                </strong>
+
+                                <div
+                                    id="facultyInternationalConferences"
+                                    class="faculty-contribution-content">
+
+                                    <p class="text-muted">
+                                        No information available.
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- PHD GUIDANCE -->
+
+                    <div class="faculty-contribution-section">
+
+                        <h6>
+                            <i class="bi bi-person-check"></i>
+                            PhD Guidance
+                        </h6>
+
+                        <div
+                            id="facultyPhdGuidance"
+                            class="faculty-contribution-content">
+
+                            <p class="text-muted">
+                                No information available.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- MASTER'S PROJECTS -->
+
+                    <div class="faculty-contribution-section">
+
+                        <h6>
+                            <i class="bi bi-kanban"></i>
+                            Projects at Master's Level
+                        </h6>
+
+                        <div
+                            id="facultyMastersProjects"
+                            class="faculty-contribution-content">
+
+                            <p class="text-muted">
+                                No information available.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+</div>
+<!-- Faculty Image Popup -->
+<div id="facultyImageModal" class="faculty-image-modal" onclick="closeFacultyImage()">
+
+    <span class="faculty-image-close">&times;</span>
+
+    <img
+        id="facultyLargeImage"
+        class="faculty-large-image"
+        src=""
+        alt="Faculty Image"
+        onclick="event.stopPropagation()">
+
+</div>
+
+<!-- =========================================================
+     BOOTSTRAP JS
+========================================================== -->
+
+<script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+</script>
+
+
+<!-- FACULTY DETAILS JS -->
+
+<script src="js/faculty-details.js"></script>
+
+
+</body>
+
+</html>

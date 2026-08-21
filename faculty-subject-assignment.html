@@ -2,11 +2,10 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Faculty Subject Assignment</title>
+    <title>Faculty Assignment | AI Academic Scheduling System</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -15,13 +14,187 @@
 
     <link rel="stylesheet" href="css/style.css">
 
+    <style>
+        .assignment-page-title {
+            font-weight: 700;
+            color: #12372a;
+        }
+
+        .filter-card,
+        .workload-card,
+        .subjects-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 14px;
+        }
+
+        /* ================= SEMESTER ================= */
+
+        .semester-pills .btn {
+            min-width: 48px;
+            margin-right: 6px;
+            margin-bottom: 6px;
+        }
+
+        .semester-pills .btn.active {
+            background: #087443;
+            border-color: #087443;
+            color: #fff;
+        }
+
+        /* ================= CYCLE ================= */
+
+        #cyclePills {
+            margin-top: 10px;
+        }
+
+        .cycle-pills {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .cycle-pills .btn {
+            min-width: 90px;
+        }
+
+        .cycle-pills .btn.active {
+            background: #087443;
+            border-color: #087443;
+            color: #fff;
+        }
+
+        /* ================= WORKLOAD ================= */
+
+        .workload-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(245px, 1fr));
+            gap: 12px;
+        }
+
+        .workload-card {
+            background: #fff;
+            padding: 14px;
+            cursor: pointer;
+            transition: .2s ease;
+            position: relative;
+            border: 1px solid #e5e7eb;
+            border-radius: 14px;
+        }
+
+        .workload-card:hover,
+        .workload-card.selected {
+            border-color: #087443;
+            box-shadow: 0 4px 14px rgba(8, 116, 67, .12);
+            transform: translateY(-1px);
+        }
+
+        .workload-name {
+            font-weight: 700;
+            color: #243b35;
+        }
+
+        .workload-hours {
+            font-size: 18px;
+            font-weight: 800;
+            color: #087443;
+        }
+
+        .workload-progress {
+            height: 7px;
+            background: #edf1ef;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .workload-progress > div {
+            height: 100%;
+            background: #087443;
+            transition: width .25s ease;
+        }
+
+        /* ================= ADD FACULTY ================= */
+
+        .add-faculty-card {
+            min-height: 135px;
+            border: 2px dashed #aab8b1;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #087443;
+            background: #fafcfb;
+        }
+
+        .add-faculty-card:hover {
+            border-color: #087443;
+            background: #f1faf5;
+        }
+
+        /* ================= SUBJECTS ================= */
+
+        .subject-row.assigned-to-selected {
+            background: #f1faf5;
+        }
+
+        .subject-code {
+            font-weight: 700;
+            color: #087443;
+        }
+
+        .subject-meta {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .status-pill {
+            font-size: 11px;
+            padding: 4px 8px;
+            border-radius: 20px;
+            background: #fff4cc;
+            color: #8a6500;
+            white-space: nowrap;
+        }
+
+        .status-pill.complete {
+            background: #dff6e9;
+            color: #087443;
+        }
+
+        /* ================= SELECTED FACULTY ================= */
+
+        .selected-faculty-banner {
+            background: #eff9f3;
+            border: 1px solid #ccebd8;
+            color: #245d43;
+            border-radius: 10px;
+        }
+
+        /* ================= EMPTY ================= */
+
+        .empty-state {
+            padding: 45px 15px;
+            text-align: center;
+            color: #7a8781;
+        }
+
+        /* ================= TABLE ================= */
+
+        .subjects-table th {
+            white-space: nowrap;
+        }
+
+        .subjects-table td {
+            vertical-align: middle;
+        }
+    </style>
 </head>
 
 <body>
 
 <div class="d-flex">
 
-    <!-- Sidebar -->
+    <!-- ================= SIDEBAR ================= -->
 
     <div class="sidebar">
 
@@ -51,12 +224,13 @@
                     Scheme
                 </a>
             </li>
+
             <li class="nav-item">
-            <a href="academic-year.html" class="nav-link">
-                <i class="bi bi-calendar3"></i>
-                Academic Year
-            </a>
-        </li>
+                <a href="academic-year.html" class="nav-link">
+                    <i class="bi bi-calendar3"></i>
+                    Academic Year
+                </a>
+            </li>
 
             <li class="nav-item">
                 <a href="subject.html" class="nav-link">
@@ -66,41 +240,59 @@
             </li>
 
             <li class="nav-item">
-                <a href="faculty.html" class="nav-link ">
+                <a href="faculty.html" class="nav-link">
                     <i class="bi bi-person-workspace"></i>
                     Faculty
                 </a>
             </li>
+
             <li class="nav-item">
-                <a href="faculty-subject-assignment.html" class="nav-link active" >
+                <a href="faculty-subject-assignment.html"
+                   class="nav-link active">
+
                     <i class="bi bi-diagram-3"></i>
                     Faculty Subject Assignment
+
                 </a>
             </li>
+
             <li class="nav-item">
-                <a href="timetable-constraints.html" class="nav-link">
+                <a href="timetable-constraints.html"
+                   class="nav-link">
+
                     <i class="bi bi-sliders"></i>
                     Timetable Constraints
+
                 </a>
             </li>
+
             <li class="nav-item">
-                <a href="generate-timetable.html" class="nav-link">
+                <a href="generate-timetable.html"
+                   class="nav-link">
+
                     <i class="bi bi-calendar-week"></i>
                     Generate Timetable
+
                 </a>
             </li>
 
             <li class="nav-item">
-                <a href="view-timetable.html" class="nav-link">
+                <a href="view-timetable.html"
+                   class="nav-link">
+
                     <i class="bi bi-table"></i>
                     View Timetable
+
                 </a>
             </li>
 
             <li class="nav-item">
-                <a href="index.html" class="nav-link text-danger">
+                <a href="index.html"
+                   class="nav-link text-danger">
+
                     <i class="bi bi-box-arrow-right"></i>
                     Logout
+
                 </a>
             </li>
 
@@ -108,302 +300,376 @@
 
     </div>
 
-    <!-- Main Content -->
 
-    <div class="main-content">
+    <!-- ================= MAIN CONTENT ================= -->
+
+    <div class="main-content w-100">
+
+        <!-- ================= TOP NAVBAR ================= -->
 
         <nav class="navbar bg-white shadow-sm rounded px-4 mb-4">
 
-            <h4>Faculty Subject Assignment</h4>
+            <div>
+
+                <div class="text-muted small">
+                    Dashboard &gt; Faculty Assignment
+                </div>
+
+                <h4 class="assignment-page-title mb-0">
+                    Faculty Subject Assignment
+                </h4>
+
+                <small class="text-muted">
+                    Assign theory and co-lab faculty before timetable generation.
+                </small>
+
+            </div>
 
             <div>
 
                 <i class="bi bi-person-circle fs-4"></i>
 
-                <b class="ms-2">Admin</b>
+                <b class="ms-2">
+                    Admin
+                </b>
 
             </div>
 
         </nav>
 
-        <!-- Search & Add Button -->
 
-        <div class="card shadow-sm">
+        <!-- ================= FILTER SECTION ================= -->
+
+        <div class="card shadow-sm filter-card mb-3">
 
             <div class="card-body">
 
-                <div class="d-flex justify-content-between mb-3">
-                    <select
-                        id="filterAcademicYear"
-                        class="form-select w-25 me-2">
+                <div class="row g-3 align-items-end">
 
-                        <option value="">Select Academic Year</option>
-                        
+                    <!-- DEPARTMENT -->
 
-                    </select>
-                    <select
-                        id="filterSemesterType"
-                        class="form-select w-25 me-2">
+                    <div class="col-lg-3 col-md-6">
 
-                        <option value="">
-                            Select Semester Type
-                        </option>
+                        <label class="form-label fw-semibold">
+                            Department
+                        </label>
 
-                        <option value="Odd">
-                            Odd (1,3,5,7)
-                        </option>
+                        <select id="filterDepartment"
+                                class="form-select">
 
-                        <option value="Even">
-                            Even (2,4,6,8)
-                        </option>
+                            <option value="">
+                                Select Department
+                            </option>
 
-                    </select>
-                    <input
-                        type="text"
-                        id="searchAssignment"
-                        class="form-control w-50"
-                        placeholder="Search Assignment">
-
-                    <button
-
-                        class="btn btn-primary px-4 text-nowrap"
-                        data-bs-toggle="modal"
-                        data-bs-target="#facultyModal">
-
-                        <i class="bi bi-plus-circle"></i>
-                       Assign Faculty
-                    </button>
-
-                </div>
-                <div id="assignmentSummary" class="alert alert-info mb-3">
-
-                        <strong>Academic Year:</strong>
-                        <span id="summaryAcademicYear">-</span>
-
-                        &nbsp;&nbsp;|&nbsp;&nbsp;
-
-                        <strong>Semester Type:</strong>
-                        <span id="summarySemesterType">-</span>
-
-                        &nbsp;&nbsp;|&nbsp;&nbsp;
-
-                        <strong>Total Assignments:</strong>
-                        <span id="summaryTotal">0</span>
+                        </select>
 
                     </div>
 
-                <!-- Faculty Table -->
-                 <div class="d-flex justify-content-between align-items-center mb-2">
-                    
 
-             
-                
+                    <!-- SCHEME -->
 
-                <table class="table table-hover table-bordered">
+                    <div class="col-lg-2 col-md-6">
 
-                    <thead class="table-primary">
+                        <label class="form-label fw-semibold">
+                            Scheme
+                        </label>
 
-                    <tr>
+                        <select id="filterScheme"
+                                class="form-select">
 
-                    <th>ID</th>
-                    <th>Department</th>
-                    <th>Semester Type</th>
-                    <th>Faculty</th>
-                    <th>Subjects</th>
-                    <th width="150">Action</th>
+                            <option value="">
+                                Select Scheme
+                            </option>
 
-                    </tr>
+                        </select>
 
-                    </thead>
-
-                    <tbody id="assignmentTableBody">
-
-
-
-                    </tbody>
-
-                </table>
-                        </div>
-    </div>
-
-    <!-- Add Faculty Modal -->
-
-    <div class="modal fade" id="facultyModal">
-
-        <div class="modal-dialog modal-xl">
-
-            <div class="modal-content">
-
-                <div class="modal-header">
-
-                    <h5 class="modal-title">Faculty Subject Assignment</h5>
-                    <button
-                        type="button"
-                        class="btn-close"
-                        data-bs-dismiss="modal">
-                    </button>
-
-                </div>
-
-                <div class="modal-body">
-
-                    <div class="row">
-
-                        
-                        <div class="col-md-6 mb-3">
-
-                            <label class="form-label">
-                                Department
-                            </label>
-
-                            <select class="form-select"   id="assignmentDepartment">
-
-                                
-
-                            </select>
-
-                        </div>
-                        <div class="col-md-6 mb-3">
-
-                            <label class="form-label">
-                                Scheme
-                            </label>
-
-                            <select
-                                class="form-select"
-                                id="assignmentScheme">
-
-                                
-
-                            </select>
-
-                        </div>
-                        <div class="col-md-6 mb-3">
-
-                            <label class="form-label">
-                                Semester 
-                            </label>
-                            <div class="col-md-3">
-
-                                <label class="form-label">
-                                    Semester Type
-                                </label>
-
-                                <select
-                                    id="assignmentSemesterType"
-                                    class="form-select">
-
-                                    <option value="">
-                                        Select Semester Type
-                                    </option>
-
-                                    <option value="Odd">
-                                        Odd
-                                    </option>
-
-                                    <option value="Even">
-                                        Even
-                                    </option>
-
-                                </select>
-
-                            </div>
-
-                            <select class="form-select" id="assignmentSemester">
-
-                                <option value="">Select Semester Type First</option>
-                                <option value="1">Semester 1</option>
-                                <option value="2">Semester 2</option>
-                                <option value="3">Semester 3</option>
-                                <option value="4">Semester 4</option>
-                                <option value="5">Semester 5</option>
-                                <option value="6">Semester 6</option>
-                                <option value="7">Semester 7</option>
-                                <option value="8">Semester 8</option>
-
-                            </select>
-                            <div id="cycleDiv" style="display:none;" class="mt-3">
-
-                                <label class="form-label">
-                                    Select Cycle
-                                </label>
-
-                                <select class="form-select" id="assignmentCycle">
-
-                                    <option value="">
-                                        Select Cycle
-                                    </option>
-
-                                    <option value="P">
-                                        P-Cycle
-                                    </option>
-
-                                    <option value="C">
-                                        C-Cycle
-                                    </option>
-
-                                </select>
-
-                            </div>
-
-                        </div>
-                        <div class="col-md-6 mb-3">
-
-                            <label class="form-label">
-                                Academic Year
-                            </label>
-
-                            <input
-                                type="text"
-                                id="academicYear"
-                                class="form-control"
-                                placeholder="2026-27">
-
-                        </div>
-                        <div class="mb-3">
-                            <input
-                                type="text"
-                                id="subjectSearch"
-                                class="form-control"
-                                placeholder="🔍 Search by Subject Code or Subject Name">
-                        </div>
-                        <table class="table table-bordered">
-
-                            <thead>
-
-                                <tr>
-                                    <th>Subject Code</th>
-                                    <th>Subject Name</th>
-                                    <th>Faculty Department</th>
-                                    <th>Faculty</th>
-                                </tr>
-
-                            </thead>
-
-                            <tbody id="assignmentSubjectsTable">
-
-                            </tbody>
-
-                        </table>
                     </div>
-                <div class="modal-footer">
 
-                    <button
-                        class="btn btn-secondary"
-                        data-bs-dismiss="modal">
 
-                        Cancel
+                    <!-- SEMESTER TYPE -->
 
-                    </button>
+                    <div class="col-lg-2 col-md-6">
 
-                    <button
-                        type="button"
-                        class="btn btn-primary"
-                        onclick="saveAssignments()">
-                        Save All Assignments
-                    </button>
+                        <label class="form-label fw-semibold">
+                            Semester Type
+                        </label>
+
+                        <select id="filterSemesterType"
+                                class="form-select">
+
+                            <option value="">
+                                Select Type
+                            </option>
+
+                            <option value="Odd">
+                                Odd Semesters
+                            </option>
+
+                            <option value="Even">
+                                Even Semesters
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- ACADEMIC YEAR -->
+
+                    <div class="col-lg-2 col-md-6">
+
+                        <label class="form-label fw-semibold">
+                            Academic Year
+                        </label>
+
+                        <select id="filterAcademicYear"
+                                class="form-select">
+
+                            <option value="">
+                                Select Academic Year
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- SEARCH -->
+
+                    <div class="col-lg-3">
+
+                        <label class="form-label fw-semibold">
+                            Search Subjects
+                        </label>
+
+                        <input
+                            id="subjectSearch"
+                            class="form-control"
+                            placeholder="Search code or subject name">
+
+                    </div>
 
                 </div>
+
+
+                <!-- ================= SEMESTER ================= -->
+
+                <div class="mt-3">
+
+                    <label class="form-label fw-semibold mb-2">
+                        Semester
+                    </label>
+
+                    <div id="semesterPills"
+                         class="semester-pills">
+
+                    </div>
+
+                </div>
+
+
+                <!-- ================= P / C CYCLE ================= -->
+
+                <!--
+                    JS will show this ONLY for Semester 1 and Semester 2.
+
+                    Semester 1:
+                        P-Cycle
+                        C-Cycle
+
+                    Semester 2:
+                        P-Cycle
+                        C-Cycle
+                -->
+
+                <div id="cyclePills"></div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================= SELECTED FACULTY ================= -->
+
+        <div
+            id="selectedFacultyBanner"
+            class="selected-faculty-banner p-3 mb-3 d-none">
+
+            <i class="bi bi-person-check me-2"></i>
+
+            Selected faculty:
+
+            <strong id="selectedFacultyName">
+            </strong>
+
+            <button
+                class="btn btn-sm btn-outline-success float-end"
+                onclick="clearSelectedFaculty()">
+
+                Clear
+
+            </button>
+
+        </div>
+
+
+        <!-- ================= FACULTY WORKLOAD ================= -->
+
+        <div class="card shadow-sm workload-card mb-3">
+
+            <div class="card-body">
+
+                <div class="d-flex justify-content-between align-items-center mb-1">
+
+                    <div>
+
+                        <h5 class="mb-1">
+                            Faculty Workload
+                        </h5>
+
+                        <small class="text-muted">
+
+                            Workload is calculated from saved
+                            assignments for the selected academic year.
+
+                        </small>
+
+                    </div>
+
+                    <span
+                        id="facultyCount"
+                        class="badge text-bg-light">
+
+                        0 Faculty
+
+                    </span>
+
+                </div>
+
+
+                <!-- WORKLOAD RULE -->
+
+                <div class="alert alert-light border small mb-3 mt-3">
+
+                    <strong>
+                        Workload rule:
+                    </strong>
+
+                    1 credit = 2h
+
+                    &nbsp; | &nbsp;
+
+                    2 credits = 4h
+
+                    &nbsp; | &nbsp;
+
+                    3 credits = 4h
+
+                    &nbsp; | &nbsp;
+
+                    4+ credits = 4h.
+
+                    Co-lab faculty receive the
+                    subject's practical hours.
+
+                </div>
+
+
+                <!-- WORKLOAD CARDS -->
+
+                <div id="workloadGrid"
+                     class="workload-grid">
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================= SUBJECTS ================= -->
+
+        <div class="card shadow-sm subjects-card">
+
+            <div class="card-body">
+
+                <div class="d-flex justify-content-between align-items-center mb-3">
+
+                    <div>
+
+                        <h5 class="mb-1">
+                            Subjects
+                        </h5>
+
+                        <small
+                            id="subjectSummary"
+                            class="text-muted">
+
+                            Select department, scheme,
+                            semester type and semester.
+
+                        </small>
+
+                    </div>
+
+
+                    <span
+                        id="pendingBadge"
+                        class="status-pill">
+
+                        0 pending
+
+                    </span>
+
+                </div>
+
+
+                <!-- SUBJECT TABLE -->
+
+                <div id="subjectsContainer">
+
+                    <div class="empty-state">
+
+                        <i class="bi bi-funnel fs-1 d-block mb-2"></i>
+
+                        Select the filters above
+                        to load subjects.
+
+                    </div>
+
+                </div>
+
+
+                <!-- SAVE / REASSIGN -->
+
+                <div
+                    class="border-top mt-4 pt-3 d-flex justify-content-end gap-2">
+
+                    <button
+                        id="reassignBtn"
+                        class="btn btn-outline-warning"
+                        onclick="saveAssignments(true)"
+                        disabled>
+
+                        <i class="bi bi-arrow-repeat me-1"></i>
+
+                        Re-Assign
+
+                    </button>
+
+
+                    <button
+                        id="saveBtn"
+                        class="btn btn-success"
+                        onclick="saveAssignments(false)"
+                        disabled>
+
+                        <i class="bi bi-save me-1"></i>
+
+                        Save Assignment
+
+                    </button>
+
                 </div>
 
             </div>
@@ -411,14 +677,150 @@
         </div>
 
     </div>
-        
 
 </div>
 
-<!-- Bootstrap JS -->
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- ================= ADD FACULTY MODAL ================= -->
+
+<div
+    class="modal fade"
+    id="addFacultyModal"
+    tabindex="-1">
+
+    <div class="modal-dialog modal-lg">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title">
+
+                    <i class="bi bi-person-plus me-2"></i>
+
+                    Add Faculty for Assignment
+
+                </h5>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal">
+
+                </button>
+
+            </div>
+
+
+            <div class="modal-body">
+
+                <p class="text-muted small">
+
+                    Select a department first.
+                    Then select the faculty you want
+                    to make available in the subject
+                    assignment dropdowns.
+
+                </p>
+
+
+                <div class="row g-3">
+
+                    <!-- DEPARTMENT -->
+
+                    <div class="col-md-6">
+
+                        <label class="form-label fw-semibold">
+                            Department
+                        </label>
+
+                        <select
+                            id="addFacultyDepartment"
+                            class="form-select">
+
+                            <option value="">
+                                Select Department
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- FACULTY -->
+
+                    <div class="col-md-6">
+
+                        <label class="form-label fw-semibold">
+                            Faculty
+                        </label>
+
+                        <select
+                            id="addFacultySelect"
+                            class="form-select"
+                            disabled>
+
+                            <option value="">
+                                Select Department First
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="addFacultyPreview"
+                    class="mt-3">
+
+                </div>
+
+            </div>
+
+
+            <div class="modal-footer">
+
+                <button
+                    class="btn btn-secondary"
+                    data-bs-dismiss="modal">
+
+                    Cancel
+
+                </button>
+
+
+                <button
+                    class="btn btn-success"
+                    onclick="addSelectedFaculty()">
+
+                    <i class="bi bi-plus-circle me-1"></i>
+
+                    Add Faculty
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ================= BOOTSTRAP ================= -->
+
+<script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+</script>
+
+
+<!-- ================= YOUR JS ================= -->
+
 <script src="js/faculty-subject-assignment.js"></script>
+
 </body>
 
 </html>

@@ -2,248 +2,624 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>View Timetable</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
+    <!-- Common CSS -->
     <link rel="stylesheet" href="css/style.css">
 
+    <!-- View Timetable CSS -->
+    <link rel="stylesheet" href="css/view-timetable.css">
+
+    <!-- Bootstrap -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+        rel="stylesheet">
 </head>
 
 <body>
 
-<div class="d-flex">
+<div class="app-layout">
 
-    <!-- Sidebar -->
+    <!-- =====================================================
+         SIDEBAR
+         ===================================================== -->
 
-    <div class="sidebar">
+    <aside class="sidebar">
 
-        <div class="logo">
-            <h3>AI Timetable</h3>
+        <div class="sidebar-title">
+            AI Timetable
         </div>
 
-        <ul class="nav flex-column">
+        <nav class="sidebar-menu">
 
-            <li class="nav-item">
-                <a href="dashboard.html" class="nav-link">
-                    <i class="bi bi-speedometer2"></i>
-                    Dashboard
-                </a>
-            </li>
+            <a href="dashboard.html" class="sidebar-item">
+                <i class="bi bi-speedometer2"></i>
+                <span>Dashboard</span>
+            </a>
 
-            <li class="nav-item">
-                <a href="department.html" class="nav-link">
-                    <i class="bi bi-building"></i>
-                    Department
-                </a>
-            </li>
+            <a href="department.html" class="sidebar-item">
+                <i class="bi bi-building"></i>
+                <span>Department</span>
+            </a>
 
-            <li class="nav-item">
-                <a href="scheme.html" class="nav-link">
-                    <i class="bi bi-journal-bookmark"></i>
-                    Scheme
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="academic-year.html" class="nav-link">
-                    <i class="bi bi-calendar3"></i>
-                    Academic Year
-                </a>
-            </li>
+            <a href="scheme.html" class="sidebar-item">
+                <i class="bi bi-journal-bookmark"></i>
+                <span>Scheme</span>
+            </a>
 
-            <li class="nav-item">
-                <a href="subject.html" class="nav-link">
-                    <i class="bi bi-book"></i>
-                    Subject
-                </a>
-            </li>
+            <a href="academic-year.html" class="sidebar-item">
+                <i class="bi bi-calendar3"></i>
+                <span>Academic Year</span>
+            </a>
 
-            <li class="nav-item">
-                <a href="faculty.html" class="nav-link">
-                    <i class="bi bi-person-workspace"></i>
-                    Faculty
-                </a>
-            </li>
+            <a href="subject.html" class="sidebar-item">
+                <i class="bi bi-book"></i>
+                <span>Subject</span>
+            </a>
 
-            <li class="nav-item">
-                <a href="faculty-subject-assignment.html" class="nav-link">
-                    <i class="bi bi-diagram-3"></i>
-                    Faculty Subject Assignment
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="timetable-constraints.html" class="nav-link">
-                    <i class="bi bi-sliders"></i>
-                    Timetable Constraints
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="generate-timetable.html" class="nav-link">
-                    <i class="bi bi-calendar-week"></i>
-                    Generate Timetable
-                </a>
-            </li>
+            <a href="faculty.html" class="sidebar-item">
+                <i class="bi bi-person-badge"></i>
+                <span>Faculty</span>
+            </a>
 
-            <li class="nav-item">
-                <a href="view-timetable.html" class="nav-link active">
-                    <i class="bi bi-table"></i>
-                    View Timetable
-                </a>
-            </li>
+            <a href="faculty-subject-assignment.html" class="sidebar-item">
+                <i class="bi bi-diagram-3"></i>
+                <span>Faculty Subject Assignment</span>
+            </a>
 
-            <li class="nav-item">
-                <a href="index.html" class="nav-link text-danger">
-                    <i class="bi bi-box-arrow-right"></i>
-                    Logout
-                </a>
-            </li>
+            <a href="timetable-constraints.html" class="sidebar-item">
+                <i class="bi bi-sliders"></i>
+                <span>Timetable Constraints</span>
+            </a>
 
-        </ul>
+            <a href="generate-timetable.html" class="sidebar-item">
+                <i class="bi bi-calendar-plus"></i>
+                <span>Generate Timetable</span>
+            </a>
 
-    </div>
+            <a href="view-timetable.html"
+               class="sidebar-item active">
 
-    <!-- Main Content -->
-
-    <div class="main-content">
-
-        <!-- Navbar -->
-
-        <nav class="navbar bg-white shadow-sm rounded px-4 mb-4">
-
-            <h4>
                 <i class="bi bi-table"></i>
-                View Timetable
-            </h4>
 
-            <div>
+                <span>View Timetable</span>
 
-                <i class="bi bi-person-circle fs-4"></i>
-
-                <b class="ms-2">Admin</b>
-
-            </div>
+            </a>
 
         </nav>
 
-        <!-- Filter Section -->
+        <div class="sidebar-bottom">
 
-        <div class="card shadow-sm mb-4" id="filterSection">
+            <a href="index.html" class="logout-link">
 
-            <div class="card-body">
+                <i class="bi bi-box-arrow-right"></i>
 
-                <div class="row g-3">
+                <span>Logout</span>
 
-                    <div class="col-md-3">
+            </a>
 
-                        <label class="form-label">
-                            Department
-                        </label>
+        </div>
 
-                        <select class="form-select" id="viewDepartment">
+    </aside>
 
-                            
-                        </select>
+
+    <!-- =====================================================
+         MAIN CONTENT
+         ===================================================== -->
+
+    <main class="main-content">
+
+        <!-- =================================================
+             PAGE HEADER
+             ================================================= -->
+
+        <section class="page-header-card">
+
+            <div>
+
+                <h1 class="page-title">
+
+                    <i class="bi bi-table"></i>
+
+                    View Timetable
+
+                </h1>
+
+                <p class="page-subtitle">
+
+                    View generated timetable for the selected semester.
+
+                </p>
+
+            </div>
+
+            <div class="admin-area">
+
+                <i class="bi bi-person-circle"></i>
+
+                <strong>Admin</strong>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             1. VIEWING CONTEXT
+             ================================================= -->
+
+        <section class="content-card">
+
+            <div class="section-header">
+
+                <h2>
+
+                    <i class="bi bi-funnel"></i>
+
+                    1. Viewing Context
+
+                </h2>
+
+            </div>
+
+
+            <div class="row g-3">
+
+                <!-- Department -->
+
+                <div class="col-md-3">
+
+                    <label
+                        for="viewDepartment"
+                        class="form-label">
+
+                        Department
+
+                    </label>
+
+                    <select
+                        id="viewDepartment"
+                        class="form-select">
+
+                        <option value="">
+                            Select Department
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- Scheme -->
+
+                <div class="col-md-3">
+
+                    <label
+                        for="viewScheme"
+                        class="form-label">
+
+                        Scheme
+
+                    </label>
+
+                    <select
+                        id="viewScheme"
+                        class="form-select">
+
+                        <option value="">
+                            Select Scheme
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- Semester Type -->
+
+                <div class="col-md-3">
+
+                    <label
+                        for="viewSemesterType"
+                        class="form-label">
+
+                        Semester Type
+
+                    </label>
+
+                    <select
+                        id="viewSemesterType"
+                        class="form-select">
+
+                        <option value="">
+                            Select Semester Type
+                        </option>
+
+                        <option value="Odd">
+                            Odd
+                        </option>
+
+                        <option value="Even">
+                            Even
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- Academic Year -->
+
+                <div class="col-md-3">
+
+                    <label
+                        for="viewAcademicYear"
+                        class="form-label">
+
+                        Academic Year
+
+                    </label>
+
+                    <select
+                        id="viewAcademicYear"
+                        class="form-select">
+
+                        <option value="">
+                            Select Academic Year
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             2. SEMESTER SELECTION
+             ================================================= -->
+
+        <section class="content-card">
+
+            <div class="section-header">
+
+                <h2>
+
+                    <i class="bi bi-mortarboard"></i>
+
+                    2. Semester Selection
+
+                </h2>
+
+            </div>
+
+            <p class="section-description">
+
+                Semesters are automatically determined by the
+                selected Odd / Even semester type.
+
+            </p>
+
+
+            <div
+                id="semesterBoxes"
+                class="semester-container">
+
+            </div>
+
+
+            <input
+                type="hidden"
+                id="viewSemester"
+                value="">
+
+
+            <input
+                type="hidden"
+                id="viewType"
+                value="single">
+
+
+            <div class="selection-info">
+
+                <strong>
+                    Selected Semester:
+                </strong>
+
+                <span id="selectedSemesterText">
+
+                    Select semester type first.
+
+                </span>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             3. VIEW TIMETABLE
+             ================================================= -->
+
+        <section class="content-card">
+
+            <div class="section-header">
+
+                <h2>
+
+                    <i class="bi bi-calendar-check"></i>
+
+                    3. View Timetable
+
+                </h2>
+
+            </div>
+
+
+            <button
+                type="button"
+                id="viewTimetableBtn"
+                class="btn view-btn">
+
+                <i class="bi bi-search"></i>
+
+                View Timetable
+
+            </button>
+
+        </section>
+
+
+        <!-- =================================================
+             TIMETABLE AREA
+             ================================================= -->
+
+        <section
+            class="content-card timetable-card"
+            id="printArea">
+
+
+            <!-- College Header -->
+
+            <div class="college-header">
+
+                <h2>
+                    SRI KRISHNA INSTITUTE OF TECHNOLOGY
+                </h2>
+
+                <p>
+                    (Accredited by NAAC |
+                    Approved by AICTE |
+                    Affiliated to VTU, Belagavi)
+                </p>
+
+                <p>
+                    #57, Chikkabanavara,
+                    Bengaluru - 560090
+                </p>
+
+            </div>
+
+
+            <!-- =================================================
+                 BASIC DETAILS
+                 ================================================= -->
+
+            <div class="table-responsive">
+
+                <table
+                    class="table table-bordered timetable-details">
+
+                    <thead>
+
+                    <tr>
+
+                        <th>Department</th>
+
+                        <th>Semester</th>
+
+                        <th>Division</th>
+
+                        <th>Room No.</th>
+
+                        <th>Branch</th>
+
+                        <th>Version</th>
+
+                        <th>W.E.F.</th>
+
+                    </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                    <tr>
+
+                        <td id="displayDepartment">
+                            -
+                        </td>
+
+                        <td id="displaySemester">
+                            -
+                        </td>
+
+                        <td>
+                            A
+                        </td>
+
+                        <td>
+                            S-201
+                        </td>
+
+                        <td id="displayBranch">
+                            -
+                        </td>
+
+                        <td id="displayScheme">
+                            -
+                        </td>
+
+                        <td id="displayAcademicYear">
+                            -
+                        </td>
+
+                    </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <!-- =================================================
+                 GENERATED TIMETABLE
+                 
+                 JS will generate:
+                 
+                 P1
+                 P2
+                 TEA BREAK
+                 P3
+                 P4
+                 LUNCH BREAK
+                 P5
+                 P6
+                 P7
+                 
+                 ================================================= -->
+
+            <div
+                id="professionalTimetable"
+                class="timetable-output">
+
+                <div class="empty-timetable">
+
+                    <i class="bi bi-calendar3"></i>
+
+                    <p>
+
+                        Select Department, Scheme,
+                        Academic Year, Semester Type
+                        and Semester.
+
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 SUBJECT + FACULTY
+                 ================================================= -->
+
+            <div class="row g-3 mt-3">
+
+
+                <!-- Subject Details -->
+
+                <div class="col-md-6">
+
+                    <div class="details-box">
+
+                        <div class="details-title green-title">
+
+                            Subject Details
+
+                        </div>
+
+                        <div class="table-responsive">
+
+                            <table
+                                class="table table-bordered mb-0">
+
+                                <thead>
+
+                                <tr>
+
+                                    <th>
+                                        Code
+                                    </th>
+
+                                    <th>
+                                        Subject Name
+                                    </th>
+
+                                    <th>
+                                        Credits
+                                    </th>
+
+                                </tr>
+
+                                </thead>
+
+                                <tbody
+                                    id="subjectDetailsBody">
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
 
                     </div>
 
-                    <div class="col-md-2">
-
-                        <label class="form-label">
-                            Scheme
-                        </label>
-
-                        <select class="form-select" id="viewScheme">
-
-                            
-                        </select>
-
-                    </div>
-                    
-                    
-
-                    <div class="col-md-3">
-
-                        <label class="form-label">
-                            Academic Year
-                        </label>
-
-                        <select class="form-select" id="viewAcademicYear">
-
-                            
-
-                        </select>
-
-                    </div>
-                    <div class="col-md-2">
-
-                        <label class="form-label">
-                            Semester Type
-                        </label>
-
-                        <select class="form-select" id="viewSemesterType">
-
-                            <option value="">Select</option>
-
-                            <option value="Odd">Odd</option>
-
-                            <option value="Even">Even</option>
-
-                        </select>
-
-                    </div>
-                    <div class="col-md-3">
-
-                        <label class="form-label">
-                            View Type
-                        </label>
-
-                        <select class="form-select" id="viewType">
-
-                            <option value="all">
-                                All Semesters
-                            </option>
-
-                            <option value="single">
-                                Particular Semester
-                            </option>
-
-                        </select>
-
-                    </div>
-                    <div class="col-md-2"
-                        id="semesterDiv"
-                        style="display:none;">
-
-                        <label class="form-label">
-                            Semester
-                        </label>
-
-                        <select class="form-select"
-                                id="viewSemester">
-
-                            <option value="">Select</option>
-
-                        </select>
-
-                    </div>
+                </div>
 
 
-                    <div class="col-md-2 d-flex align-items-end">
+                <!-- Faculty Details -->
 
-                        <button class="btn btn-primary w-100"id="viewTimetableBtn">
+                <div class="col-md-6">
 
-                            <i class="bi bi-search"></i>
+                    <div class="details-box">
 
-                            View Timetable
+                        <div class="details-title green-title">
 
-                        </button>
+                            Faculty Details
+
+                        </div>
+
+                        <div class="table-responsive">
+
+                            <table
+                                class="table table-bordered mb-0">
+
+                                <thead>
+
+                                <tr>
+
+                                    <th>
+                                        Faculty
+                                    </th>
+
+                                    <th>
+                                        Subject
+                                    </th>
+
+                                </tr>
+
+                                </thead>
+
+                                <tbody
+                                    id="facultyDetailsBody">
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
 
                     </div>
 
@@ -251,298 +627,154 @@
 
             </div>
 
-        </div>
 
-        <!-- Timetable Card -->
+            <!-- =================================================
+                 NOTES
+                 ================================================= -->
 
-        <div class="card shadow">
-            
-            
-            <div class="card-body">
-                <div id="printArea">
-                
-              
-<div class="text-center mb-4">
+            <div class="notes-box mt-3">
 
-    <div class="row align-items-center">
+                <strong>Notes</strong>
 
-        <div class="col-2">
+                <ul>
 
-           
-            <img src="images/logo.jpg"
-                 alt="College Logo"
-                 width="90"
-                 height="90"
-                 class="img-fluid">
+                    <li>
 
-        </div>
+                        Tea Break:
 
-        <div class="col-10">
+                        <strong>
+                            11:00 AM - 11:15 AM
+                        </strong>
 
-            <h2 class="fw-bold mb-1">
-                SRI KRISHNA INSTITUTE OF TECHNOLOGY
-            </h2>
+                    </li>
 
-            <p class="mb-0">
-                (Accredited by NAAC | Approved by AICTE | Affiliated to VTU,
-                Belagavi)
-            </p>
+                    <li>
 
-            <small>
-                #57, Chikkabanavara, Bengaluru - 560090
-            </small>
+                        Lunch Break:
 
-        </div>
+                        <strong>
+                            1:05 PM - 1:45 PM
+                        </strong>
 
-    </div>
+                    </li>
 
-</div>
+                    <li>
 
+                        Working Days:
 
-<table class="table table-bordered text-center mb-4">
+                        <strong>
+                            Monday to Saturday
+                        </strong>
 
-    <tr class="table-light">
+                    </li>
 
-        <th>Department</th>
-        <th>Semester</th>
-        <th>Division</th>
-        <th>Room No.</th>
-        <th>Branch</th>
-        <th>Version</th>
-        <th>W.E.F.</th>
+                    <li>
 
-    </tr>
+                        Timetable generated automatically
+                        by AI Timetable System.
 
-    <tr>
+                    </li>
 
-        <td id="displayDepartment"></td>
-        <td id="displaySemester"></td>
-        <td>A</td>
-        <td>S-201</td>
-        <td id="displayBranch"></td>
-        <td id="displayScheme"></td>
-        <td id="displayAcademicYear"></td>
-    </tr>
-
-</table>
-
-
-
-<div id="professionalTimetable"></div>
-
-<div class="row mt-4">
-
-    
-
-    <div class="col-lg-6">
-
-        <div class="card shadow-sm mb-4">
-
-            <div class="card-header bg-primary text-white">
-
-                <h5 class="mb-0">
-                    Subject Details
-                </h5>
+                </ul>
 
             </div>
 
-            <div class="card-body p-0">
 
-                <table class="table table-bordered table-hover mb-0">
+            <!-- =================================================
+                 ACTION BUTTONS
+                 ================================================= -->
 
-                    <thead class="table-light">
+            <div class="action-buttons">
 
-                        <tr>
+                <button
+                    type="button"
+                    id="saveTimetableBtn"
+                    class="btn save-btn">
 
-                            <th>Code</th>
-                            <th>Subject Name</th>
-                            <th>Credits</th>
+                    <i class="bi bi-database-check"></i>
 
-                        </tr>
+                    Save Timetable
 
-                    </thead>
+                </button>
 
-                    <tbody id="subjectDetailsBody">
 
-                    </tbody>
+                <button
+                    type="button"
+                    id="printTimetableBtn"
+                    class="btn btn-secondary">
 
-                </table>
+                    <i class="bi bi-printer"></i>
 
-            </div>
+                    Print
 
-        </div>
+                </button>
 
-    </div>
 
-    
+                <button
+                    type="button"
+                    id="exportPdfBtn"
+                    class="btn btn-danger">
 
-    <div class="col-lg-6">
+                    <i class="bi bi-file-earmark-pdf"></i>
 
-        <div class="card shadow-sm mb-4">
+                    Export PDF
 
-            <div class="card-header bg-success text-white">
+                </button>
 
-                <h5 class="mb-0">
-                    Faculty Details
-                </h5>
 
-            </div>
+                <button
+                    type="button"
+                    id="exportExcelBtn"
+                    class="btn btn-primary">
 
-            <div class="card-body p-0">
+                    <i class="bi bi-file-earmark-excel"></i>
 
-                <table class="table table-bordered table-hover mb-0">
+                    Export Excel
 
-                    <thead class="table-light">
-
-                        <tr>
-
-                            <th>Faculty</th>
-                            <th>Subject</th>
-
-                        </tr>
-
-                    </thead>
-
-                    <tbody id="facultyDetailsBody">
-
-                    </tbody>
-
-                </table>
+                </button>
 
             </div>
 
-        </div>
+        </section>
 
-    </div>
-
-</div>
-
-
-
-<div class="alert alert-info" id="notesSection">
-    <h6 class="mb-2">
-        Notes
-    </h6>
-
-    <ul class="mb-0">
-
-        <li>Tea Break : <strong>11:00 AM - 11:15 AM</strong></li>
-
-        <li>Lunch Break : <strong>1:05 PM - 1:45 PM</strong></li>
-
-        <li>Working Days : <strong>Monday to Saturday</strong></li>
-
-        <li>Timetable generated automatically by AI Timetable System.</li>
-
-    </ul>
+    </main>
 
 </div>
 
 
+<!-- =========================================================
+     BOOTSTRAP JS
+     ========================================================= -->
+
+<script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+</script>
 
 
-<hr>
+<!-- =========================================================
+     PDF
+     ========================================================= -->
+
+<script
+    src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js">
+</script>
 
 
+<!-- =========================================================
+     EXCEL
+     ========================================================= -->
 
-<div class="row text-center mt-5 mb-4">
-
-    <div class="col-md-4">
-
-        <div style="height:60px;"></div>
-
-        <hr>
-
-        <h6 class="fw-bold">
-            Timetable Coordinator
-        </h6>
-
-    </div>
-
-    <div class="col-md-4">
-
-        <div style="height:60px;"></div>
-
-        <hr>
-
-        <h6 class="fw-bold">
-            Head of Department
-        </h6>
-
-    </div>
-
-    <div class="col-md-4">
-
-        <div style="height:60px;"></div>
-
-        <hr>
-
-        <h6 class="fw-bold">
-            Principal
-        </h6>
-
-    </div>
-
-</div>
+<script
+    src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js">
+</script>
 
 
+<!-- =========================================================
+     VIEW TIMETABLE JS
+     ========================================================= -->
 
-<div class="text-center mt-4">
-
-    <small class="text-muted">
-
-        © 2026 AI-Based Automatic Timetable Generation System |
-        Developed using HTML, CSS, Bootstrap, JavaScript,
-        Spring Boot & MySQL
-
-    </small>
-
-</div>
-        
-        </div>   <!-- closes printArea -->
-
-
-<div class="d-flex justify-content-center gap-3 my-4">
-
-    <button
-        class="btn btn-primary"
-        id="printTimetableBtn">
-
-        <i class="bi bi-printer"></i>
-        Print
-
-    </button>
-
-    <button
-        class="btn btn-danger"
-        id="exportPdfBtn">
-
-        <i class="bi bi-file-earmark-pdf"></i>
-        Export PDF
-
-    </button>
-
-    <button
-        class="btn btn-success"
-        id="exportExcelBtn">
-
-        <i class="bi bi-file-earmark-excel"></i>
-        Export Excel
-
-    </button>
-
-</div>
-    
-    </div>
-    </div>
-</div>
-
-<!-- Bootstrap JS -->
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="js/view-timetable.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
 
 </body>
 

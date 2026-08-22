@@ -1,279 +1,683 @@
 from flask import Blueprint, request, jsonify
 import mysql.connector
+import json
+
+
+# ============================================================
+# BLUEPRINT
+# ============================================================
 
 timetable_constraints_api = Blueprint(
     "timetable_constraints_api",
     __name__
 )
-def get_connection():
 
-    return mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="root",
-        database="timetable_db"
-    )
+
+# ============================================================
+# DATABASE CONFIGURATION
+# Same configuration used in faculty_subject_assignment.py
+# ============================================================
+
+DB_CONFIG = {
+    "host": "localhost",
+    "user": "root",
+    "password": "root",
+    "database": "timetable_db"
+}
+
+
+def get_connection(dictionary=True):
+    return mysql.connector.connect(**DB_CONFIG)
+
+
+# ============================================================
+# HELPER
+# ============================================================
+
+def json_to_text(value, default):
+    """
+    Convert Python list/dict into JSON text
+    for MySQL TEXT columns.
+    """
+
+    if value is None:
+        value = default
+
+    try:
+        return json.dumps(value)
+    except (TypeError, ValueError):
+        return json.dumps(default)
+
+
+def text_to_json(value, default):
+    """
+    Convert JSON text from MySQL TEXT column
+    back into Python list/dict.
+    """
+
+    if value is None or value == "":
+        return default
+
+    try:
+        return json.loads(value)
+    except (TypeError, ValueError, json.JSONDecodeError):
+        return default
+
+
+# ============================================================
+# GET CONSTRAINTS
+# ============================================================
+
 @timetable_constraints_api.route(
-    "/timetable-constraints/test",
+    "/timetable-constraints",
     methods=["GET"]
 )
+def get_timetable_constraints():
 
-def test():
+    academic_year = request.args.get(
+        "academic_year"
+    )
 
-    return jsonify({
-        "message": "Timetable Constraints API Working"
-    })
+    department_code = request.args.get(
+        "department"
+    )
 
+    scheme_id = request.args.get(
+        "scheme"
+    )
+
+    # --------------------------------------------------------
+    # Validate parameters
+    # --------------------------------------------------------
+
+    if not academic_year:
+        return jsonify({
+            "success": False,
+            "message": "Academic year is required."
+        }), 400
+
+    if not department_code:
+        return jsonify({
+            "success": False,
+            "message": "Department is required."
+        }), 400
+
+    if not scheme_id:
+        return jsonify({
+            "success": False,
+            "message": "Scheme is required."
+        }), 400
+
+    connection = None
+    cursor = None
+
+    try:
+
+        connection = get_connection(
+            dictionary=True
+        )
+
+        cursor = connection.cursor(
+            dictionary=True
+        )
+
+        # ----------------------------------------------------
+        # Find constraints
+        # ----------------------------------------------------
+
+        cursor.execute(
+            """
+            SELECT
+                id,
+                academic_year,
+                department_code,
+                scheme_id,
+                working_days,
+                periods,
+                break_data,
+                faculty_daily_limit,
+                student_daily_limit,
+                lab_consecutive,
+                faculty_clash,
+                semester_clash,
+                cycle_constraint,
+                created_at,
+                updated_at
+            FROM timetable_constraints
+            WHERE
+                academic_year = %s
+                AND department_code = %s
+                AND scheme_id = %s
+            LIMIT 1
+            """,
+            (
+                academic_year,
+                department_code,
+                scheme_id
+            )
+        )
+
+        row = cursor.fetchone()
+
+        # ----------------------------------------------------
+        # No record
+        # ----------------------------------------------------
+
+        if not row:
+
+            return jsonify({
+                "success": True,
+                "exists": False,
+                "message": "No constraints saved yet."
+            }), 200
+
+        # ----------------------------------------------------
+        # Convert TEXT -> JSON
+        # ----------------------------------------------------
+
+        row["working_days"] = text_to_json(
+            row.get("working_days"),
+            []
+        )
+
+        row["periods"] = text_to_json(
+            row.get("periods"),
+            []
+        )
+
+        row["break"] = text_to_json(
+            row.get("break_data"),
+            {}
+        )
+
+        # ----------------------------------------------------
+        # Convert TINYINT -> boolean
+        # ----------------------------------------------------
+
+        row["lab_consecutive"] = bool(
+            row.get("lab_consecutive", 0)
+        )
+
+        row["faculty_clash"] = bool(
+            row.get("faculty_clash", 1)
+        )
+
+        row["semester_clash"] = bool(
+            row.get("semester_clash", 1)
+        )
+
+        row["cycle_constraint"] = bool(
+            row.get("cycle_constraint", 1)
+        )
+
+        # ----------------------------------------------------
+        # Convert limits
+        # ----------------------------------------------------
+
+        row["faculty_daily_limit"] = int(
+            row.get(
+                "faculty_daily_limit",
+                4
+            ) or 4
+        )
+
+        row["student_daily_limit"] = int(
+            row.get(
+                "student_daily_limit",
+                6
+            ) or 6
+        )
+
+        return jsonify({
+            "success": True,
+            "exists": True,
+            "data": row
+        }), 200
+
+    except Exception as error:
+
+        print(
+            "GET timetable constraints error:",
+            error
+        )
+
+        return jsonify({
+            "success": False,
+            "message": "Unable to load timetable constraints.",
+            "error": str(error)
+        }), 500
+
+    finally:
+
+        if cursor:
+            cursor.close()
+
+        if connection:
+            connection.close()
+
+
+# ============================================================
+# SAVE / UPDATE CONSTRAINTS
+# ============================================================
 
 @timetable_constraints_api.route(
     "/timetable-constraints",
     methods=["POST"]
 )
-def save_constraint():
+def save_timetable_constraints():
 
-    data = request.json
-
-    connection = get_connection()
-
-    cursor = connection.cursor(dictionary=True)
-
-    # Get Department ID
-    cursor.execute(
-        "SELECT department_id FROM department WHERE department_code = %s",
-        (data["department"],)
+    data = request.get_json(
+        silent=True
     )
-    department = cursor.fetchone()
 
-    # Get Scheme ID
-    cursor.execute(
-        "SELECT scheme_id FROM scheme WHERE scheme_year = %s",
-        (data["scheme"],)
+    if not data:
+
+        return jsonify({
+            "success": False,
+            "message": "No constraint data received."
+        }), 400
+
+    # --------------------------------------------------------
+    # Get values
+    # --------------------------------------------------------
+
+    academic_year = data.get(
+        "academic_year"
     )
-    scheme = cursor.fetchone()
 
-    query = """
-    INSERT INTO timetable_constraints
-    (
-        department_id,
-        scheme_id,
-        academic_year,
-        semester_type,
-        semester_id,
-        working_days,
-        periods_per_day,
-        college_start_time,
-        period_duration,
-        lunch_after_period,
-        short_break_after_period,
-        short_break_duration,
-        max_periods_per_day,
-        max_periods_per_week,
-        lab_duration
+    department_code = data.get(
+        "department"
     )
-    VALUES
-    (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
-    """
 
-    cursor.execute(
-        query,
-        (
-            department["department_id"],
-            scheme["scheme_id"],
-            data["academic_year"],
-            data["semester_type"],
-            data["semester"],
-            ",".join(data["working_days"]),
-            data["periods_per_day"],
-            data["college_start_time"],
-            data["period_duration"],
-            data["lunch_after_period"],
-            data["short_break_after_period"] if data["short_break_after_period"] else None,
-            data["short_break_duration"] if data["short_break_duration"] else None,
-            data["max_periods_per_day"],
-            data["max_periods_per_week"],
-            data["lab_duration"]
+    scheme_id = data.get(
+        "scheme"
+    )
+
+    # --------------------------------------------------------
+    # Validate
+    # --------------------------------------------------------
+
+    if not academic_year:
+
+        return jsonify({
+            "success": False,
+            "message": "Academic year is required."
+        }), 400
+
+    if not department_code:
+
+        return jsonify({
+            "success": False,
+            "message": "Department is required."
+        }), 400
+
+    if not scheme_id:
+
+        return jsonify({
+            "success": False,
+            "message": "Scheme is required."
+        }), 400
+
+    # --------------------------------------------------------
+    # Prepare JSON TEXT values
+    # --------------------------------------------------------
+
+    working_days = json_to_text(
+        data.get("working_days"),
+        []
+    )
+
+    periods = json_to_text(
+        data.get("periods"),
+        []
+    )
+
+    break_data = json_to_text(
+        data.get("break"),
+        {}
+    )
+
+    # --------------------------------------------------------
+    # Prepare numeric values
+    # --------------------------------------------------------
+
+    try:
+
+        faculty_daily_limit = int(
+            data.get(
+                "faculty_daily_limit",
+                4
+            )
         )
+
+    except (TypeError, ValueError):
+
+        faculty_daily_limit = 4
+
+
+    try:
+
+        student_daily_limit = int(
+            data.get(
+                "student_daily_limit",
+                6
+            )
+        )
+
+    except (TypeError, ValueError):
+
+        student_daily_limit = 6
+
+
+    lab_consecutive = (
+        1
+        if data.get(
+            "lab_consecutive",
+            False
+        )
+        else 0
     )
 
-    connection.commit()
+    faculty_clash = (
+        1
+        if data.get(
+            "faculty_clash",
+            True
+        )
+        else 0
+    )
 
-    cursor.close()
-    connection.close()
+    semester_clash = (
+        1
+        if data.get(
+            "semester_clash",
+            True
+        )
+        else 0
+    )
 
-    return jsonify({
-        "message": "Constraint Saved Successfully"
-    })
+    cycle_constraint = (
+        1
+        if data.get(
+            "cycle_constraint",
+            True
+        )
+        else 0
+    )
+
+    connection = None
+    cursor = None
+
+    try:
+
+        connection = get_connection(
+            dictionary=True
+        )
+
+        cursor = connection.cursor(
+            dictionary=True
+        )
+
+        # ====================================================
+        # CHECK EXISTING RECORD
+        # ====================================================
+
+        cursor.execute(
+            """
+            SELECT id
+            FROM timetable_constraints
+            WHERE
+                academic_year = %s
+                AND department_code = %s
+                AND scheme_id = %s
+            LIMIT 1
+            """,
+            (
+                academic_year,
+                department_code,
+                scheme_id
+            )
+        )
+
+        existing = cursor.fetchone()
+
+        # ====================================================
+        # UPDATE EXISTING
+        # ====================================================
+
+        if existing:
+
+            constraint_id = existing["id"]
+
+            cursor.execute(
+                """
+                UPDATE timetable_constraints
+                SET
+                    working_days = %s,
+                    periods = %s,
+                    break_data = %s,
+                    faculty_daily_limit = %s,
+                    student_daily_limit = %s,
+                    lab_consecutive = %s,
+                    faculty_clash = %s,
+                    semester_clash = %s,
+                    cycle_constraint = %s,
+                    updated_at = NOW()
+                WHERE id = %s
+                """,
+                (
+                    working_days,
+                    periods,
+                    break_data,
+                    faculty_daily_limit,
+                    student_daily_limit,
+                    lab_consecutive,
+                    faculty_clash,
+                    semester_clash,
+                    cycle_constraint,
+                    constraint_id
+                )
+            )
+
+            message = (
+                "Timetable constraints updated successfully."
+            )
+
+        # ====================================================
+        # INSERT NEW
+        # ====================================================
+
+        else:
+
+            cursor.execute(
+                """
+                INSERT INTO timetable_constraints
+                (
+                    academic_year,
+                    department_code,
+                    scheme_id,
+                    working_days,
+                    periods,
+                    break_data,
+                    faculty_daily_limit,
+                    student_daily_limit,
+                    lab_consecutive,
+                    faculty_clash,
+                    semester_clash,
+                    cycle_constraint,
+                    created_at,
+                    updated_at
+                )
+                VALUES
+                (
+                    %s,
+                    %s,
+                    %s,
+                    %s,
+                    %s,
+                    %s,
+                    %s,
+                    %s,
+                    %s,
+                    %s,
+                    %s,
+                    %s,
+                    NOW(),
+                    NOW()
+                )
+                """,
+                (
+                    academic_year,
+                    department_code,
+                    scheme_id,
+                    working_days,
+                    periods,
+                    break_data,
+                    faculty_daily_limit,
+                    student_daily_limit,
+                    lab_consecutive,
+                    faculty_clash,
+                    semester_clash,
+                    cycle_constraint
+                )
+            )
+
+            message = (
+                "Timetable constraints saved successfully."
+            )
+
+        # ----------------------------------------------------
+        # Commit
+        # ----------------------------------------------------
+
+        connection.commit()
+
+        return jsonify({
+            "success": True,
+            "message": message
+        }), 200
+
+    except Exception as error:
+
+        if connection:
+            connection.rollback()
+
+        print(
+            "SAVE timetable constraints error:",
+            error
+        )
+
+        return jsonify({
+            "success": False,
+            "message": "Unable to save timetable constraints.",
+            "error": str(error)
+        }), 500
+
+    finally:
+
+        if cursor:
+            cursor.close()
+
+        if connection:
+            connection.close()
+
+
+# ============================================================
+# DELETE CONSTRAINTS
+# ============================================================
+
 @timetable_constraints_api.route(
     "/timetable-constraints",
-    methods=["GET"]
-)
-def get_constraints():
-
-    connection = get_connection()
-
-    cursor = connection.cursor(dictionary=True)
-
-    query = """
-    SELECT
-        tc.constraint_id,
-        d.department_code,
-        s.scheme_year,
-        tc.academic_year,
-        tc.semester_type,
-        tc.semester_id,
-        tc.working_days,
-        tc.periods_per_day,
-        tc.college_start_time,
-        tc.period_duration,
-        tc.lunch_after_period,
-        tc.short_break_after_period,
-        tc.short_break_duration
-    FROM timetable_constraints tc
-    JOIN department d
-        ON tc.department_id = d.department_id
-    JOIN scheme s
-        ON tc.scheme_id = s.scheme_id
-    ORDER BY tc.constraint_id;
-    """
-
-    cursor.execute(query)
-
-    constraints = cursor.fetchall()
-    for constraint in constraints:
-        constraint["college_start_time"] = str(
-            constraint["college_start_time"]
-        )
-
-    cursor.close()
-
-    connection.close()
-
-    return jsonify(constraints)
-@timetable_constraints_api.route(
-    "/timetable-constraints/<int:constraint_id>",
-    methods=["GET"]
-)
-def get_constraint(constraint_id):
-
-    connection = get_connection()
-
-    cursor = connection.cursor(dictionary=True)
-
-    query = """
-    SELECT *
-    FROM timetable_constraints
-    WHERE constraint_id = %s
-    """
-
-    cursor.execute(query, (constraint_id,))
-
-    constraint = cursor.fetchone()
-    if constraint:
-        constraint["college_start_time"] = str(
-            constraint["college_start_time"]
-        )
-
-    cursor.close()
-
-    connection.close()
-
-    return jsonify(constraint)
-@timetable_constraints_api.route(
-    "/timetable-constraints/<int:constraint_id>",
-    methods=["PUT"]
-)
-def update_constraint(constraint_id):
-
-    data = request.json
-
-    connection = get_connection()
-
-    cursor = connection.cursor(dictionary=True)
-    cursor.execute(
-        "SELECT department_id FROM department WHERE department_code=%s",
-        (data["department"],)
-    )
-
-    department = cursor.fetchone()
-
-    cursor.execute(
-        "SELECT scheme_id FROM scheme WHERE scheme_year=%s",
-        (data["scheme"],)
-    )
-
-    scheme = cursor.fetchone()
-    query = """
-    UPDATE timetable_constraints
-    SET
-        department_id=%s,
-        scheme_id=%s,
-        academic_year=%s,
-        semester_type=%s,
-        semester_id=%s,
-        working_days=%s,
-        periods_per_day=%s,
-        college_start_time=%s,
-        period_duration=%s,
-        lunch_after_period=%s,
-        short_break_after_period=%s,
-        short_break_duration=%s,
-        max_periods_per_day=%s,
-        max_periods_per_week=%s,
-        lab_duration=%s
-    WHERE constraint_id=%s
-    """
-    cursor.execute(
-        query,
-        (
-            department["department_id"],
-            scheme["scheme_id"],
-            data["academic_year"],
-            data["semester_type"],
-            data["semester"],
-            ",".join(data["working_days"]),
-            data["periods_per_day"],
-            data["college_start_time"],
-            data["period_duration"],
-            data["lunch_after_period"],
-            data["short_break_after_period"],
-            data["short_break_duration"],
-            data["max_periods_per_day"],
-            data["max_periods_per_week"],
-            data["lab_duration"],
-            constraint_id
-        )
-    )
-
-    connection.commit()
-
-    cursor.close()
-
-    connection.close()
-
-    return jsonify({
-        "message": "Constraint Updated Successfully"
-    })
-@timetable_constraints_api.route(
-    "/timetable-constraints/<int:constraint_id>",
     methods=["DELETE"]
 )
-def delete_constraint(constraint_id):
+def delete_timetable_constraints():
 
-    connection = get_connection()
-
-    cursor = connection.cursor()
-
-    cursor.execute(
-        "DELETE FROM timetable_constraints WHERE constraint_id = %s",
-        (constraint_id,)
+    academic_year = request.args.get(
+        "academic_year"
     )
 
-    connection.commit()
+    department_code = request.args.get(
+        "department"
+    )
 
-    cursor.close()
+    scheme_id = request.args.get(
+        "scheme"
+    )
 
-    connection.close()
+    if not academic_year:
+        return jsonify({
+            "success": False,
+            "message": "Academic year is required."
+        }), 400
 
-    return jsonify({
-        "message": "Constraint Deleted Successfully"
-    })
+    if not department_code:
+        return jsonify({
+            "success": False,
+            "message": "Department is required."
+        }), 400
+
+    if not scheme_id:
+        return jsonify({
+            "success": False,
+            "message": "Scheme is required."
+        }), 400
+
+    connection = None
+    cursor = None
+
+    try:
+
+        connection = get_connection()
+
+        cursor = connection.cursor()
+
+        cursor.execute(
+            """
+            DELETE FROM timetable_constraints
+            WHERE
+                academic_year = %s
+                AND department_code = %s
+                AND scheme_id = %s
+            """,
+            (
+                academic_year,
+                department_code,
+                scheme_id
+            )
+        )
+
+        deleted_count = cursor.rowcount
+
+        connection.commit()
+
+        return jsonify({
+            "success": True,
+            "message": (
+                "Timetable constraints deleted successfully."
+            ),
+            "deleted": deleted_count
+        }), 200
+
+    except Exception as error:
+
+        if connection:
+            connection.rollback()
+
+        print(
+            "DELETE timetable constraints error:",
+            error
+        )
+
+        return jsonify({
+            "success": False,
+            "message": "Unable to delete timetable constraints.",
+            "error": str(error)
+        }), 500
+
+    finally:
+
+        if cursor:
+            cursor.close()
+
+        if connection:
+            connection.close()

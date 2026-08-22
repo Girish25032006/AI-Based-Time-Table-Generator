@@ -4,505 +4,927 @@
 <head>
 
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
     <title>Timetable Constraints</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet">
 
-    <link rel="stylesheet"
+    <link
+        rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-    <link rel="stylesheet" href="css/style.css">
+    <link
+        rel="stylesheet"
+        href="css/style.css">
+
+    <style>
+
+        .constraint-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 14px;
+            background: #fff;
+        }
+
+        .constraint-title {
+            font-weight: 700;
+            color: #12372a;
+        }
+
+        .day-btn {
+            min-width: 105px;
+        }
+
+        .day-btn.active {
+            background: #087443;
+            border-color: #087443;
+            color: white;
+        }
+
+        .period-row {
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 10px;
+            background: #fafcfb;
+        }
+
+        .period-number {
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: #087443;
+            color: white;
+            font-weight: 700;
+        }
+
+        .constraint-help {
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+    </style>
 
 </head>
 
+
 <body>
+
 
 <div class="d-flex">
 
-    <!-- Sidebar -->
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
 
     <div class="sidebar">
 
         <div class="logo">
-            <h3>AI Timetable</h3>
+
+            <h3>
+                AI Timetable
+            </h3>
+
         </div>
+
 
         <ul class="nav flex-column">
 
+
             <li class="nav-item">
-                <a href="dashboard.html" class="nav-link">
+
+                <a
+                    href="dashboard.html"
+                    class="nav-link">
+
                     <i class="bi bi-speedometer2"></i>
+
                     Dashboard
+
                 </a>
+
             </li>
 
+
             <li class="nav-item">
-                <a href="department.html" class="nav-link">
+
+                <a
+                    href="department.html"
+                    class="nav-link">
+
                     <i class="bi bi-building"></i>
+
                     Department
+
                 </a>
+
             </li>
 
+
             <li class="nav-item">
-                <a href="scheme.html" class="nav-link">
+
+                <a
+                    href="scheme.html"
+                    class="nav-link">
+
                     <i class="bi bi-journal-bookmark"></i>
+
                     Scheme
+
                 </a>
+
             </li>
+
+
             <li class="nav-item">
-                <a href="academic-year.html" class="nav-link">
+
+                <a
+                    href="academic-year.html"
+                    class="nav-link">
+
                     <i class="bi bi-calendar3"></i>
+
                     Academic Year
+
                 </a>
+
             </li>
+
+
             <li class="nav-item">
-                <a href="subject.html" class="nav-link">
+
+                <a
+                    href="subject.html"
+                    class="nav-link">
+
                     <i class="bi bi-book"></i>
+
                     Subject
+
                 </a>
+
             </li>
 
+
             <li class="nav-item">
-                <a href="faculty.html" class="nav-link ">
+
+                <a
+                    href="faculty.html"
+                    class="nav-link">
+
                     <i class="bi bi-person-workspace"></i>
+
                     Faculty
+
                 </a>
+
             </li>
+
+
             <li class="nav-item">
-                <a href="faculty-subject-assignment.html" class="nav-link " >
+
+                <a
+                    href="faculty-subject-assignment.html"
+                    class="nav-link">
+
                     <i class="bi bi-diagram-3"></i>
+
                     Faculty Subject Assignment
+
                 </a>
+
             </li>
+
+
             <li class="nav-item">
-                <a href="timetable-constraints.html" class="nav-link active">
+
+                <a
+                    href="timetable-constraints.html"
+                    class="nav-link active">
+
                     <i class="bi bi-sliders"></i>
+
                     Timetable Constraints
+
                 </a>
+
             </li>
+
+
             <li class="nav-item">
-                <a href="generate-timetable.html" class="nav-link">
+
+                <a
+                    href="generate-timetable.html"
+                    class="nav-link">
+
                     <i class="bi bi-calendar-week"></i>
+
                     Generate Timetable
+
                 </a>
+
             </li>
 
+
             <li class="nav-item">
-                <a href="view-timetable.html" class="nav-link">
+
+                <a
+                    href="view-timetable.html"
+                    class="nav-link">
+
                     <i class="bi bi-table"></i>
+
                     View Timetable
+
                 </a>
+
             </li>
 
+
             <li class="nav-item">
-                <a href="index.html" class="nav-link text-danger">
+
+                <a
+                    href="index.html"
+                    class="nav-link text-danger">
+
                     <i class="bi bi-box-arrow-right"></i>
+
                     Logout
+
                 </a>
+
             </li>
 
         </ul>
 
     </div>
 
-    <!-- Main Content -->
 
-    <div class="main-content">
 
-        <nav class="navbar bg-white shadow-sm rounded px-4 mb-4">
+    <!-- =====================================================
+         MAIN CONTENT
+    ====================================================== -->
 
-            <h4>Timetable Constraints</h4>
+    <div class="main-content w-100">
+
+
+        <!-- TOP BAR -->
+
+        <nav
+            class="navbar bg-white shadow-sm rounded px-4 mb-4">
 
             <div>
 
-                <i class="bi bi-person-circle fs-4"></i>
+                <div class="text-muted small">
 
-                <b class="ms-2">Admin</b>
+                    Dashboard &gt;
+                    Timetable Constraints
+
+                </div>
+
+                <h4 class="mb-0">
+
+                    Timetable Constraints
+
+                </h4>
+
+                <small class="text-muted">
+
+                    Configure the rules used by the
+                    timetable generation system.
+
+                </small>
+
+            </div>
+
+
+            <div>
+
+                <i
+                    class="bi bi-person-circle fs-4">
+                </i>
+
+                <b class="ms-2">
+                    Admin
+                </b>
 
             </div>
 
         </nav>
 
-        <!-- Search & Add Button -->
 
-        <div class="card shadow-sm">
+
+        <!-- =================================================
+             CONTEXT
+        ================================================== -->
+
+        <div class="card constraint-card shadow-sm mb-3">
 
             <div class="card-body">
 
-                <div class="d-flex justify-content-end mb-3">
+                <h5 class="constraint-title mb-3">
 
-                <button
-                    class="btn btn-primary"
-                    onclick="resetConstraintForm()"
-                    data-bs-toggle="modal"
-                    data-bs-target="#facultyModal">
+                    <i class="bi bi-funnel me-2"></i>
 
-                    <i class="bi bi-plus-circle"></i>
-                    Add Constraints
+                    Constraint Context
 
-                </button>
+                </h5>
+
+
+                <div class="row g-3">
+
+
+                    <div class="col-md-4">
+
+                        <label
+                            class="form-label fw-semibold">
+
+                            Academic Year
+
+                        </label>
+
+                        <select
+                            id="academicYear"
+                            class="form-select">
+
+                            <option value="">
+
+                                Select Academic Year
+
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="col-md-4">
+
+                        <label
+                            class="form-label fw-semibold">
+
+                            Department
+
+                        </label>
+
+                        <select
+                            id="department"
+                            class="form-select">
+
+                            <option value="">
+
+                                Select Department
+
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="col-md-4">
+
+                        <label
+                            class="form-label fw-semibold">
+
+                            Scheme
+
+                        </label>
+
+                        <select
+                            id="scheme"
+                            class="form-select">
+
+                            <option value="">
+
+                                Select Scheme
+
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
 
             </div>
 
-                <!-- Faculty Table -->
-
-                <table class="table table-hover table-bordered">
-
-                    <thead class="table-primary">
-
-                        <tr>
-
-                            <th>ID</th>
-                            <th>Department</th>
-                            <th>Scheme</th>
-                            <th>Academic Year</th>
-                            <th>Semester</th>
-                            <th>Days</th>
-                            <th>Periods/Day</th>
-                            <th>Start Time</th>
-                            <th>Period Duration</th>
-                            <th>Lunch Break</th>
-                            <th>Short Break</th>
-                            <th width="150">Action</th>
-
-                        </tr>
-
-                    </thead>
-
-                    <tbody id="constraintTableBody">
+        </div>
 
 
 
-                    </tbody>
+        <!-- =================================================
+             1. WORKING DAYS
+        ================================================== -->
 
-                </table>
-                        </div>
-    </div>
+        <div class="card constraint-card shadow-sm mb-3">
 
-    <!-- Add Faculty Modal -->
+            <div class="card-body">
 
-    <div class="modal fade" id="facultyModal">
+                <h5 class="constraint-title">
 
-        <div class="modal-dialog modal-xl">
+                    <i class="bi bi-calendar-week me-2"></i>
 
-            <div class="modal-content">
+                    1. Working Days
 
-                <div class="modal-header">
+                </h5>
 
-                    <h5 class="modal-title">Timetable Constraints</h5>
+                <p class="constraint-help">
+
+                    Select the days on which classes can
+                    be scheduled.
+
+                </p>
+
+
+                <div
+                    id="workingDays"
+                    class="d-flex flex-wrap gap-2">
+
+
                     <button
                         type="button"
-                        class="btn-close"
-                        data-bs-dismiss="modal">
+                        class="btn btn-outline-success day-btn active"
+                        data-day="Monday">
+
+                        Monday
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="btn btn-outline-success day-btn active"
+                        data-day="Tuesday">
+
+                        Tuesday
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="btn btn-outline-success day-btn active"
+                        data-day="Wednesday">
+
+                        Wednesday
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="btn btn-outline-success day-btn active"
+                        data-day="Thursday">
+
+                        Thursday
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="btn btn-outline-success day-btn active"
+                        data-day="Friday">
+
+                        Friday
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="btn btn-outline-success day-btn"
+                        data-day="Saturday">
+
+                        Saturday
+
                     </button>
 
                 </div>
-                
-                <div class="modal-body">
-                    <form id="constraintForm">
-                    <div class="row">
 
-                        <div class="col-md-6 mb-3">
+            </div>
 
-                            <label class="form-label">
-                                Department
-                            </label>
+        </div>
 
-                            <select class="form-select" id="constraintDepartment">
 
-                                <option value="">
-                                    Select Department
-                                </option>
 
-                            </select>
+        <!-- =================================================
+             2. PERIODS
+        ================================================== -->
 
-                        </div>
-                        <div class="col-md-6 mb-3">
+        <div class="card constraint-card shadow-sm mb-3">
 
-                          <label class="form-label">
-                              Scheme
-                          </label>
+            <div class="card-body">
 
-                          <select class="form-select" id="constraintScheme">
 
-                              <option value="">
-                                  Select Scheme
-                              </option>
+                <div
+                    class="d-flex justify-content-between
+                           align-items-center mb-3">
 
-                          </select>
 
-                        </div>
-                        <div class="col-md-6 mb-3">
+                    <div>
 
-                            <label class="form-label">
-                                Academic Year
-                            </label>
+                        <h5 class="constraint-title mb-1">
 
-                            <input
-                                type="text"
-                                id="constraintAcademicYear"
-                                class="form-control"
-                                placeholder="Example: 2026-27">
+                            <i class="bi bi-clock me-2"></i>
 
-                        </div>
-                        <div class="col-md-6 mb-3">
+                            2. Periods / Time Slots
 
-                                <label class="form-label">
-                                    Semester Type
-                                </label>
+                        </h5>
 
-                                <select class="form-select" id="constraintSemesterType">
 
-                                    <option value="">
-                                        Select Semester Type
-                                    </option>
+                        <p class="constraint-help mb-0">
 
-                                    <option value="Odd">
-                                        Odd
-                                    </option>
+                            Define the daily class periods.
 
-                                    <option value="Even">
-                                        Even
-                                    </option>
+                        </p>
 
-                                </select>
+                    </div>
 
-                            </div>
 
-                        <div class="col-md-6 mb-3">
+                    <button
+                        type="button"
+                        id="addPeriodBtn"
+                        class="btn btn-success">
 
-                          <label class="form-label">
-                              Semester
-                          </label>
-                          
+                        <i class="bi bi-plus-circle me-1"></i>
 
-                          <select class="form-select" id="constraintSemester">
+                        Add Period
 
-                            <option value="">
-                                Select Semester Type First
+                    </button>
+
+                </div>
+
+
+                <div id="periodContainer"></div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             3. LUNCH / BREAK
+        ================================================== -->
+
+        <div class="card constraint-card shadow-sm mb-3">
+
+            <div class="card-body">
+
+                <h5 class="constraint-title">
+
+                    <i class="bi bi-cup-hot me-2"></i>
+
+                    3. Lunch / Break
+
+                </h5>
+
+
+                <div class="row g-3 mt-1">
+
+
+                    <div class="col-md-4">
+
+                        <label class="form-label">
+
+                            Break Type
+
+                        </label>
+
+
+                        <select
+                            id="breakType"
+                            class="form-select">
+
+
+                            <option value="Lunch">
+
+                                Lunch
+
                             </option>
 
-                          </select>
+
+                            <option value="Break">
+
+                                Break
+
+                            </option>
+
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="col-md-4">
+
+                        <label class="form-label">
+
+                            Start Time
+
+                        </label>
+
+
+                        <input
+                            type="time"
+                            id="breakStart"
+                            class="form-control"
+                            value="13:00">
+
+                    </div>
+
+
+                    <div class="col-md-4">
+
+                        <label class="form-label">
+
+                            End Time
+
+                        </label>
+
+
+                        <input
+                            type="time"
+                            id="breakEnd"
+                            class="form-control"
+                            value="14:00">
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             4. FACULTY DAILY LIMIT
+        ================================================== -->
+
+        <div class="card constraint-card shadow-sm mb-3">
+
+            <div class="card-body">
+
+
+                <h5 class="constraint-title">
+
+                    <i class="bi bi-person-check me-2"></i>
+
+                    4. Faculty Daily Limit
+
+                </h5>
+
+
+                <p class="constraint-help">
+
+                    Maximum teaching hours a faculty member
+                    can receive in one day.
+
+                </p>
+
+
+                <div class="row">
+
+                    <div class="col-md-4">
+
+                        <label class="form-label">
+
+                            Maximum Hours / Day
+
+                        </label>
+
+
+                        <input
+                            type="number"
+                            id="facultyDailyLimit"
+                            class="form-control"
+                            min="1"
+                            value="4">
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             5. SEMESTER / STUDENT DAILY LIMIT
+        ================================================== -->
+
+        <div class="card constraint-card shadow-sm mb-3">
+
+            <div class="card-body">
+
+
+                <h5 class="constraint-title">
+
+                    <i class="bi bi-mortarboard me-2"></i>
+
+                    5. Semester / Student Daily Limit
+
+                </h5>
+
+
+                <p class="constraint-help">
+
+                    Maximum class hours for a semester/batch
+                    in one day.
+
+                </p>
+
+
+                <div class="row">
+
+
+                    <div class="col-md-4">
+
+                        <label class="form-label">
+
+                            Maximum Hours / Day
+
+                        </label>
+
+
+                        <input
+                            type="number"
+                            id="studentDailyLimit"
+                            class="form-control"
+                            min="1"
+                            value="6">
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             6. LAB CONSECUTIVE
+        ================================================== -->
+
+        <div class="card constraint-card shadow-sm mb-3">
+
+            <div class="card-body">
+
+
+                <h5 class="constraint-title">
+
+                    <i class="bi bi-bezier2 me-2"></i>
+
+                    6. Lab Consecutive Periods
+
+                </h5>
+
+
+                <p class="constraint-help">
+
+                    Lab classes must use consecutive periods.
+
+                </p>
+
+
+                <div class="form-check form-switch">
+
+
+                    <input
+                        class="form-check-input"
+                        type="checkbox"
+                        id="labConsecutive"
+                        checked>
+
+
+                    <label
+                        class="form-check-label"
+                        for="labConsecutive">
+
+                        Enable consecutive lab periods
+
+                    </label>
+
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             7. CLASH PREVENTION
+        ================================================== -->
+
+        <div class="card constraint-card shadow-sm mb-3">
+
+            <div class="card-body">
+
+
+                <h5 class="constraint-title">
+
+                    <i class="bi bi-shield-check me-2"></i>
+
+                    7. Clash Prevention
+
+                </h5>
+
+
+                <div class="row g-3">
+
+
+                    <div class="col-md-6">
+
+
+                        <div class="form-check form-switch">
+
+
+                            <input
+                                class="form-check-input"
+                                type="checkbox"
+                                id="facultyClash"
+                                checked>
+
+
+                            <label
+                                class="form-check-label"
+                                for="facultyClash">
+
+                                Prevent Faculty Clash
+
+                            </label>
+
 
                         </div>
 
-                        <div class="col-md-12 mb-3">
 
-    <label class="form-label">
-        Working Days
-    </label>
+                        <small class="text-muted">
 
-    <div class="row">
+                            A faculty member cannot teach
+                            two classes at the same time.
 
-        <div class="col-md-2">
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="monday" value="Monday">
-                <label class="form-check-label">Monday</label>
-            </div>
-        </div>
-
-        <div class="col-md-2">
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="tuesday" value="Tuesday">
-                <label class="form-check-label">Tuesday</label>
-            </div>
-        </div>
-
-        <div class="col-md-2">
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="wednesday" value="Wednesday">
-                <label class="form-check-label">Wednesday</label>
-            </div>
-        </div>
-
-        <div class="col-md-2">
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="thursday" value="Thursday">
-                <label class="form-check-label">Thursday</label>
-            </div>
-        </div>
-
-        <div class="col-md-2">
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="friday" value="Friday">
-                <label class="form-check-label">Friday</label>
-            </div>
-        </div>
-
-        <div class="col-md-2">
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="saturday" value="Saturday">
-                <label class="form-check-label">Saturday</label>
-            </div>
-        </div>
-
-    </div>
-
-</div>
-
-<div class="col-md-6 mb-3">
-
-    <label class="form-label">
-        Periods Per Day
-    </label>
-
-    <input
-        type="number"
-        id="periodsPerDay"
-        class="form-control"
-        placeholder="Enter Number of Periods">
-
-</div>
-<div class="col-md-3 mb-3">
-
-    <label class="form-label">
-        College Start Time
-    </label>
-
-    <input
-        type="time"
-        id="collegeStartTime"
-        class="form-control">
-
-</div>
-<div class="col-md-3 mb-3">
-
-    <label class="form-label">
-        Period Duration (Minutes)
-    </label>
-
-    <input
-        type="number"
-        id="periodDuration"
-        class="form-control"
-        placeholder="e.g. 45">
-
-</div>
-
-<div class="col-md-4 mb-3">
-
-    <label class="form-label">
-        Lunch After Period
-    </label>
-
-    <select class="form-select" id="lunchAfterPeriod">
-
-        <option value="">Select</option>
-
-        <option value="1">After 1st Period</option>
-        <option value="2">After 2nd Period</option>
-        <option value="3">After 3rd Period</option>
-        <option value="4">After 4th Period</option>
-        <option value="5">After 5th Period</option>
-        <option value="6">After 6th Period</option>
-        <option value="7">After 7th Period</option>
-
-    </select>
-
-</div>
-<div class="col-md-4 mb-3">
-
-    <label class="form-label">
-        Short Break After Period
-    </label>
-
-    <select class="form-select" id="shortBreakAfterPeriod">
-
-        <option value="">No Short Break</option>
-
-        <option value="1">After 1st Period</option>
-        <option value="2">After 2nd Period</option>
-        <option value="3">After 3rd Period</option>
-        <option value="4">After 4th Period</option>
-        <option value="5">After 5th Period</option>
-        <option value="6">After 6th Period</option>
-
-    </select>
-
-</div>
-
-<div class="col-md-4 mb-3">
-    <label class="form-label">
-        Short Break Duration (Minutes)
-    </label>
-
-    <input
-        type="number"
-        id="shortBreakDuration"
-        class="form-control"
-        placeholder="e.g. 10">
-
-</div>
-<div class="col-md-4 mb-3">
-
-    <label class="form-label">
-        Max Faculty Periods / Day
-    </label>
-
-    <input
-        type="number"
-        id="maxPeriodsPerDay"
-        class="form-control"
-        placeholder="Example: 4">
-
-</div>
-
-<div class="col-md-4 mb-3">
-
-    <label class="form-label">
-        Max Faculty Periods / Week
-    </label>
-
-    <input
-        type="number"
-        id="maxPeriodsPerWeek"
-        class="form-control"
-        placeholder="Example: 18">
-
-</div>
-
-<div class="col-md-4 mb-3">
-
-    <label class="form-label">
-        Lab Duration (Periods)
-    </label>
-
-    <select
-        class="form-select"
-        id="labDuration">
-
-        <option value="">Select</option>
-        <option value="2">2 Periods</option>
-        <option value="3">3 Periods</option>
-
-    </select>
-
-</div>
-
+                        </small>
 
 
                     </div>
-                    </form>
-                </div>
-               
-                <div class="modal-footer">
 
-                    <button
-                        class="btn btn-secondary"
-                        data-bs-dismiss="modal">
 
-                        Cancel
 
-                    </button>
+                    <div class="col-md-6">
 
-                    <button
-                        class="btn btn-primary" type="button"  onclick="saveConstraint()">
 
-                        Save Constraint
+                        <div class="form-check form-switch">
 
-                    </button>
+
+                            <input
+                                class="form-check-input"
+                                type="checkbox"
+                                id="semesterClash"
+                                checked>
+
+
+                            <label
+                                class="form-check-label"
+                                for="semesterClash">
+
+                                Prevent Semester Clash
+
+                            </label>
+
+
+                        </div>
+
+
+                        <small class="text-muted">
+
+                            A semester cannot have two subjects
+                            at the same time.
+
+                        </small>
+
+
+                    </div>
+
 
                 </div>
 
@@ -510,15 +932,209 @@
 
         </div>
 
-    </div>
+
+
+        <!-- =================================================
+             8. P / C CYCLE
+        ================================================== -->
+
+        <div class="card constraint-card shadow-sm mb-3">
+
+            <div class="card-body">
+
+
+                <h5 class="constraint-title">
+
+                    <i class="bi bi-arrow-repeat me-2"></i>
+
+                    8. P-Cycle / C-Cycle
+
+                </h5>
+
+
+                <p class="constraint-help">
+
+                    Semester 1 and 2 are common semesters.
+                    The timetable must respect the selected
+                    P-Cycle or C-Cycle.
+
+                </p>
+
+
+                <div class="form-check form-switch">
+
+
+                    <input
+                        class="form-check-input"
+                        type="checkbox"
+                        id="cycleConstraint"
+                        checked>
+
+
+                    <label
+                        class="form-check-label"
+                        for="cycleConstraint">
+
+                        Enable P-Cycle / C-Cycle constraint
+
+                    </label>
+
+
+                </div>
+
+            </div>
+
         </div>
+
+
+
+        <!-- =================================================
+             9. SUBJECT THEORY / LAB RULES
+        ================================================== -->
+
+        <div class="card constraint-card shadow-sm mb-3">
+
+            <div class="card-body">
+
+
+                <h5 class="constraint-title">
+
+                    <i class="bi bi-book me-2"></i>
+
+                    9. Subject Theory / Lab Rules
+
+                </h5>
+
+
+                <p class="constraint-help">
+
+                    These values are automatically taken from
+                    the Subject and Faculty Subject Assignment
+                    modules.
+
+                </p>
+
+
+                <div class="alert alert-light border">
+
+
+                    <ul class="mb-0">
+
+
+                        <li>
+
+                            Theory hours come from subject data.
+
+                        </li>
+
+
+                        <li>
+
+                            Lab hours come from subject data.
+
+                        </li>
+
+
+                        <li>
+
+                            Theory + Lab must follow the assigned
+                            Theory and Co-Lab faculty.
+
+                        </li>
+
+
+                        <li>
+
+                            Lab periods must be consecutive.
+
+                        </li>
+
+
+                        <li>
+
+                            Faculty workload comes from the
+                            Faculty Subject Assignment module.
+
+                        </li>
+
+
+                    </ul>
+
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             SAVE
+        ================================================== -->
+
+        <div
+            class="card constraint-card shadow-sm mb-5">
+
+
+            <div class="card-body">
+
+
+                <div
+                    class="d-flex justify-content-between
+                           align-items-center">
+
+
+                    <div>
+
+
+                        <h5 class="mb-1">
+
+                            Save Timetable Constraints
+
+                        </h5>
+
+
+                        <small class="text-muted">
+
+                            These constraints will be used
+                            during timetable generation.
+
+                        </small>
+
+
+                    </div>
+
+
+                    <button
+                        type="button"
+                        id="saveConstraintsBtn"
+                        class="btn btn-success px-4">
+
+
+                        <i class="bi bi-save me-1"></i>
+
+                        Save Constraints
+
+
+                    </button>
+
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+    </div>
 
 </div>
 
-<!-- Bootstrap JS -->
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="js/timetable-constraints.js"></script>
+
+
 </body>
 
 </html>

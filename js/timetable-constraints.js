@@ -1,438 +1,1492 @@
-const DEPARTMENT_API =
-    "http://127.0.0.1:5000/departments";
+// ============================================================
+// TIMETABLE CONSTRAINTS
+// ============================================================
 
-const SCHEME_API =
-    "http://127.0.0.1:5000/schemes";
+const API_BASE = "http://127.0.0.1:5000";
 
-const CONSTRAINT_API =
-    "http://127.0.0.1:5000/timetable-constraints";
 
-let editId = null;
-function init() {
+// ============================================================
+// GLOBAL DATA
+// ============================================================
 
-    loadDepartmentDropdown();
+let periods = [];
 
-    loadSchemeDropdown();
+let periodCounter = 0;
 
-}
-init();
-async function loadDepartmentDropdown() {
 
-    const response =
-        await fetch(DEPARTMENT_API);
+// ============================================================
+// PAGE LOAD
+// ============================================================
 
-    const departments =
-        await response.json();
+document.addEventListener("DOMContentLoaded", () => {
 
-    const dropdown =
-        document.getElementById("constraintDepartment");
+    loadAcademicYears();
 
-    dropdown.innerHTML =
-        '<option value="">Select Department</option>';
+    loadDepartments();
 
-    departments.forEach(department => {
+    loadSchemes();
 
-        dropdown.innerHTML += `
-            <option value="${department.department_code}">
-                ${department.department_code}
-            </option>
-        `;
+    initializePeriods();
 
-    });
+    setupEventListeners();
 
-}
-async function loadSchemeDropdown() {
+});
 
-    const response =
-        await fetch(SCHEME_API);
 
-    const schemes =
-        await response.json();
+// ============================================================
+// API HELPER
+// ============================================================
 
-    const dropdown =
-        document.getElementById("constraintScheme");
+async function fetchJSON(url, options = {}) {
 
-    dropdown.innerHTML =
-        '<option value="">Select Scheme</option>';
+    const response = await fetch(
+        API_BASE + url,
+        options
+    );
 
-    schemes.forEach(scheme => {
+    if (!response.ok) {
 
-        dropdown.innerHTML += `
-            <option value="${scheme.scheme_year}">
-                ${scheme.scheme_year}
-            </option>
-        `;
+        let message =
+            `Request failed: ${response.status}`;
 
-    });
+        try {
 
-}
-function loadSemesterDropdown() {
+            const data = await response.json();
 
-    const semesterType =
-        document.getElementById("constraintSemesterType").value;
+            if (data.message) {
+                message = data.message;
+            }
 
-    const semesterDropdown =
-        document.getElementById("constraintSemester");
+        } catch (error) {
+            // Ignore JSON parsing error
+        }
 
-    semesterDropdown.innerHTML =
-        '<option value="">Select Semester</option>';
-
-    let semesters = [];
-
-    if (semesterType === "Odd") {
-
-        semesters = [1, 3, 5, 7];
-
-    } else if (semesterType === "Even") {
-
-        semesters = [2, 4, 6, 8];
-
+        throw new Error(message);
     }
 
-    semesters.forEach(semester => {
+    return response.json();
+}
 
-        semesterDropdown.innerHTML += `
-            <option value="${semester}">
-                Semester ${semester}
+
+// ============================================================
+// ACADEMIC YEARS
+// ============================================================
+
+async function loadAcademicYears() {
+
+    const select =
+        document.getElementById("academicYear");
+
+    if (!select) return;
+
+    try {
+
+        const data =
+            await fetchJSON("/academic-years");
+
+        select.innerHTML = `
+            <option value="">
+                Select Academic Year
             </option>
         `;
 
-    });
+        data.forEach(item => {
+
+            const year =
+                typeof item === "string"
+                    ? item
+                    : item.academic_year;
+
+            if (!year) return;
+
+            const option =
+                document.createElement("option");
+
+            option.value = year;
+
+            option.textContent = year;
+
+            select.appendChild(option);
+
+        });
+
+    } catch (error) {
+
+        console.error(
+            "Academic year error:",
+            error
+        );
+
+        alert(
+            "Unable to load academic years.\n\n" +
+            error.message
+        );
+
+    }
+}
+
+
+// ============================================================
+// DEPARTMENTS
+// ============================================================
+
+async function loadDepartments() {
+
+    const select =
+        document.getElementById("department");
+
+    if (!select) return;
+
+    try {
+
+        const data =
+            await fetchJSON(
+                "/assignment-departments"
+            );
+
+        select.innerHTML = `
+            <option value="">
+                Select Department
+            </option>
+        `;
+
+        data.forEach(item => {
+
+            let id;
+            let code;
+            let name;
+
+            if (Array.isArray(item)) {
+
+                id = item[0];
+
+                code = item[1];
+
+                name = item[2];
+
+            } else {
+
+                id =
+                    item.department_id;
+
+                code =
+                    item.department_code;
+
+                name =
+                    item.department_name;
+
+            }
+
+            const option =
+                document.createElement("option");
+
+            option.value =
+                code || id;
+
+            option.textContent =
+                name
+                    ? `${code} - ${name}`
+                    : code;
+
+            option.dataset.departmentId =
+                id || "";
+
+            option.dataset.departmentCode =
+                code || "";
+
+            select.appendChild(option);
+
+        });
+
+    } catch (error) {
+
+        console.error(
+            "Department error:",
+            error
+        );
+
+        alert(
+            "Unable to load departments.\n\n" +
+            error.message
+        );
+
+    }
+}
+
+
+// ============================================================
+// SCHEMES
+// ============================================================
+
+async function loadSchemes() {
+
+    const select =
+        document.getElementById("scheme");
+
+    if (!select) return;
+
+    try {
+
+        const data =
+            await fetchJSON("/schemes");
+
+        select.innerHTML = `
+            <option value="">
+                Select Scheme
+            </option>
+        `;
+
+        data.forEach(item => {
+
+            let value;
+            let text;
+
+            if (Array.isArray(item)) {
+
+                value = item[0];
+
+                text =
+                    item[1] ??
+                    item[0];
+
+            } else {
+
+                value =
+                    item.scheme_id ??
+                    item.scheme_year ??
+                    item.scheme;
+
+                text =
+                    item.scheme_name ??
+                    item.scheme_year ??
+                    item.scheme ??
+                    value;
+
+            }
+
+            if (
+                value === undefined ||
+                value === null
+            ) {
+                return;
+            }
+
+            const option =
+                document.createElement("option");
+
+            option.value = value;
+
+            option.textContent = text;
+
+            select.appendChild(option);
+
+        });
+
+    } catch (error) {
+
+        console.error(
+            "Scheme error:",
+            error
+        );
+
+        alert(
+            "Unable to load schemes.\n\n" +
+            error.message
+        );
+
+    }
+}
+
+
+// ============================================================
+// PERIODS
+// ============================================================
+
+function initializePeriods() {
+
+    periods = [];
+
+    periodCounter = 0;
+
+
+    addPeriod("09:00", "10:00");
+
+    addPeriod("10:00", "11:00");
+
+    addPeriod("11:15", "12:15");
+
+    addPeriod("12:15", "13:15");
+
+    addPeriod("14:00", "15:00");
+
+    addPeriod("15:00", "16:00");
 
 }
-function saveConstraint() {
 
-    const department =
-        document.getElementById("constraintDepartment").value;
 
-    const scheme =
-        document.getElementById("constraintScheme").value;
+// ============================================================
+// ADD PERIOD
+// ============================================================
 
-    const semester =
-        document.getElementById("constraintSemester").value;
+function addPeriod(
+    startTime = "",
+    endTime = ""
+) {
 
-    const workingDays = [];
+    periodCounter++;
 
-    document.querySelectorAll(
-        '#constraintForm input[type="checkbox"]:checked'
-    ).forEach(day => {
-        workingDays.push(day.value);
-    });
+    const period = {
 
-    const periodsPerDay =
-        document.getElementById("periodsPerDay").value;
+        id: periodCounter,
 
-    const collegeStartTime =
-        document.getElementById("collegeStartTime").value;
+        period_number: periodCounter,
 
-    const periodDuration =
-        document.getElementById("periodDuration").value;
+        start_time: startTime,
 
-    const lunchAfterPeriod =
-        document.getElementById("lunchAfterPeriod").value;
-
-    const shortBreakAfterPeriod =
-        document.getElementById("shortBreakAfterPeriod").value;
-
-    const shortBreakDuration =
-        document.getElementById("shortBreakDuration").value;
-
-    if (
-        !department ||
-        !scheme ||
-        !semester ||
-        workingDays.length === 0 ||
-        !periodsPerDay ||
-        !collegeStartTime ||
-        !periodDuration ||
-        !lunchAfterPeriod
-    ) {
-        alert("Please fill all required fields.");
-        return;
-    }
-
-    const data = {
-
-        department,
-
-        scheme,
-
-        academic_year:
-            document.getElementById("constraintAcademicYear").value,
-
-        semester_type:
-            document.getElementById("constraintSemesterType").value,
-
-        semester,
-
-        working_days: workingDays,
-
-        periods_per_day: periodsPerDay,
-
-        college_start_time: collegeStartTime,
-
-        period_duration: periodDuration,
-
-        lunch_after_period: lunchAfterPeriod,
-
-        short_break_after_period: shortBreakAfterPeriod,
-
-        short_break_duration: shortBreakDuration,
-
-        max_periods_per_day:
-            document.getElementById("maxPeriodsPerDay").value,
-
-        max_periods_per_week:
-            document.getElementById("maxPeriodsPerWeek").value,
-
-        lab_duration:
-            document.getElementById("labDuration").value
+        end_time: endTime
 
     };
 
-    const url = editId
-        ? `${CONSTRAINT_API}/${editId}`
-        : CONSTRAINT_API;
+    periods.push(period);
 
-    const method = editId
-        ? "PUT"
-        : "POST";
-
-    fetch(url, {
-
-        method: method,
-
-        headers: {
-            "Content-Type": "application/json"
-        },
-
-        body: JSON.stringify(data)
-
-    })
-    .then(response => response.json())
-    .then(result => {
-
-        alert(result.message);
-        loadConstraints();
-
-        document
-            .querySelector("#facultyModal .btn-close")
-            .click();
-
-        document.getElementById("constraintForm").reset();
-
-        editId = null;
-
-    })
-    
-    .catch(error => {
-
-        console.error(error);
-
-        alert("Error while saving constraint.");
-
-    });
+    renderPeriods();
 
 }
-async function loadConstraints() {
 
-    const response = await fetch(CONSTRAINT_API);
 
-    const constraints = await response.json();
+// ============================================================
+// RENDER PERIODS
+// ============================================================
 
-    const tableBody =
-        document.getElementById("constraintTableBody");
+function renderPeriods() {
 
-    tableBody.innerHTML = "";
+    const container =
+        document.getElementById(
+            "periodContainer"
+        );
 
-    constraints.forEach((constraint, index) => {
+    if (!container) return;
 
-        tableBody.innerHTML += `
+    container.innerHTML = "";
 
-        <tr>
+    periods.forEach(
+        (period, index) => {
 
-            <td>${index + 1}</td>
+            const div =
+                document.createElement("div");
 
-                <td>${constraint.department_code}</td>
+            div.className =
+                "period-row";
 
-                <td>${constraint.scheme_year}</td>
+            div.innerHTML = `
 
-                <td>${constraint.academic_year}</td>
+                <div class="row g-3 align-items-center">
 
-                <td>${constraint.semester_type} - ${constraint.semester_id}</td>
+                    <div class="col-md-1">
 
-                <td>${constraint.working_days}</td>
+                        <div class="period-number">
 
-                <td>${constraint.periods_per_day}</td>
+                            ${index + 1}
 
-                <td>${constraint.college_start_time}</td>
+                        </div>
 
-                <td>${constraint.period_duration} Min</td>
+                    </div>
 
-                <td>After ${constraint.lunch_after_period}</td>
 
-                <td>
-                    After ${constraint.short_break_after_period}
-                    (${constraint.short_break_duration} Min)
-                </td>
+                    <div class="col-md-4">
 
-                <td>
+                        <label class="form-label">
 
-                <button
-                    class="btn btn-warning btn-sm"
-                    onclick="editConstraint(${constraint.constraint_id})">
+                            Start Time
 
-                    Edit
+                        </label>
 
-                </button>
-                <button
-                    class="btn btn-danger btn-sm"
-                    onclick="deleteConstraint(${constraint.constraint_id})">
+                        <input
+                            type="time"
+                            class="form-control period-start"
+                            value="${period.start_time}"
+                            data-id="${period.id}"
+                        >
 
-                    Delete
-                </button>
+                    </div>
 
-            </td>
 
-        </tr>
+                    <div class="col-md-4">
 
-        `;
+                        <label class="form-label">
 
-    });
+                            End Time
 
-}
-async function deleteConstraint(id) {
+                        </label>
 
-    const confirmDelete = confirm(
-        "Are you sure you want to delete this constraint?"
+                        <input
+                            type="time"
+                            class="form-control period-end"
+                            value="${period.end_time}"
+                            data-id="${period.id}"
+                        >
+
+                    </div>
+
+
+                    <div class="col-md-3">
+
+                        <label class="form-label d-block">
+
+                            Action
+
+                        </label>
+
+                        <button
+                            type="button"
+                            class="btn btn-outline-danger"
+                            onclick="removePeriod(${period.id})"
+                        >
+
+                            <i class="bi bi-trash"></i>
+
+                            Remove
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            `;
+
+            container.appendChild(div);
+
+        }
     );
 
-    if (!confirmDelete) {
+}
+
+
+// ============================================================
+// REMOVE PERIOD
+// ============================================================
+
+function removePeriod(id) {
+
+    if (periods.length <= 1) {
+
+        alert(
+            "At least one period is required."
+        );
+
         return;
+    }
+
+    periods =
+        periods.filter(
+            period =>
+                period.id !== id
+        );
+
+    periods.forEach(
+        (period, index) => {
+
+            period.period_number =
+                index + 1;
+
+        }
+    );
+
+    renderPeriods();
+
+}
+
+
+// ============================================================
+// READ PERIODS FROM UI
+// ============================================================
+
+function readPeriods() {
+
+    const result = [];
+
+    document
+        .querySelectorAll(".period-row")
+        .forEach(
+            (row, index) => {
+
+                const start =
+                    row.querySelector(
+                        ".period-start"
+                    )?.value || "";
+
+                const end =
+                    row.querySelector(
+                        ".period-end"
+                    )?.value || "";
+
+                result.push({
+
+                    period_number:
+                        index + 1,
+
+                    start_time:
+                        start,
+
+                    end_time:
+                        end
+
+                });
+
+            }
+        );
+
+    return result;
+}
+
+
+// ============================================================
+// WORKING DAYS
+// ============================================================
+
+function getWorkingDays() {
+
+    const selected = [];
+
+    document
+        .querySelectorAll(
+            "#workingDays .day-btn.active"
+        )
+        .forEach(
+            button => {
+
+                selected.push(
+                    button.dataset.day
+                );
+
+            }
+        );
+
+    return selected;
+}
+
+
+// ============================================================
+// DAY BUTTONS
+// ============================================================
+
+function setupDayButtons() {
+
+    document
+        .querySelectorAll(
+            "#workingDays .day-btn"
+        )
+        .forEach(
+            button => {
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        button.classList.toggle(
+                            "active"
+                        );
+
+                    }
+                );
+
+            }
+        );
+
+}
+
+
+// ============================================================
+// VALIDATE PERIODS
+// ============================================================
+
+function validatePeriods() {
+
+    const currentPeriods =
+        readPeriods();
+
+    if (
+        currentPeriods.length === 0
+    ) {
+
+        return (
+            "At least one period is required."
+        );
+
+    }
+
+    for (
+        let i = 0;
+        i < currentPeriods.length;
+        i++
+    ) {
+
+        const period =
+            currentPeriods[i];
+
+        if (
+            !period.start_time ||
+            !period.end_time
+        ) {
+
+            return `
+                Period ${i + 1}
+                must have both start and end time.
+            `;
+
+        }
+
+        if (
+            period.start_time >=
+            period.end_time
+        ) {
+
+            return `
+                Period ${i + 1}
+                has an invalid time range.
+            `;
+
+        }
+
+    }
+
+    for (
+        let i = 1;
+        i < currentPeriods.length;
+        i++
+    ) {
+
+        const previous =
+            currentPeriods[i - 1];
+
+        const current =
+            currentPeriods[i];
+
+        if (
+            current.start_time <
+            previous.end_time
+        ) {
+
+            return (
+                `Period ${i + 1} overlaps ` +
+                `Period ${i}.`
+            );
+
+        }
+
+    }
+
+    return null;
+}
+
+
+// ============================================================
+// VALIDATE BREAK
+// ============================================================
+
+function validateBreak() {
+
+    const start =
+        document.getElementById(
+            "breakStart"
+        )?.value;
+
+    const end =
+        document.getElementById(
+            "breakEnd"
+        )?.value;
+
+    if (!start || !end) {
+
+        return null;
+
+    }
+
+    if (start >= end) {
+
+        return (
+            "Break start time must be before end time."
+        );
+
+    }
+
+    return null;
+}
+
+
+// ============================================================
+// COLLECT CONSTRAINT DATA
+// ============================================================
+
+function collectConstraintData() {
+
+    return {
+
+        academic_year:
+            document.getElementById(
+                "academicYear"
+            )?.value || null,
+
+        department:
+            document.getElementById(
+                "department"
+            )?.value || null,
+
+        scheme:
+            document.getElementById(
+                "scheme"
+            )?.value || null,
+
+        working_days:
+            getWorkingDays(),
+
+        periods:
+            readPeriods(),
+
+        break: {
+
+            type:
+                document.getElementById(
+                    "breakType"
+                )?.value || "Lunch",
+
+            start_time:
+                document.getElementById(
+                    "breakStart"
+                )?.value || null,
+
+            end_time:
+                document.getElementById(
+                    "breakEnd"
+                )?.value || null
+
+        },
+
+        faculty_daily_limit:
+            Number(
+                document.getElementById(
+                    "facultyDailyLimit"
+                )?.value || 0
+            ),
+
+        student_daily_limit:
+            Number(
+                document.getElementById(
+                    "studentDailyLimit"
+                )?.value || 0
+            ),
+
+        lab_consecutive:
+            document.getElementById(
+                "labConsecutive"
+            )?.checked || false,
+
+        faculty_clash:
+            document.getElementById(
+                "facultyClash"
+            )?.checked || false,
+
+        semester_clash:
+            document.getElementById(
+                "semesterClash"
+            )?.checked || false,
+
+        cycle_constraint:
+            document.getElementById(
+                "cycleConstraint"
+            )?.checked || false
+
+    };
+
+}
+
+
+// ============================================================
+// VALIDATE CONSTRAINTS
+// ============================================================
+
+function validateConstraints() {
+
+    const academicYear =
+        document.getElementById(
+            "academicYear"
+        )?.value;
+
+    const department =
+        document.getElementById(
+            "department"
+        )?.value;
+
+    const scheme =
+        document.getElementById(
+            "scheme"
+        )?.value;
+
+    if (!academicYear) {
+
+        alert(
+            "Please select Academic Year."
+        );
+
+        return false;
+
+    }
+
+    if (!department) {
+
+        alert(
+            "Please select Department."
+        );
+
+        return false;
+
+    }
+
+    if (!scheme) {
+
+        alert(
+            "Please select Scheme."
+        );
+
+        return false;
+
+    }
+
+    const workingDays =
+        getWorkingDays();
+
+    if (
+        workingDays.length === 0
+    ) {
+
+        alert(
+            "Please select at least one working day."
+        );
+
+        return false;
+
+    }
+
+    const periodError =
+        validatePeriods();
+
+    if (periodError) {
+
+        alert(periodError);
+
+        return false;
+
+    }
+
+    const breakError =
+        validateBreak();
+
+    if (breakError) {
+
+        alert(breakError);
+
+        return false;
+
+    }
+
+    const facultyLimit =
+        Number(
+            document.getElementById(
+                "facultyDailyLimit"
+            )?.value || 0
+        );
+
+    if (
+        facultyLimit <= 0
+    ) {
+
+        alert(
+            "Faculty daily limit must be greater than 0."
+        );
+
+        return false;
+
+    }
+
+    const studentLimit =
+        Number(
+            document.getElementById(
+                "studentDailyLimit"
+            )?.value || 0
+        );
+
+    if (
+        studentLimit <= 0
+    ) {
+
+        alert(
+            "Semester/student daily limit must be greater than 0."
+        );
+
+        return false;
+
+    }
+
+    return true;
+
+}
+
+
+// ============================================================
+// SAVE CONSTRAINTS
+// ============================================================
+
+async function saveConstraints() {
+
+    if (
+        !validateConstraints()
+    ) {
+
+        return;
+
+    }
+
+    const data =
+        collectConstraintData();
+
+    const button =
+        document.getElementById(
+            "saveConstraintsBtn"
+        );
+
+    const originalHTML =
+        button.innerHTML;
+
+    button.disabled = true;
+
+    button.innerHTML = `
+
+        <span
+            class="spinner-border spinner-border-sm me-1">
+        </span>
+
+        Saving...
+
+    `;
+
+    try {
+
+        const result =
+            await fetchJSON(
+                "/timetable-constraints",
+                {
+
+                    method: "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json"
+
+                    },
+
+                    body:
+                        JSON.stringify(data)
+
+                }
+            );
+
+        alert(
+            result.message ||
+            "Timetable constraints saved successfully."
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Constraint save error:",
+            error
+        );
+
+        alert(
+            "Unable to save timetable constraints.\n\n" +
+            error.message
+        );
+
+    } finally {
+
+        button.disabled = false;
+
+        button.innerHTML =
+            originalHTML;
+
+    }
+
+}
+
+
+// ============================================================
+// LOAD EXISTING CONSTRAINTS
+// ============================================================
+
+async function loadConstraints() {
+
+    const academicYear =
+        document.getElementById(
+            "academicYear"
+        )?.value;
+
+    const department =
+        document.getElementById(
+            "department"
+        )?.value;
+
+    const scheme =
+        document.getElementById(
+            "scheme"
+        )?.value;
+
+    if (
+        !academicYear ||
+        !department ||
+        !scheme
+    ) {
+
+        return;
+
     }
 
     try {
 
-        const response = await fetch(
-            `${CONSTRAINT_API}/${id}`,
-            {
-                method: "DELETE"
-            }
+        const query =
+            `?academic_year=${encodeURIComponent(
+                academicYear
+            )}` +
+
+            `&department=${encodeURIComponent(
+                department
+            )}` +
+
+            `&scheme=${encodeURIComponent(
+                scheme
+            )}`;
+
+        const result =
+            await fetchJSON(
+                `/timetable-constraints${query}`
+            );
+
+        if (
+            !result ||
+            result.exists === false
+        ) {
+
+            return;
+
+        }
+
+        /*
+         * Backend returns:
+         *
+         * {
+         *     success: true,
+         *     exists: true,
+         *     data: {...}
+         * }
+         *
+         * So use result.data.
+         */
+
+        const data =
+            result.data || result;
+
+        applyConstraintData(
+            data
         );
-
-        const result = await response.json();
-
-        alert(result.message);
-
-        loadConstraints();
 
     } catch (error) {
 
-        console.error(error);
-
-        alert("Error deleting constraint.");
+        console.log(
+            "No existing constraints loaded:",
+            error.message
+        );
 
     }
 
 }
-async function editConstraint(id) {
 
-    editId = id;
 
-    const response =
-        await fetch(`${CONSTRAINT_API}/${id}`);
+// ============================================================
+// APPLY EXISTING CONSTRAINTS
+// ============================================================
 
-    const constraint =
-        await response.json();
+function applyConstraintData(data) {
 
-    document.getElementById("constraintDepartment").value =
-        constraint.department_code;
+    if (!data) {
+        return;
+    }
 
-    document.getElementById("constraintScheme").value =
-        constraint.scheme_year;
 
-    document.getElementById("constraintAcademicYear").value =
-        constraint.academic_year;
+    // --------------------------------------------------------
+    // WORKING DAYS
+    // --------------------------------------------------------
 
-    document.getElementById("constraintSemesterType").value =
-        constraint.semester_type;
+    if (
+        Array.isArray(
+            data.working_days
+        )
+    ) {
 
-    loadSemesterDropdown();
+        document
+            .querySelectorAll(
+                "#workingDays .day-btn"
+            )
+            .forEach(
+                button => {
 
-    document.getElementById("constraintSemester").value =
-        constraint.semester_id;
+                    button.classList.toggle(
+                        "active",
+                        data.working_days.includes(
+                            button.dataset.day
+                        )
+                    );
 
-    document.getElementById("periodsPerDay").value =
-        constraint.periods_per_day;
-
-    document.getElementById("collegeStartTime").value =
-        constraint.college_start_time;
-
-    document.getElementById("periodDuration").value =
-        constraint.period_duration;
-
-    document.getElementById("lunchAfterPeriod").value =
-        constraint.lunch_after_period;
-
-    document.getElementById("shortBreakAfterPeriod").value =
-        constraint.short_break_after_period;
-
-    document.getElementById("shortBreakDuration").value =
-        constraint.short_break_duration;
-
-    document.getElementById("maxPeriodsPerDay").value =
-        constraint.max_periods_per_day;
-
-    document.getElementById("maxPeriodsPerWeek").value =
-        constraint.max_periods_per_week;
-
-    document.getElementById("labDuration").value =
-        constraint.lab_duration;
-
-    document.querySelectorAll(
-        '#constraintForm input[type="checkbox"]'
-    ).forEach(day => {
-
-        day.checked = false;
-
-    });
-
-    constraint.working_days
-        .split(",")
-        .forEach(day => {
-
-            const checkbox = document.querySelector(
-                `input[value="${day}"]`
+                }
             );
 
-            if (checkbox) {
+    }
 
-                checkbox.checked = true;
+
+    // --------------------------------------------------------
+    // PERIODS
+    // --------------------------------------------------------
+
+    if (
+        Array.isArray(
+            data.periods
+        ) &&
+        data.periods.length > 0
+    ) {
+
+        periods =
+            data.periods.map(
+                (period, index) => ({
+
+                    id:
+                        index + 1,
+
+                    period_number:
+                        period.period_number ||
+                        index + 1,
+
+                    start_time:
+                        period.start_time ||
+                        "",
+
+                    end_time:
+                        period.end_time ||
+                        ""
+
+                })
+            );
+
+        periodCounter =
+            periods.length;
+
+        renderPeriods();
+
+    }
+
+
+    // --------------------------------------------------------
+    // BREAK
+    // --------------------------------------------------------
+
+    if (data.break) {
+
+        const type =
+            document.getElementById(
+                "breakType"
+            );
+
+        const start =
+            document.getElementById(
+                "breakStart"
+            );
+
+        const end =
+            document.getElementById(
+                "breakEnd"
+            );
+
+        if (type) {
+
+            type.value =
+                data.break.type ||
+                "Lunch";
+
+        }
+
+        if (start) {
+
+            start.value =
+                data.break.start_time ||
+                "";
+
+        }
+
+        if (end) {
+
+            end.value =
+                data.break.end_time ||
+                "";
+
+        }
+
+    }
+
+
+    // --------------------------------------------------------
+    // FACULTY DAILY LIMIT
+    // --------------------------------------------------------
+
+    if (
+        data.faculty_daily_limit !==
+        undefined &&
+        data.faculty_daily_limit !==
+        null
+    ) {
+
+        document.getElementById(
+            "facultyDailyLimit"
+        ).value =
+            data.faculty_daily_limit;
+
+    }
+
+
+    // --------------------------------------------------------
+    // STUDENT DAILY LIMIT
+    // --------------------------------------------------------
+
+    if (
+        data.student_daily_limit !==
+        undefined &&
+        data.student_daily_limit !==
+        null
+    ) {
+
+        document.getElementById(
+            "studentDailyLimit"
+        ).value =
+            data.student_daily_limit;
+
+    }
+
+
+    // --------------------------------------------------------
+    // LAB CONSECUTIVE
+    // --------------------------------------------------------
+
+    if (
+        data.lab_consecutive !==
+        undefined
+    ) {
+
+        document.getElementById(
+            "labConsecutive"
+        ).checked =
+            Boolean(
+                data.lab_consecutive
+            );
+
+    }
+
+
+    // --------------------------------------------------------
+    // FACULTY CLASH
+    // --------------------------------------------------------
+
+    if (
+        data.faculty_clash !==
+        undefined
+    ) {
+
+        document.getElementById(
+            "facultyClash"
+        ).checked =
+            Boolean(
+                data.faculty_clash
+            );
+
+    }
+
+
+    // --------------------------------------------------------
+    // SEMESTER CLASH
+    // --------------------------------------------------------
+
+    if (
+        data.semester_clash !==
+        undefined
+    ) {
+
+        document.getElementById(
+            "semesterClash"
+        ).checked =
+            Boolean(
+                data.semester_clash
+            );
+
+    }
+
+
+    // --------------------------------------------------------
+    // P / C CYCLE
+    // --------------------------------------------------------
+
+    if (
+        data.cycle_constraint !==
+        undefined
+    ) {
+
+        document.getElementById(
+            "cycleConstraint"
+        ).checked =
+            Boolean(
+                data.cycle_constraint
+            );
+
+    }
+
+}
+
+
+// ============================================================
+// EVENT LISTENERS
+// ============================================================
+
+function setupEventListeners() {
+
+    // --------------------------------------------------------
+    // Working day buttons
+    // --------------------------------------------------------
+
+    setupDayButtons();
+
+
+    // --------------------------------------------------------
+    // Add period
+    // --------------------------------------------------------
+
+    const addPeriodBtn =
+        document.getElementById(
+            "addPeriodBtn"
+        );
+
+    if (addPeriodBtn) {
+
+        addPeriodBtn.addEventListener(
+            "click",
+            () => {
+
+                addPeriod();
 
             }
+        );
 
-        });
+    }
 
-    const modal = new bootstrap.Modal(
-        document.getElementById("facultyModal")
-    );
 
-    modal.show();
+    // --------------------------------------------------------
+    // Save button
+    // --------------------------------------------------------
+
+    const saveBtn =
+        document.getElementById(
+            "saveConstraintsBtn"
+        );
+
+    if (saveBtn) {
+
+        saveBtn.addEventListener(
+            "click",
+            saveConstraints
+        );
+
+    }
+
+
+    // --------------------------------------------------------
+    // Department change
+    // --------------------------------------------------------
+
+    const department =
+        document.getElementById(
+            "department"
+        );
+
+    if (department) {
+
+        department.addEventListener(
+            "change",
+            async () => {
+
+                await loadConstraints();
+
+            }
+        );
+
+    }
+
+
+    // --------------------------------------------------------
+    // Academic year change
+    // --------------------------------------------------------
+
+    const academicYear =
+        document.getElementById(
+            "academicYear"
+        );
+
+    if (academicYear) {
+
+        academicYear.addEventListener(
+            "change",
+            async () => {
+
+                await loadConstraints();
+
+            }
+        );
+
+    }
+
+
+    // --------------------------------------------------------
+    // Scheme change
+    // --------------------------------------------------------
+
+    const scheme =
+        document.getElementById(
+            "scheme"
+        );
+
+    if (scheme) {
+
+        scheme.addEventListener(
+            "change",
+            async () => {
+
+                await loadConstraints();
+
+            }
+        );
+
+    }
 
 }
-function resetConstraintForm() {
 
-    document.getElementById("constraintForm").reset();
 
-    document.querySelectorAll(
-        '#constraintForm input[type="checkbox"]'
-    ).forEach(day => day.checked = false);
+// ============================================================
+// EXPORT
+// ============================================================
 
-    editId = null;
-
-}
-
-document
-    .getElementById("constraintSemesterType")
-    .addEventListener("change", loadSemesterDropdown);
-loadConstraints();
+window.removePeriod =
+    removePeriod;

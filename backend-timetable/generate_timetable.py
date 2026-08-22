@@ -1,6 +1,15 @@
-from flask import Blueprint, request, jsonify
+import json
+from collections import defaultdict
+
+from flask import Blueprint, jsonify, request
 import mysql.connector
+
 from timetable_generator import TimetableGenerator
+
+
+# ============================================================
+# BLUEPRINT
+# ============================================================
 
 generate_timetable_api = Blueprint(
     "generate_timetable_api",
@@ -8,772 +17,1369 @@ generate_timetable_api = Blueprint(
 )
 
 
+# ============================================================
+# DATABASE CONFIG
+# ============================================================
+
+DB_CONFIG = {
+    "host": "localhost",
+    "user": "root",
+    "password": "root",
+    "database": "timetable_db",
+}
+
+
 def get_connection():
-
-    return mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="root",
-        database="timetable_db"
-    )
-def get_department_for_semester(selected_department_id, semester):
-
-    # First Year (Common SH Department)
-    if semester in [1, 2]:
-        return 9
-
-    # Department selected by user
-    return selected_department_id
+    return mysql.connector.connect(**DB_CONFIG)
 
 
-@generate_timetable_api.route(
-    "/generate-timetable/test",
-    methods=["GET"]
-)
-def test():
+# ============================================================
+# JSON HELPER
+# ============================================================
 
-    return jsonify({
-        "message": "Generate Timetable API Working"
-    })
-@generate_timetable_api.route(
-    "/generate-timetable",
-    methods=["POST"]
-)
-def generate_timetable():
+def parse_json(value, default):
 
-    data = request.json
+    if value is None:
+        return default
 
-    connection = get_connection()
+    if isinstance(value, (dict, list)):
+        return value
 
-    cursor = connection.cursor(dictionary=True)
-    cursor.execute(
-        "SELECT department_id FROM department WHERE department_code=%s",
-        (data["department"],)
+    try:
+        return json.loads(value)
+
+    except Exception:
+        return default
+
+
+# ============================================================
+# NORMALIZE CONSTRAINT
+# ============================================================
+
+def normalize_constraint(row):
+
+    # --------------------------------------------------------
+    # Working days
+    # --------------------------------------------------------
+
+    working_days = parse_json(
+        row.get("working_days"),
+        []
     )
 
-    department = cursor.fetchone()
+    if isinstance(working_days, str):
 
-    cursor.execute(
-        "SELECT scheme_id FROM scheme WHERE scheme_year=%s",
-        (data["scheme"],)
+        working_days = [
+            x.strip()
+            for x in working_days.split(",")
+            if x.strip()
+        ]
+
+    if not working_days:
+
+        working_days = [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday"
+        ]
+
+
+    # --------------------------------------------------------
+    # Periods
+    # --------------------------------------------------------
+
+    periods = parse_json(
+        row.get("periods"),
+        []
     )
 
-    scheme = cursor.fetchone()
-    cursor.execute(
+    if not isinstance(periods, list):
+
+        periods = []
+
+
+    # --------------------------------------------------------
+    # Add generator-compatible fields
+    # --------------------------------------------------------
+
+    row["working_days"] = working_days
+
+    row["periods"] = periods
+
+    row["periods_per_day"] = len(periods)
+
+    return row
+
+
+# ============================================================
+# LOAD CONSTRAINT
+# ============================================================
+
+def load_constraint(
+    conn,
+    department_code,
+    scheme_id,
+    academic_year
+):
+
+    cur = conn.cursor(
+        dictionary=True
+    )
+
+    cur.execute(
         """
-        SELECT *
+        SELECT
+            id,
+            academic_year,
+            department_code,
+            scheme_id,
+            working_days,
+            periods,
+            break_data,
+            faculty_daily_limit,
+            student_daily_limit,
+            lab_consecutive,
+            faculty_clash,
+            semester_clash,
+            cycle_constraint
         FROM timetable_constraints
-        WHERE department_id=%s
-        AND scheme_id=%s
-        AND semester_type=%s
-        ORDER BY semester_id
+        WHERE academic_year = %s
+          AND department_code = %s
+          AND scheme_id = %s
+        ORDER BY id DESC
         LIMIT 1
         """,
         (
-            department["department_id"],
-            scheme["scheme_id"],
-            data["semester_type"]
+            academic_year,
+            department_code,
+            scheme_id
         )
     )
 
+    row = cur.fetchone()
 
-    constraints = cursor.fetchall()
-    constraint = None
+    cur.close()
 
-    for c in constraints:
+    if not row:
 
-        if c["academic_year"] == data["academic_year"]:
-            constraint = c
-            break
-    print("Department ID:", department["department_id"])
-    print("Scheme ID:", scheme["scheme_id"])
-    print("Academic Year:", data["academic_year"])
-    print("Semester Type:", data["semester_type"])
-
-
-    if constraint:
-        constraint["college_start_time"] = str(
-            constraint["college_start_time"]
+        raise ValueError(
+            "No timetable constraint found for "
+            f"{department_code}, "
+            f"scheme {scheme_id}, "
+            f"{academic_year}"
         )
 
-        constraint["created_at"] = str(
-            constraint["created_at"]
-        )
-    if data["semester_type"] == "Odd":
+    return normalize_constraint(row)
 
-        semester_list = (1, 3, 5, 7)
 
-    else:
+# ============================================================
+# LOAD SUBJECTS
+# ============================================================
 
-        semester_list = (2, 4, 6, 8)
-    subjects = []
+def load_subjects(conn, department_code, scheme_id, semesters, academic_year=None):
+    if not semesters:
+        return []
 
-    for sem in semester_list:
-        department_id = get_department_for_semester(
-            department["department_id"],
-            sem
-        )
+    cur = conn.cursor(dictionary=True)
 
-        cursor.execute(
-            """
-            SELECT
-                s.subject_id,
-                s.subject_code,
-                s.subject_name,
-                s.semester_id,
-                s.lecture_hours,
-                s.tutorial_hours,
-                s.practical_hours
-            FROM faculty_subject_assignment fsa
-            JOIN subject s
-                ON fsa.subject_id = s.subject_id
-            WHERE
-                fsa.academic_year = %s
-                AND fsa.status = 'Active'
-                AND s.department_id = %s
-                AND s.scheme_id = %s
-                AND s.semester_id = %s
-            ORDER BY
-                s.subject_code
-            """,
+    placeholders = ",".join(["%s"] * len(semesters))
+
+    sql = f"""
+        SELECT
+            s.subject_id,
+            s.subject_code,
+            s.subject_name,
+            s.semester_id,
+            s.scheme_id,
+            s.department_id,
+            s.credits,
+            s.lecture_hours,
+            s.tutorial_hours,
+            s.practical_hours,
+            s.cycle,
+
+            CASE
+                WHEN EXISTS (
+                    SELECT 1
+                    FROM faculty_subject_assignment fsa
+                    WHERE fsa.subject_id = s.subject_id
+                      AND fsa.academic_year = %s
+                      AND fsa.status = 'Active'
+                )
+                THEN 1
+                ELSE 0
+            END AS has_active_assignment
+
+        FROM subject s
+
+        JOIN department d
+            ON d.department_id = s.department_id
+
+        WHERE
+            s.scheme_id = %s
+
+            AND s.semester_id IN ({placeholders})
+
+            AND
             (
-                data["academic_year"],
-                department_id,
-                scheme["scheme_id"],
-                sem
+                (
+                    s.semester_id IN (1, 2)
+                    AND d.department_code = 'SH'
+                )
+
+                OR
+
+                (
+                    s.semester_id NOT IN (1, 2)
+                    AND d.department_code = %s
+                )
             )
+
+        ORDER BY
+            s.semester_id,
+            s.subject_code,
+
+            /*
+             * VERY IMPORTANT:
+             * If duplicate subject rows exist,
+             * choose the row that actually has
+             * an active faculty assignment.
+             */
+            has_active_assignment DESC,
+
+            /*
+             * If both have assignments,
+             * use the latest/highest subject_id.
+             */
+            s.subject_id DESC
+    """
+
+    params = (
+        [academic_year]
+        + [scheme_id]
+        + [int(x) for x in semesters]
+        + [department_code]
+    )
+
+    cur.execute(sql, params)
+
+    rows = cur.fetchall()
+
+    cur.close()
+
+    # ---------------------------------------------------------
+    # Remove duplicate subject codes.
+    #
+    # Because SQL already puts assigned rows first,
+    # the selected row will be the assigned subject_id.
+    # ---------------------------------------------------------
+
+    unique = {}
+
+    for row in rows:
+
+        key = (
+            int(row["semester_id"]),
+            str(
+                row["subject_code"]
+            ).strip().upper()
         )
 
-        subjects.extend(cursor.fetchall())
+        if key not in unique:
+            unique[key] = row
+
+    result = list(unique.values())
+
+    print(
+        "LOADED SUBJECTS:",
+        {
+            sem: [
+                (
+                    s["subject_code"],
+                    s["subject_id"],
+                    s["has_active_assignment"]
+                )
+                for s in result
+                if int(s["semester_id"]) == sem
+            ]
+            for sem in semesters
+        }
+    )
+
+    return result
+# ============================================================
+# LOAD FACULTY ASSIGNMENTS
+# ============================================================
+
+def load_assignments(
+    conn,
+    subject_ids,
+    academic_year
+):
+
+    if not subject_ids:
+        return []
 
 
-    total_subjects = len(subjects)
+    cur = conn.cursor(
+        dictionary=True
+    )
 
-    print("Subjects Count:", total_subjects)
-    print("Total Subjects:", total_subjects)
+    placeholders = ",".join(
+        ["%s"] * len(subject_ids)
+    )
 
 
+    # IMPORTANT:
+    #
+    # faculty table has:
+    #
+    # faculty_id
+    # faculty_name
+    # department_id
+    # designation
+    # max_workload
+    # status
+    #
+    # There is NO first_name / last_name.
+    # --------------------------------------------------------
+
+    sql = f"""
+        SELECT
+
+            fsa.subject_id,
+
+            fsa.faculty_id,
+
+            fsa.lab_faculty_id,
+
+            fsa.lab_co_faculty_id,
+
+            f.faculty_name,
+
+            f.designation,
+
+            f.max_workload,
+
+            f.status AS faculty_status,
+
+            lf.faculty_name
+                AS lab_faculty_name,
+
+            cf.faculty_name
+                AS lab_co_faculty_name
+
+        FROM faculty_subject_assignment fsa
+
+        JOIN faculty f
+          ON f.faculty_id =
+             fsa.faculty_id
+
+        LEFT JOIN faculty lf
+          ON lf.faculty_id =
+             fsa.lab_faculty_id
+
+        LEFT JOIN faculty cf
+          ON cf.faculty_id =
+             fsa.lab_co_faculty_id
+
+        WHERE
+            fsa.subject_id
+            IN ({placeholders})
+
+          AND fsa.academic_year = %s
+
+          AND fsa.status = 'Active'
+
+          AND f.status = 'Active'
+    """
 
 
+    params = (
+        [int(x) for x in subject_ids]
+        +
+        [academic_year]
+    )
 
-    print("Subjects:")
-    for subject in subjects:
-        print(subject)
-    print("\nSubject Hours\n")
 
-    for subject in subjects:
-        total_hours = (
-                subject["lecture_hours"] +
-                subject["tutorial_hours"] +
-                subject["practical_hours"]
+    cur.execute(
+        sql,
+        params
+    )
+
+    rows = cur.fetchall()
+
+    cur.close()
+
+
+    # --------------------------------------------------------
+    # One active assignment per subject
+    # --------------------------------------------------------
+
+    result = {}
+
+    for row in rows:
+
+        subject_id = int(
+            row["subject_id"]
+        )
+
+        if subject_id not in result:
+
+            result[subject_id] = row
+
+
+    return list(
+        result.values()
+    )
+
+
+# ============================================================
+# CONVERT RESULT TO JSON SAFE FORMAT
+# ============================================================
+
+def make_json_safe(value):
+
+    if isinstance(value, dict):
+
+        return {
+            str(k):
+                make_json_safe(v)
+            for k, v in value.items()
+        }
+
+
+    if isinstance(value, list):
+
+        return [
+            make_json_safe(v)
+            for v in value
+        ]
+
+
+    return value
+
+
+# ============================================================
+# GENERATE TIMETABLE API
+# ============================================================
+
+@generate_timetable_api.route(
+    "/generate-timetable",
+    methods=["POST", "OPTIONS"]
+)
+def generate_timetable_api_route():
+
+    # --------------------------------------------------------
+    # CORS preflight
+    # --------------------------------------------------------
+
+    if request.method == "OPTIONS":
+
+        return jsonify({
+            "ok": True
+        }), 200
+
+
+    conn = None
+
+
+    try:
+
+        # ====================================================
+        # READ FRONTEND REQUEST
+        # ====================================================
+
+        data = request.get_json(
+            silent=True
+        ) or {}
+
+
+        print(
+            "\n========== GENERATE REQUEST =========="
         )
 
         print(
-            subject["subject_code"],
-            "Semester:", subject["semester_id"],
-            "Hours:", total_hours
-        )
-    assignments = []
-
-    for sem in semester_list:
-        department_id = get_department_for_semester(
-            department["department_id"],
-            sem
+            "REQUEST DATA:",
+            data
         )
 
-        cursor.execute(
-            """
-            SELECT
-                fsa.subject_id,
-                fsa.faculty_id,
-                f.faculty_name,
-                s.subject_code,
-                s.semester_id
-            FROM faculty_subject_assignment fsa
-            JOIN faculty f
-                ON fsa.faculty_id = f.faculty_id
-            JOIN subject s
-                ON fsa.subject_id = s.subject_id
-            WHERE
-                fsa.academic_year = %s
-                AND fsa.status = 'Active'
-                AND s.department_id = %s
-                AND s.scheme_id = %s
-                AND s.semester_id = %s
-            ORDER BY
-                s.subject_code
-            """,
-            (
-                data["academic_year"],
-                department_id,
-                scheme["scheme_id"],
-                sem
+
+        # ====================================================
+        # DEPARTMENT
+        # ====================================================
+
+        department = str(
+            data.get("department")
+            or data.get("department_code")
+            or ""
+        ).strip()
+
+
+        # ====================================================
+        # SCHEME
+        # ====================================================
+
+        scheme_id = (
+            data.get("scheme")
+            or data.get("scheme_id")
+        )
+
+
+        # ====================================================
+        # ACADEMIC YEAR
+        # ====================================================
+
+        academic_year = str(
+            data.get("academic_year")
+            or data.get("academicYear")
+            or ""
+        ).strip()
+
+
+        # ====================================================
+        # SEMESTER TYPE
+        # ====================================================
+
+        semester_type = str(
+            data.get("semester_type")
+            or data.get("semesterType")
+            or ""
+        ).strip().lower()
+
+
+        # ====================================================
+        # VALIDATE BASIC INPUT
+        # ====================================================
+
+        if not department:
+
+            return jsonify({
+                "success": False,
+                "message":
+                    "Department is required."
+            }), 400
+
+
+        if scheme_id in (
+            None,
+            ""
+        ):
+
+            return jsonify({
+                "success": False,
+                "message":
+                    "Scheme is required."
+            }), 400
+
+
+        if not academic_year:
+
+            return jsonify({
+                "success": False,
+                "message":
+                    "Academic year is required."
+            }), 400
+
+
+        try:
+
+            scheme_id = int(
+                scheme_id
+            )
+
+        except Exception:
+
+            return jsonify({
+                "success": False,
+                "message":
+                    "Invalid scheme."
+            }), 400
+
+
+        # ====================================================
+        # SEMESTERS
+        # ====================================================
+
+        selected = data.get(
+            "semesters"
+        )
+
+
+        if selected:
+
+            semesters = [
+                int(x)
+                for x in selected
+            ]
+
+
+        elif semester_type == "odd":
+
+            semesters = [
+                1,
+                3,
+                5,
+                7
+            ]
+
+
+        elif semester_type == "even":
+
+            semesters = [
+                2,
+                4,
+                6,
+                8
+            ]
+
+
+        else:
+
+            return jsonify({
+                "success": False,
+                "message":
+                    "Semester Type must be Odd or Even."
+            }), 400
+
+
+        # ====================================================
+        # ENFORCE ODD / EVEN
+        # ====================================================
+
+        if semester_type == "odd":
+
+            semesters = [
+                s
+                for s in semesters
+                if s % 2 == 1
+            ]
+
+
+        elif semester_type == "even":
+
+            semesters = [
+                s
+                for s in semesters
+                if s % 2 == 0
+            ]
+
+
+        # Remove duplicates
+        semesters = list(
+            dict.fromkeys(
+                semesters
             )
         )
 
-        assignments.extend(cursor.fetchall())
-    faculty_assigned = len(assignments)
-    print("Assignments Count:", faculty_assigned)
-    print("Faculty Assignments:")
 
-    for assignment in assignments:
-        print(assignment)
-    # Create Empty Timetable
+        if not semesters:
 
-    days = constraint["working_days"].split(",")
+            return jsonify({
+                "success": False,
+                "message":
+                    "No valid semesters selected."
+            }), 400
 
-    periods = constraint["periods_per_day"]
 
-    timetable = {}
+        # ====================================================
+        # CONNECT DATABASE
+        # ====================================================
 
-    for sem in semester_list:
+        conn = get_connection()
 
-        timetable[sem] = {}
 
-        for day in days:
+        # ====================================================
+        # LOAD CONSTRAINT
+        # ====================================================
 
-            timetable[sem][day] = []
+        constraint = load_constraint(
+            conn,
+            department,
+            scheme_id,
+            academic_year
+        )
 
-            for period in range(1, periods + 1):
-                timetable[sem][day].append("Empty")
-    print("\nEmpty Timetable Created\n")
 
-    for sem in timetable:
+        # ====================================================
+        # LOAD SUBJECTS
+        # ====================================================
 
-        print(f"Semester {sem}")
+        subjects = load_subjects(
+            conn,
+            department,
+            scheme_id,
+            semesters
+        )
 
-        for day in timetable[sem]:
-            print(day, timetable[sem][day])
 
-        print()
-    # Group subjects semester-wise
+        if not subjects:
 
-    semester_subjects = {}
+            return jsonify({
+                "success": False,
+                "message":
+                    "No subjects found for the selected semesters.",
+                "department":
+                    department,
+                "scheme":
+                    scheme_id,
+                "academic_year":
+                    academic_year,
+                "semesters":
+                    semesters
+            }), 409
 
-    for sem in semester_list:
-        semester_subjects[sem] = []
 
-    for subject in subjects:
-        semester_subjects[subject["semester_id"]].append(subject)
+        # ====================================================
+        # LOAD FACULTY ASSIGNMENTS
+        # ====================================================
 
-    print("\nSemester-wise Subjects\n")
+        subject_ids = [
+            int(
+                s["subject_id"]
+            )
+            for s in subjects
+        ]
 
-    for sem in semester_subjects:
-        print(f"Semester {sem}")
 
-        for subject in semester_subjects[sem]:
+        assignments = load_assignments(
+            conn,
+            subject_ids,
+            academic_year
+        )
+
+
+        # ====================================================
+        # ONLY ASSIGNED SUBJECTS
+        # ====================================================
+
+        assigned_ids = {
+            int(
+                a["subject_id"]
+            )
+            for a in assignments
+        }
+
+
+        unassigned = defaultdict(
+            list
+        )
+
+
+        for subject in subjects:
+
+            sid = int(
+                subject["subject_id"]
+            )
+
+            if sid not in assigned_ids:
+
+                unassigned[
+                    int(
+                        subject["semester_id"]
+                    )
+                ].append(
+                    subject[
+                        "subject_code"
+                    ]
+                )
+
+
+        subjects = [
+            s
+            for s in subjects
+            if int(
+                s["subject_id"]
+            ) in assigned_ids
+        ]
+
+
+        if unassigned:
+
             print(
-                subject["subject_code"],
-                subject["lecture_hours"] +
-                subject["tutorial_hours"] +
-                subject["practical_hours"]
+                "SKIPPING UNASSIGNED SUBJECTS:",
+                dict(unassigned)
             )
 
-        print()
-    # Allocate first subject to Monday P1
+
+        # ====================================================
+        # DATA SUMMARY
+        # ====================================================
+
+        subjects_by_semester = defaultdict(
+            int
+        )
 
 
-    print("Received Data:", data)
-    print("Department:", department)
-    print("Scheme:", scheme)
-    print("Constraint:", constraint)
-    cursor.close()
+        for subject in subjects:
 
-    connection.close()
+            subjects_by_semester[
+                int(
+                    subject["semester_id"]
+                )
+            ] += 1
 
-    if not constraint:
-        cursor.close()
-        connection.close()
+
+        print(
+            "GENERATION DATA:",
+            "selected_semesters=",
+            semesters,
+            "subjects=",
+            len(subjects),
+            "assignments=",
+            len(assignments),
+            "subjects_by_semester=",
+            dict(
+                subjects_by_semester
+            )
+        )
+
+
+        if not subjects:
+
+            return jsonify({
+                "success": False,
+                "message":
+                    "No Active faculty assignments found for the selected semesters.",
+                "unassigned_subjects":
+                    dict(unassigned)
+            }), 409
+
+
+        # ====================================================
+        # CREATE GENERATOR
+        # ====================================================
+
+        print(
+            "\n========== STARTING GENERATOR =========="
+        )
+
+
+        generator = TimetableGenerator(
+            constraint=constraint,
+            subjects=subjects,
+            assignments=assignments,
+            semester_list=semesters
+        )
+
+
+        # ====================================================
+        # ONE GENERATION
+        #
+        # IMPORTANT:
+        # NO 50 / 100 / 120 ATTEMPT LOOP.
+        #
+        # The generator is executed once.
+        # ====================================================
+
+        timetable = generator.generate()
+
+
+        # ====================================================
+        # CHECK RESULT
+        # ====================================================
+
+        if timetable is None:
+
+            return jsonify({
+                "success": False,
+                "message":
+                    "Could not generate a valid timetable with the selected assignments and constraints.",
+                "semesters":
+                    semesters,
+                "unassigned_subjects":
+                    dict(unassigned)
+            }), 409
+
+
+        # ====================================================
+        # JSON SAFE TIMETABLE
+        # ====================================================
+
+        timetable_json = (
+            make_json_safe(
+                timetable
+            )
+        )
+
+
+        # ====================================================
+        # FINAL RESPONSE
+        # ====================================================
+
+        response = {
+
+            "success": True,
+
+            "message":
+                "TIMETABLE GENERATED SUCCESSFULLY.",
+
+            "department":
+                department,
+
+            "scheme":
+                scheme_id,
+
+            "academic_year":
+                academic_year,
+
+            "semester_type":
+                semester_type,
+
+            "semesters":
+                semesters,
+
+            "working_days":
+                constraint[
+                    "working_days"
+                ],
+
+            "periods":
+                constraint[
+                    "periods"
+                ],
+
+            "timetable":
+                timetable_json,
+
+            "subjects":
+                make_json_safe(
+                    subjects
+                ),
+
+            "assignments":
+                make_json_safe(
+                    assignments
+                ),
+
+            "unassigned_subjects":
+                dict(
+                    unassigned
+                ),
+
+            "generation_options":
+                1
+        }
+
+
+        print(
+            "\n========== GENERATION SUCCESS =========="
+        )
+
+        print(
+            "TIMETABLE GENERATED SUCCESSFULLY"
+        )
+
+        print(
+            "Semesters:",
+            semesters
+        )
+
+        print(
+            "Subjects:",
+            len(subjects)
+        )
+
+        print(
+            "Assignments:",
+            len(assignments)
+        )
+
+        print(
+            "========================================\n"
+        )
+
+
+        return jsonify(
+            response
+        ), 200
+
+
+    # ========================================================
+    # MYSQL ERROR
+    # ========================================================
+
+    except mysql.connector.Error as e:
+
+        print(
+            "MYSQL ERROR:",
+            e
+        )
+
 
         return jsonify({
-            "message": "No timetable constraint found for the selected combination."
-        }), 404
 
-    cursor.close()
-    connection.close()
-    generator = TimetableGenerator(
-        constraint,
-        subjects,
-        assignments,
-        semester_list
-    )
+            "success": False,
 
-    timetable = generator.generate()
-    subject_faculty = generator.build_subject_faculty_map()
-    print("\nSubject Faculty Map\n")
+            "message":
+                f"MySQL error: {e}"
 
-    for subject_id, faculty in subject_faculty.items():
-        print(subject_id, faculty)
+        }), 500
 
-    constraint["total_subjects"] = total_subjects
-    constraint["faculty_assigned"] = faculty_assigned
-    constraint["timetable"] = timetable
 
-    return jsonify(constraint)
-@generate_timetable_api.route(
-    "/academic-years",
-    methods=["GET"]
-)
-def get_academic_years():
+    # ========================================================
+    # OTHER ERROR
+    # ========================================================
 
-    connection = get_connection()
+    except Exception as e:
 
-    cursor = connection.cursor(dictionary=True)
+        import traceback
 
-    cursor.execute("""
-        SELECT DISTINCT academic_year
-        FROM faculty_subject_assignment
-        ORDER BY academic_year
-    """)
+        print(
+            "\n========== GENERATION ERROR =========="
+        )
 
-    years = cursor.fetchall()
+        traceback.print_exc()
 
-    cursor.close()
-    connection.close()
+        print(
+            "======================================\n"
+        )
 
-    return jsonify(years)
+
+        return jsonify({
+
+            "success": False,
+
+            "message":
+                str(e)
+
+        }), 500
+
+
+    # ========================================================
+    # CLOSE DATABASE
+    # ========================================================
+
+    finally:
+
+        if conn is not None:
+
+            try:
+
+                conn.close()
+
+            except Exception:
+
+                pass
+
+# ============================================================
+# SAVE GENERATED TIMETABLE
+# ============================================================
+
 @generate_timetable_api.route(
     "/save-timetable",
-    methods=["POST"]
+    methods=["POST", "OPTIONS"]
 )
 def save_timetable():
-    data = request.json
 
-    timetable = data["timetable"]
+    if request.method == "OPTIONS":
+        return jsonify({"ok": True}), 200
 
-    department = data["department"]
+    conn = None
 
-    scheme = data["scheme"]
+    try:
 
-    connection = get_connection()
+        data = request.get_json(
+            silent=True
+        ) or {}
 
-    cursor = connection.cursor(dictionary=True)
-
-    cursor.execute(
-        "SELECT department_id FROM department WHERE department_code=%s",
-        (department,)
-    )
-
-    department_id = cursor.fetchone()["department_id"]
-    print("Department ID =", department_id)
-
-    cursor.execute(
-        "SELECT scheme_id FROM scheme WHERE scheme_year=%s",
-        (scheme,)
-    )
-
-    scheme_id = cursor.fetchone()["scheme_id"]
-    print("Scheme ID =", scheme_id)
-    cursor.execute(
-        """
-        DELETE FROM timetable
-        WHERE department_id = %s
-          AND scheme_id = %s
-          AND academic_year = %s
-          AND semester_type = %s
-        """,
-        (
-            department_id,
-            scheme_id,
-            data["academic_year"],
-            data["semester_type"]
+        print(
+            "\n========== SAVE TIMETABLE =========="
         )
-    )
 
-    print("Old timetable deleted.")
+        print(
+            "SAVE DATA:",
+            data
+        )
 
+        department_id = data.get(
+            "department_id"
+        )
 
-    for semester in timetable:
+        scheme_id = data.get(
+            "scheme_id"
+        )
 
-        for day in timetable[semester]:
+        academic_year = data.get(
+            "academic_year"
+        )
 
-            periods = timetable[semester][day]
+        semester_type = data.get(
+            "semester_type"
+        )
 
-            for period_number, slot in enumerate(periods, start=1):
+        timetable = data.get(
+            "timetable"
+        )
 
-                if slot == "Empty":
+        if not department_id:
+            return jsonify({
+                "success": False,
+                "message":
+                    "department_id is required."
+            }), 400
+
+        if not scheme_id:
+            return jsonify({
+                "success": False,
+                "message":
+                    "scheme_id is required."
+            }), 400
+
+        if not academic_year:
+            return jsonify({
+                "success": False,
+                "message":
+                    "academic_year is required."
+            }), 400
+
+        if semester_type not in (
+            "Odd",
+            "Even"
+        ):
+            return jsonify({
+                "success": False,
+                "message":
+                    "semester_type must be Odd or Even."
+            }), 400
+
+        if not isinstance(
+            timetable,
+            dict
+        ):
+            return jsonify({
+                "success": False,
+                "message":
+                    "Invalid timetable data."
+            }), 400
+
+        conn = get_connection()
+
+        cur = conn.cursor()
+
+        # ----------------------------------------------------
+        # DELETE OLD DATA FOR SAME VERSION
+        # ----------------------------------------------------
+
+        for semester_id, days in timetable.items():
+
+            try:
+                semester_id = int(
+                    semester_id
+                )
+            except Exception:
+                continue
+
+            cur.execute(
+                """
+                DELETE FROM timetable
+                WHERE department_id = %s
+                  AND scheme_id = %s
+                  AND academic_year = %s
+                  AND semester_type = %s
+                  AND semester_id = %s
+                """,
+                (
+                    int(department_id),
+                    int(scheme_id),
+                    academic_year,
+                    semester_type,
+                    semester_id
+                )
+            )
+
+        # ----------------------------------------------------
+        # INSERT GENERATED TIMETABLE
+        # ----------------------------------------------------
+
+        inserted_rows = 0
+
+        for semester_id, days in timetable.items():
+
+            try:
+                semester_id = int(
+                    semester_id
+                )
+            except Exception:
+                continue
+
+            if not isinstance(
+                days,
+                dict
+            ):
+                continue
+
+            for day, periods in days.items():
+
+                if not isinstance(
+                    periods,
+                    list
+                ):
+                    continue
+
+                for period_index, slot in enumerate(
+                    periods
+                ):
+
+                    if (
+                        slot is None
+                        or slot == "Empty"
+                        or slot == "FREE"
+                    ):
+                        continue
+
+                    period = (
+                        period_index + 1
+                    )
 
                     subject_id = None
                     faculty_id = None
 
-                else:
+                    # ----------------------------------------
+                    # SLOT IS DICTIONARY
+                    # ----------------------------------------
 
-                    subject_id = slot["subject_id"]
-                    faculty_id = slot["faculty_id"]
-                print("Inserting Semester:", semester)
+                    if isinstance(
+                        slot,
+                        dict
+                    ):
 
-                cursor.execute(
-                    """
-                    INSERT INTO timetable
-                    (
-                        department_id,
-                        scheme_id,
-                        academic_year,
-                        semester_type,
-                        semester_id,
-                        day,
-                        period,
-                        subject_id,
-                        faculty_id
+                        subject_id = (
+                            slot.get(
+                                "subject_id"
+                            )
+                        )
+
+                        faculty_id = (
+                            slot.get(
+                                "faculty_id"
+                            )
+                        )
+
+                    # ----------------------------------------
+                    # INSERT
+                    # ----------------------------------------
+
+                    cur.execute(
+                        """
+                        INSERT INTO timetable
+                        (
+                            department_id,
+                            scheme_id,
+                            academic_year,
+                            semester_type,
+                            semester_id,
+                            day,
+                            period,
+                            subject_id,
+                            faculty_id
+                        )
+                        VALUES
+                        (
+                            %s,
+                            %s,
+                            %s,
+                            %s,
+                            %s,
+                            %s,
+                            %s,
+                            %s,
+                            %s
+                        )
+                        """,
+                        (
+                            int(department_id),
+                            int(scheme_id),
+                            academic_year,
+                            semester_type,
+                            semester_id,
+                            day,
+                            period,
+                            subject_id,
+                            faculty_id
+                        )
                     )
-                    VALUES
-                    (
-                        %s,%s,%s,%s,%s,%s,%s,%s,%s
-                    )
-                    """,
-                    (
-                        department_id,
-                        scheme_id,
-                        data["academic_year"],
-                        data["semester_type"],
-                        int(semester),
-                        day,
-                        period_number,
-                        subject_id,
-                        faculty_id
-                    )
-                )
 
-    connection.commit()
+                    inserted_rows += 1
 
-    print("Save Timetable API Called")
-    print(timetable.keys())
-    for semester in timetable:
+        conn.commit()
 
-        print("Semester :", semester)
+        cur.close()
 
-        for day in timetable[semester]:
-            print("Day :", day)
-
-            print(timetable[semester][day])
-    cursor.close()
-
-    connection.close()
-
-    return jsonify({
-        "message": "Database Connected Successfully"
-    })
-
-
-@generate_timetable_api.route(
-    "/view-timetable",
-    methods=["POST"]
-)
-def view_timetable():
-
-    data = request.json
-
-    connection = get_connection()
-
-    cursor = connection.cursor(dictionary=True)
-
-    department = data["department"]
-
-    scheme = data["scheme"]
-
-    academic_year = data["academic_year"]
-
-    semester_type = data["semester_type"]
-
-    view_type = data["view_type"]
-
-    semester = data["semester"]
-    cursor.execute(
-        """
-        SELECT department_id
-        FROM department
-        WHERE department_code = %s
-        """,
-        (department,)
-    )
-
-    department_id = cursor.fetchone()["department_id"]
-    cursor.execute(
-        """
-        SELECT scheme_id
-        FROM scheme
-        WHERE scheme_year = %s
-        """,
-        (scheme,)
-    )
-
-    scheme_id = cursor.fetchone()["scheme_id"]
-    cursor.execute(
-        """
-        SELECT *
-        FROM timetable
-        WHERE department_id = %s
-          AND scheme_id = %s
-          AND academic_year = %s
-          AND semester_type = %s
-          AND semester_id = %s
-        ORDER BY
-            FIELD(day,
-                'Monday',
-                'Tuesday',
-                'Wednesday',
-                'Thursday',
-                'Friday'
-            ),
-            period
-        """,
-        (
-            department_id,
-            scheme_id,
-            academic_year,
-            semester_type,
-            semester
+        print(
+            "TIMETABLE SAVED SUCCESSFULLY"
         )
-    )
 
-    rows = cursor.fetchall()
-
-    timetable = {}
-    if semester not in timetable:
-        timetable[semester] = {
-
-            "Monday": ["Empty"] * 7,
-            "Tuesday": ["Empty"] * 7,
-            "Wednesday": ["Empty"] * 7,
-            "Thursday": ["Empty"] * 7,
-            "Friday": ["Empty"] * 7
-
-        }
-        for row in rows:
-
-            day = row["day"]
-
-            period = row["period"] - 1
-
-            if row["subject_id"] is None:
-                timetable[semester][day][period] = "Empty"
-
-                continue
-
-            cursor.execute(
-                """
-                SELECT
-                    subject_code,
-                    lecture_hours,
-                    tutorial_hours,
-                    practical_hours
-                FROM subject
-                WHERE subject_id = %s
-                """,
-                (row["subject_id"],)
-            )
-
-            subject = cursor.fetchone()
-            if subject["practical_hours"] > 0:
-
-                if subject["lecture_hours"] > 0:
-
-                    subject_type = "Integrated"
-
-                else:
-
-                    subject_type = "Lab"
-
-            else:
-
-                subject_type = "Theory"
-
-            cursor.execute(
-                """
-                SELECT
-                    faculty_name
-                FROM faculty
-                WHERE faculty_id = %s
-                """,
-                (row["faculty_id"],)
-            )
-
-            faculty = cursor.fetchone()
-
-            timetable[semester][day][period] = {
-
-                "subject_id": row["subject_id"],
-
-                "subject_code": subject["subject_code"],
-
-
-                "subject_type": subject_type,
-                "faculty_id": row["faculty_id"],
-
-                "faculty_name": faculty["faculty_name"]
-
-            }
-
-
-    cursor.execute(
-        """
-        SELECT department_name
-        FROM department
-        WHERE department_id = %s
-        """,
-        (department_id,)
-    )
-
-    department_details = cursor.fetchone()
-    cursor.close()
-    connection.close()
-
-    return jsonify({
-
-        "department": department_details["department_name"],
-
-        "semester": semester,
-
-        "academic_year": academic_year,
-
-        "scheme": scheme,
-
-        "timetable": timetable
-
-    })
-@generate_timetable_api.route(
-    "/view-subject-details",
-    methods=["POST"]
-)
-def view_subject_details():
-
-    data = request.json
-
-    connection = get_connection()
-
-    cursor = connection.cursor(dictionary=True)
-
-    cursor.execute(
-        """
-        SELECT department_id
-        FROM department
-        WHERE department_code = %s
-        """,
-        (data["department"],)
-    )
-
-    department_id = cursor.fetchone()["department_id"]
-
-    cursor.execute(
-        """
-        SELECT scheme_id
-        FROM scheme
-        WHERE scheme_year = %s
-        """,
-        (data["scheme"],)
-    )
-
-    scheme_id = cursor.fetchone()["scheme_id"]
-
-    cursor.execute(
-        """
-        SELECT DISTINCT
-            s.subject_code,
-            s.subject_name,
-            s.credits
-        FROM timetable t
-        JOIN subject s
-            ON t.subject_id = s.subject_id
-        WHERE t.department_id = %s
-          AND t.scheme_id = %s
-          AND t.semester_id = %s
-          AND t.academic_year = %s
-          AND t.semester_type = %s
-        ORDER BY s.subject_code
-        """,
-        (
-            department_id,
-            scheme_id,
-            data["semester"],
-            data["academic_year"],
-            data["semester_type"]
+        print(
+            "Rows inserted:",
+            inserted_rows
         )
-    )
 
-    subjects = cursor.fetchall()
-
-    cursor.close()
-    connection.close()
-
-    return jsonify(subjects)
-@generate_timetable_api.route(
-    "/view-faculty-details",
-    methods=["POST"]
-)
-def view_faculty_details():
-
-    data = request.json
-
-    connection = get_connection()
-
-    cursor = connection.cursor(dictionary=True)
-
-    cursor.execute(
-        """
-        SELECT department_id
-        FROM department
-        WHERE department_code = %s
-        """,
-        (data["department"],)
-    )
-
-    department_id = cursor.fetchone()["department_id"]
-
-    cursor.execute(
-        """
-        SELECT scheme_id
-        FROM scheme
-        WHERE scheme_year = %s
-        """,
-        (data["scheme"],)
-    )
-
-    scheme_id = cursor.fetchone()["scheme_id"]
-
-    cursor.execute(
-        """
-        SELECT DISTINCT
-            f.faculty_name,
-            s.subject_code
-        FROM timetable t
-        JOIN faculty f
-            ON t.faculty_id = f.faculty_id
-        JOIN subject s
-            ON t.subject_id = s.subject_id
-        WHERE t.department_id = %s
-          AND t.scheme_id = %s
-          AND t.semester_id = %s
-          AND t.academic_year = %s
-          AND t.semester_type = %s
-        ORDER BY f.faculty_name
-        """,
-        (
-            department_id,
-            scheme_id,
-            data["semester"],
-            data["academic_year"],
-            data["semester_type"]
+        print(
+            "====================================\n"
         )
+
+        return jsonify({
+            "success": True,
+            "message":
+                "Timetable saved successfully.",
+            "rows_inserted":
+                inserted_rows
+        }), 200
+
+    except mysql.connector.Error as e:
+
+        if conn:
+            conn.rollback()
+
+        print(
+            "MYSQL SAVE ERROR:",
+            e
+        )
+
+        return jsonify({
+            "success": False,
+            "message":
+                f"MySQL error: {e}"
+        }), 500
+
+    except Exception as e:
+
+        if conn:
+            conn.rollback()
+
+        import traceback
+
+        traceback.print_exc()
+
+        return jsonify({
+            "success": False,
+            "message":
+                str(e)
+        }), 500
+
+    finally:
+
+        if conn:
+
+            try:
+                conn.close()
+            except Exception:
+                pass
+# ============================================================
+# DIRECT RUN
+# ============================================================
+
+if __name__ == "__main__":
+
+    print(
+        "generate_timetable_api loaded."
     )
 
-    faculty = cursor.fetchall()
+    print(
+        "Run app.py to start Flask."
+    )
 
-    cursor.close()
-    connection.close()
-
-    return jsonify(faculty)
-def is_lab_already_allocated(
-        self,
-        semester,
-        day
-):
-
-    for slot in self.timetable[semester][day]:
-
-        if slot == "Empty":
-            continue
-
-        if slot["subject_type"] in ["Lab", "Integrated"]:
-            return True
-
-    return False

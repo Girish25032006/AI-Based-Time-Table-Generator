@@ -1,502 +1,2574 @@
+// ============================================================
+// VIEW TIMETABLE JAVASCRIPT
+// ============================================================
+
 const API = "http://127.0.0.1:5000";
-const DEPARTMENT_API = "http://127.0.0.1:5000/departments";
-const SCHEME_API = "http://127.0.0.1:5000/schemes";
-const ACADEMIC_YEAR_API = "http://127.0.0.1:5000/academic-years";
-const semesterType = document.getElementById("viewSemesterType");
 
-const viewType = document.getElementById("viewType");
+const DEPARTMENT_API = `${API}/assignment-departments`;
+const SCHEME_API = `${API}/schemes`;
+const ACADEMIC_YEAR_API = `${API}/academic-years`;
 
-const semesterDiv = document.getElementById("semesterDiv");
 
-const semester = document.getElementById("viewSemester");
-const viewTimetableBtn = document.getElementById("viewTimetableBtn");
-const printTimetableBtn =document.getElementById("printTimetableBtn");
-const exportPdfBtn =document.getElementById("exportPdfBtn");
+// ============================================================
+// ELEMENTS
+// ============================================================
+
+const departmentSelect =
+    document.getElementById("viewDepartment");
+
+const schemeSelect =
+    document.getElementById("viewScheme");
+
+const academicYearSelect =
+    document.getElementById("viewAcademicYear");
+
+const semesterTypeSelect =
+    document.getElementById("viewSemesterType");
+
+const semesterBoxes =
+    document.getElementById("semesterBoxes");
+
+const viewSemester =
+    document.getElementById("viewSemester");
+
+const viewType =
+    document.getElementById("viewType");
+
+const selectedSemesterText =
+    document.getElementById("selectedSemesterText");
+
+const viewTimetableBtn =
+    document.getElementById("viewTimetableBtn");
+
+const saveTimetableBtn =
+    document.getElementById("saveTimetableBtn");
+
+const printTimetableBtn =
+    document.getElementById("printTimetableBtn");
+
+const exportPdfBtn =
+    document.getElementById("exportPdfBtn");
+
 const exportExcelBtn =
     document.getElementById("exportExcelBtn");
-viewType.addEventListener("change", function () {
 
-    if (this.value === "single") {
 
-        semesterDiv.style.display = "block";
+// ============================================================
+// INITIAL LOAD
+// ============================================================
 
-    } else {
+document.addEventListener("DOMContentLoaded", function () {
 
-        semesterDiv.style.display = "none";
+    loadDepartments();
+    loadSchemes();
+    loadAcademicYears();
 
+    if (semesterBoxes) {
+        semesterBoxes.innerHTML = "";
+    }
+
+    if (selectedSemesterText) {
+        selectedSemesterText.textContent =
+            "Select semester type first.";
     }
 
 });
-semesterType.addEventListener("change", function () {
 
-    semester.innerHTML =
-        `<option value="">Select Semester</option>`;
+
+// ============================================================
+// SEMESTER TYPE
+// ============================================================
+
+if (semesterTypeSelect) {
+
+    semesterTypeSelect.addEventListener(
+        "change",
+        function () {
+            createSemesterBoxes(this.value);
+        }
+    );
+
+}
+
+
+// ============================================================
+// CREATE SEMESTER BOXES
+// ============================================================
+
+function createSemesterBoxes(type) {
+
+    if (!semesterBoxes) {
+        return;
+    }
+
+    semesterBoxes.innerHTML = "";
+
+    if (viewSemester) {
+        viewSemester.value = "";
+    }
+
+    if (selectedSemesterText) {
+        selectedSemesterText.textContent =
+            "Select a semester.";
+    }
 
     let semesters = [];
 
-    if (this.value === "Odd") {
+    if (type === "Odd") {
 
-        semesters = [1, 3, 5, 7];
+        semesters = [
+            1,
+            3,
+            5,
+            7
+        ];
 
     }
 
-    else if (this.value === "Even") {
+    else if (type === "Even") {
 
-        semesters = [2, 4, 6, 8];
+        semesters = [
+            2,
+            4,
+            6,
+            8
+        ];
 
     }
 
-    semesters.forEach(function (sem) {
+    else {
 
-        semester.innerHTML +=
-            `<option value="${sem}">
-                Semester ${sem}
-            </option>`;
+        if (selectedSemesterText) {
+            selectedSemesterText.textContent =
+                "Select semester type first.";
+        }
+
+        return;
+    }
+
+
+    semesters.forEach(function (semester) {
+
+        const button =
+            document.createElement("button");
+
+        button.type = "button";
+
+        button.className =
+            "semester-box";
+
+        button.textContent =
+            `Semester ${semester}`;
+
+
+        button.addEventListener(
+            "click",
+            function () {
+
+                document
+                    .querySelectorAll(".semester-box")
+                    .forEach(function (btn) {
+
+                        btn.classList.remove(
+                            "selected"
+                        );
+
+                    });
+
+
+                button.classList.add(
+                    "selected"
+                );
+
+
+                if (viewSemester) {
+
+                    viewSemester.value =
+                        semester;
+
+                }
+
+
+                if (viewType) {
+
+                    viewType.value =
+                        "single";
+
+                }
+
+
+                if (selectedSemesterText) {
+
+                    selectedSemesterText.textContent =
+                        `Semester ${semester}`;
+
+                }
+
+            }
+        );
+
+
+        semesterBoxes.appendChild(button);
 
     });
 
-});
-viewTimetableBtn.addEventListener("click", viewTimetable);
-printTimetableBtn.addEventListener(
-    "click",
-    printTimetable
-);
-exportPdfBtn.addEventListener(
-    "click",
-    exportPDF
-);
-exportExcelBtn.addEventListener(
-    "click",
-    exportExcel
-);
-function displayTimetable(timetable) {
+}
 
-    const container = document.getElementById("professionalTimetable");
+
+// ============================================================
+// VIEW TIMETABLE BUTTON
+// ============================================================
+
+if (viewTimetableBtn) {
+
+    viewTimetableBtn.addEventListener(
+        "click",
+        viewTimetable
+    );
+
+}
+
+
+// ============================================================
+// VIEW TIMETABLE
+// ============================================================
+
+async function viewTimetable() {
+
+    try {
+
+        const department =
+            getValue("viewDepartment");
+
+        const scheme =
+            getValue("viewScheme");
+
+        const academicYear =
+            getValue("viewAcademicYear");
+
+        const semesterType =
+            getValue("viewSemesterType");
+
+        const semester =
+            getValue("viewSemester");
+
+
+        // ----------------------------------------------------
+        // VALIDATION
+        // ----------------------------------------------------
+
+        if (!department) {
+
+            alert(
+                "Please select Department."
+            );
+
+            return;
+        }
+
+
+        if (!scheme) {
+
+            alert(
+                "Please select Scheme."
+            );
+
+            return;
+        }
+
+
+        if (!academicYear) {
+
+            alert(
+                "Please select Academic Year."
+            );
+
+            return;
+        }
+
+
+        if (!semesterType) {
+
+            alert(
+                "Please select Semester Type."
+            );
+
+            return;
+        }
+
+
+        if (!semester) {
+
+            alert(
+                "Please select a Semester."
+            );
+
+            return;
+        }
+
+
+        // ----------------------------------------------------
+        // BUTTON LOADING
+        // ----------------------------------------------------
+
+        const oldButtonText =
+            viewTimetableBtn.innerHTML;
+
+        viewTimetableBtn.disabled = true;
+
+        viewTimetableBtn.innerHTML =
+            `<i class="bi bi-hourglass-split"></i> Loading...`;
+
+
+        // ----------------------------------------------------
+        // API REQUEST
+        // ----------------------------------------------------
+
+        const response = await fetch(
+            `${API}/view-timetable`,
+            {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type":
+                        "application/json"
+                },
+
+                body: JSON.stringify({
+
+                    department:
+                        department,
+
+                    scheme:
+                        scheme,
+
+                    academic_year:
+                        academicYear,
+
+                    semester_type:
+                        semesterType,
+
+                    semester:
+                        semester,
+
+                    view_type:
+                        "single"
+
+                })
+
+            }
+        );
+
+
+        // ----------------------------------------------------
+        // SERVER ERROR
+        // ----------------------------------------------------
+
+        if (!response.ok) {
+
+            let message =
+                `Server error: ${response.status}`;
+
+            try {
+
+                const errorData =
+                    await response.json();
+
+                message =
+                    errorData.message ||
+                    errorData.error ||
+                    message;
+
+            }
+
+            catch (error) {}
+
+            throw new Error(message);
+
+        }
+
+
+        // ----------------------------------------------------
+        // RESPONSE
+        // ----------------------------------------------------
+
+        const result =
+            await response.json();
+
+
+        console.log(
+            "View Timetable Response:",
+            result
+        );
+
+
+        // ----------------------------------------------------
+        // HEADER DETAILS
+        // ----------------------------------------------------
+
+        setText(
+            "displayDepartment",
+            result.department || department
+        );
+
+
+        setText(
+            "displaySemester",
+            result.semester ||
+            `Semester ${semester}`
+        );
+
+
+        setText(
+            "displayBranch",
+            result.branch ||
+            department
+        );
+
+
+        setText(
+            "displayScheme",
+            result.scheme ||
+            scheme
+        );
+
+
+        setText(
+            "displayAcademicYear",
+            result.academic_year ||
+            academicYear
+        );
+
+
+        // ----------------------------------------------------
+        // TIMETABLE
+        // ----------------------------------------------------
+
+        displayTimetable(
+            result.timetable
+        );
+
+
+        // ----------------------------------------------------
+        // SUBJECT DETAILS
+        // ----------------------------------------------------
+
+        displaySubjectDetails(
+            result.subjects || []
+        );
+
+
+        // ----------------------------------------------------
+        // FACULTY DETAILS
+        // ----------------------------------------------------
+
+        displayFacultyDetails(
+            result
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "VIEW TIMETABLE ERROR:",
+            error
+        );
+
+        alert(
+            "Unable to load timetable.\n\n" +
+            error.message
+        );
+
+    }
+
+    finally {
+
+        if (viewTimetableBtn) {
+
+            viewTimetableBtn.disabled =
+                false;
+
+            viewTimetableBtn.innerHTML =
+                `<i class="bi bi-search"></i> View Timetable`;
+
+        }
+
+    }
+
+}
+
+
+// ============================================================
+// SET TEXT
+// ============================================================
+
+function setText(
+    id,
+    value
+) {
+
+    const element =
+        document.getElementById(id);
+
+    if (element) {
+
+        element.textContent =
+            value ?? "-";
+
+    }
+
+}
+
+
+// ============================================================
+// GET VALUE
+// ============================================================
+
+function getValue(id) {
+
+    const element =
+        document.getElementById(id);
+
+    if (!element) {
+        return "";
+    }
+
+    return element.value;
+
+}
+
+
+// ============================================================
+// DISPLAY TIMETABLE
+// ============================================================
+
+function displayTimetable(
+    timetable
+) {
+
+    const container =
+        document.getElementById(
+            "professionalTimetable"
+        );
+
+
+    if (!container) {
+        return;
+    }
+
 
     container.innerHTML = "";
+
+
+    if (!timetable) {
+
+        showEmptyTimetable(
+            "No timetable found."
+        );
+
+        return;
+
+    }
+
+
+    const selectedSemester =
+        getValue("viewSemester");
+
+
+    let semesterData =
+        timetable;
+
+
+    // ========================================================
+    // SEMESTER DATA
+    // ========================================================
+
+    if (
+
+        typeof timetable === "object" &&
+
+        !Array.isArray(timetable)
+
+    ) {
+
+        if (
+
+            selectedSemester &&
+
+            timetable[selectedSemester]
+
+        ) {
+
+            semesterData =
+                timetable[selectedSemester];
+
+        }
+
+        else {
+
+            const keys =
+                Object.keys(timetable);
+
+
+            if (keys.length === 1) {
+
+                semesterData =
+                    timetable[keys[0]];
+
+            }
+
+        }
+
+    }
+
+
+    // ========================================================
+    // TABLE
+    // ========================================================
+
     container.innerHTML = `
-    <div class="table-responsive">
 
-    <table class="table table-bordered text-center align-middle">
+        <div class="table-responsive">
 
-    <thead class="table-primary">
+            <table
+                class="table table-bordered
+                       text-center align-middle">
 
-    <tr>
+                <thead>
 
-    <th rowspan="2">Day</th>
+                    <tr>
 
-    <th>I</th>
-    <th>II</th>
+                        <th rowspan="2">
+                            Day
+                        </th>
 
-    <th class="table-warning" style="width:90px;">
-          Tea Break
-      </th>
 
-    <th>III</th>
-    <th>IV</th>
+                        <th>
+                            P1
+                        </th>
 
-    <th class="table-danger" style="width:90px;">
-        Lunch Break
-    </th>
 
-    <th>V</th>
-    <th>VI</th>
-    <th>VII</th>
+                        <th>
+                            P2
+                        </th>
 
-    </tr>
 
-    <tr>
+                        <th
+                            class="break-header"
+                            rowspan="2">
 
-    <th>9:10<br>9:55</th>
+                            Tea Break
 
-    <th>10:05<br>11:00</th>
+                            <br>
 
-    <th>11:00<br>11:15</th>
+                            <small>
+                                11:00 - 11:15
+                            </small>
 
-    <th>11:15<br>12:10</th>
+                        </th>
 
-    <th>12:10<br>1:05</th>
 
-    <th>1:05<br>1:45</th>
+                        <th>
+                            P3
+                        </th>
 
-    <th>1:45<br>2:40</th>
 
-    <th>2:40<br>3:35</th>
+                        <th>
+                            P4
+                        </th>
 
-    <th>3:35<br>4:30</th>
 
-    </tr>
+                        <th
+                            class="break-header"
+                            rowspan="2">
 
-    </thead>
+                            Lunch Break
 
-    <tbody id="professionalBody">
+                            <br>
 
-    </tbody>
+                            <small>
+                                1:05 - 1:45
+                            </small>
 
-    </table>
+                        </th>
 
-    </div>
+
+                        <th>
+                            P5
+                        </th>
+
+
+                        <th>
+                            P6
+                        </th>
+
+
+                        <th>
+                            P7
+                        </th>
+
+                    </tr>
+
+
+                    <tr>
+
+                        <th>
+                            9:10 - 10:05
+                        </th>
+
+
+                        <th>
+                            10:05 - 11:00
+                        </th>
+
+
+                        <th>
+                            11:15 - 12:10
+                        </th>
+
+
+                        <th>
+                            12:10 - 1:05
+                        </th>
+
+
+                        <th>
+                            1:45 - 2:40
+                        </th>
+
+
+                        <th>
+                            2:40 - 3:35
+                        </th>
+
+
+                        <th>
+                            3:35 - 4:30
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody
+                    id="professionalBody">
+
+                </tbody>
+
+            </table>
+
+        </div>
+
     `;
 
-    const semesterOrder = Object.keys(timetable)
-        .map(Number)
-        .sort((a, b) => a - b);
 
-    const dayOrder = [
+    const tbody =
+        document.getElementById(
+            "professionalBody"
+        );
+
+
+    if (!tbody) {
+        return;
+    }
+
+
+    const days = [
+
         "Monday",
         "Tuesday",
         "Wednesday",
         "Thursday",
-        "Friday"
+        "Friday",
+        "Saturday"
+
     ];
 
-    for (const semester of semesterOrder) {
 
-        
+    days.forEach(function (day) {
 
-        const tbody = document.getElementById("professionalBody");
+        const dayData =
+            semesterData?.[day];
 
-        const semesterData = timetable[semester];
 
-        for (const day of dayOrder) {
-
-            if (!semesterData[day]) {
-                continue;
-            }
-
-            let row = `<tr>`;
-
-            row += `<td><b>${day}</b></td>`;
-
-            // Tea Break (only once)
-            
-            const periods = semesterData[day];
-            let displayColumn = 1;
-
-            let i = 0;
-
-            while (i < periods.length) {
-              // Lunch Break after Period 4
-              if (displayColumn === 5 && day === "Monday") {
-
-                  row += `
-                      <td rowspan="5"
-                          class="table-danger align-middle fw-bold">
-                          LUNCH<br>BREAK
-                      </td>
-                  `;
-
-              }
-              const slot = periods[i];
-              if (displayColumn === 3 && day === "Monday") {
-
-                  row += `
-                      <td rowspan="5"
-                          class="table-warning align-middle fw-bold">
-                          TEA<br>BREAK
-                      </td>
-                  `;
-
-              }
-
-              if (slot === "Empty") {
-
-                  row += `<td class="text-muted">-</td>`;
-
-                  i++;
-                  displayColumn++;
-
-                  continue;
-
-              } else {
-
-                  let cellClass = "table-primary";
-
-                  if (slot.subject_type === "Lab") {
-
-                      cellClass = "table-warning";
-
-                  } else if (slot.subject_type === "Integrated") {
-
-                      cellClass = "table-success";
-
-                  }
-
-                  if (
-    i < periods.length - 1 &&
-    periods[i + 1] !== "Empty" &&
-    slot.subject_type !== "Theory" &&
-    slot.subject_id === periods[i + 1].subject_id
-) {
-
-    row += `
-        <td colspan="2" class="table-warning">
-
-            <strong>${slot.subject_code}</strong><br>
-
-            <small>${slot.faculty_name}</small>
-
-        </td>
-    `;
-
-    i += 2;
-    displayColumn += 2;
-} else {
-
-    row += `
-        <td class="${cellClass}">
-
-            <strong>${slot.subject_code}</strong><br>
-
-            <small>${slot.faculty_name}</small>
-
-        </td>
-    `;
-
-    i++;
-    displayColumn++;
-}
-
-              }
-
-    // Tea Break after Period 2
-             
-
-          }
-
-            row += `</tr>`;
-
-            tbody.innerHTML += row;
-
+        if (!dayData) {
+            return;
         }
+
+
+        const periods =
+            Array.isArray(dayData)
+
+                ? dayData
+
+                : getPeriodsFromObject(
+                    dayData
+                );
+
+
+        let row = `
+
+            <tr>
+
+                <td>
+
+                    <strong>
+                        ${escapeHTML(day)}
+                    </strong>
+
+                </td>
+
+        `;
+
+
+        // ====================================================
+        // P1 + P2
+        // ====================================================
+
+        row += buildPeriodSection(
+            periods,
+            0,
+            2
+        );
+
+
+        // ====================================================
+        // TEA BREAK
+        // ====================================================
+
+        row += `
+
+            <td class="break-cell">
+
+                <strong>
+                    Tea Break
+                </strong>
+
+                <br>
+
+                <small>
+                    11:00 - 11:15
+                </small>
+
+            </td>
+
+        `;
+
+
+        // ====================================================
+        // P3 + P4
+        // ====================================================
+
+        row += buildPeriodSection(
+            periods,
+            2,
+            2
+        );
+
+
+        // ====================================================
+        // LUNCH BREAK
+        // ====================================================
+
+        row += `
+
+            <td class="break-cell">
+
+                <strong>
+                    Lunch Break
+                </strong>
+
+                <br>
+
+                <small>
+                    1:05 - 1:45
+                </small>
+
+            </td>
+
+        `;
+
+
+        // ====================================================
+        // P5 + P6 + P7
+        // ====================================================
+
+        row += buildPeriodSection(
+            periods,
+            4,
+            3
+        );
+
+
+        row += `
+
+            </tr>
+
+        `;
+
+
+        tbody.innerHTML += row;
+
+    });
+
+
+    if (!tbody.innerHTML.trim()) {
+
+        showEmptyTimetable(
+            "No timetable data available for this semester."
+        );
 
     }
 
 }
-async function viewTimetable() {
 
-    const response = await fetch(
-        `${API}/view-timetable`,
-        {
-            method: "POST",
 
-            headers: {
-                "Content-Type": "application/json"
-            },
+// ============================================================
+// BUILD PERIOD SECTION
+// ============================================================
 
-            body: JSON.stringify({
+function buildPeriodSection(
+    periods,
+    startIndex,
+    count
+) {
 
-                department: document.getElementById("viewDepartment").value,
-                scheme: document.getElementById("viewScheme").value,
-                academic_year: document.getElementById("viewAcademicYear").value,
-                semester_type: document.getElementById("viewSemesterType").value,
-                view_type: document.getElementById("viewType").value,
-                semester: document.getElementById("viewSemester").value
+    let html = "";
 
-            })
+    let i =
+        startIndex;
+
+
+    const end =
+        startIndex + count;
+
+
+    while (i < end) {
+
+        const currentSlot =
+            periods[i];
+
+
+        const nextSlot =
+            periods[i + 1];
+
+
+        // ====================================================
+        // LAB MERGING
+        // ====================================================
+
+        if (
+
+            i + 1 < end &&
+
+            isLabSlot(currentSlot) &&
+
+            isLabSlot(nextSlot) &&
+
+            isSameSubject(
+                currentSlot,
+                nextSlot
+            )
+
+        ) {
+
+            html += createPeriodCell(
+                currentSlot,
+                2
+            );
+
+
+            i += 2;
+
+            continue;
+
+        }
+
+
+        // ====================================================
+        // NORMAL CELL
+        // ====================================================
+
+        html += createPeriodCell(
+            currentSlot,
+            1
+        );
+
+
+        i++;
+
+    }
+
+
+    return html;
+
+}
+
+
+// ============================================================
+// GET PERIODS
+// ============================================================
+
+function getPeriodsFromObject(
+    dayData
+) {
+
+    const periods = [];
+
+
+    for (
+        let i = 1;
+        i <= 7;
+        i++
+    ) {
+
+        periods.push(
+
+            dayData[`P${i}`] ??
+
+            dayData[`p${i}`] ??
+
+            dayData[i - 1] ??
+
+            null
+
+        );
+
+    }
+
+
+    return periods;
+
+}
+
+
+// ============================================================
+// CREATE PERIOD CELL
+// ============================================================
+
+function createPeriodCell(
+    slot,
+    colspan = 1
+) {
+
+    // ========================================================
+    // FREE
+    // ========================================================
+
+    if (
+
+        slot === null ||
+
+        slot === undefined ||
+
+        slot === "" ||
+
+        slot === "Free" ||
+
+        slot === "FREE"
+
+    ) {
+
+        return `
+
+            <td
+
+                ${
+                    colspan > 1
+                        ? `colspan="${colspan}"`
+                        : ""
+                }
+
+                class="text-muted">
+
+                Free
+
+            </td>
+
+        `;
+
+    }
+
+
+    // ========================================================
+    // STRING
+    // ========================================================
+
+    if (
+        typeof slot === "string"
+    ) {
+
+        return `
+
+            <td
+
+                ${
+                    colspan > 1
+                        ? `colspan="${colspan}"`
+                        : ""
+                }>
+
+                ${escapeHTML(slot)}
+
+            </td>
+
+        `;
+
+    }
+
+
+    // ========================================================
+    // OBJECT
+    // ========================================================
+
+    const code =
+        slot.subject_code ||
+
+        slot.code ||
+
+        slot.subjectCode ||
+
+        "";
+
+
+    const subjectName =
+        slot.subject_name ||
+
+        slot.subjectName ||
+
+        slot.name ||
+
+        "";
+
+
+    const faculty =
+        slot.faculty_name ||
+
+        slot.faculty ||
+
+        slot.facultyName ||
+
+        "";
+
+
+    const isLab =
+        isLabSlot(slot);
+
+
+    let html = `
+
+        <td
+
+            ${
+                colspan > 1
+                    ? `colspan="${colspan}"`
+                    : ""
+            }
+
+            class="${
+                isLab
+                    ? "lab-cell"
+                    : ""
+            }">
+
+    `;
+
+
+    // ========================================================
+    // SUBJECT CODE
+    // ========================================================
+
+    if (code) {
+
+        html += `
+
+            <strong>
+                ${escapeHTML(code)}
+            </strong>
+
+        `;
+
+    }
+
+
+    // ========================================================
+    // SUBJECT NAME
+    // ========================================================
+
+    if (subjectName) {
+
+        html += `
+
+            <br>
+
+            <small>
+                ${escapeHTML(subjectName)}
+            </small>
+
+        `;
+
+    }
+
+
+    // ========================================================
+    // LAB TAG REMOVED
+    // ========================================================
+
+
+    // ========================================================
+    // FACULTY
+    // ========================================================
+
+    if (faculty) {
+
+        html += `
+
+            <br>
+
+            <small>
+                ${escapeHTML(faculty)}
+            </small>
+
+        `;
+
+    }
+
+
+    html += `
+
+        </td>
+
+    `;
+
+
+    return html;
+
+}
+
+
+// ============================================================
+// LAB CHECK
+// ============================================================
+
+function isLabSlot(slot) {
+
+    if (
+
+        !slot ||
+
+        typeof slot !== "object"
+
+    ) {
+
+        return false;
+
+    }
+
+
+    if (
+        slot.is_lab === true
+    ) {
+
+        return true;
+
+    }
+
+
+    if (
+        slot.lab === true
+    ) {
+
+        return true;
+
+    }
+
+
+    const practicalHours =
+        Number(
+
+            slot.practical_hours ||
+
+            slot.practicalHours ||
+
+            0
+
+        );
+
+
+    const credits =
+        Number(
+
+            slot.credits ||
+
+            0
+
+        );
+
+
+    return (
+
+        practicalHours > 0 &&
+
+        credits === 1
+
+    );
+
+}
+
+
+// ============================================================
+// SAME SUBJECT
+// ============================================================
+
+function isSameSubject(
+    first,
+    second
+) {
+
+    if (
+
+        !first ||
+
+        !second ||
+
+        typeof first !== "object" ||
+
+        typeof second !== "object"
+
+    ) {
+
+        return false;
+
+    }
+
+
+    const firstCode =
+        String(
+
+            first.subject_code ||
+
+            first.code ||
+
+            first.subjectCode ||
+
+            ""
+
+        )
+        .trim()
+        .toLowerCase();
+
+
+    const secondCode =
+        String(
+
+            second.subject_code ||
+
+            second.code ||
+
+            second.subjectCode ||
+
+            ""
+
+        )
+        .trim()
+        .toLowerCase();
+
+
+    if (
+
+        firstCode &&
+
+        secondCode &&
+
+        firstCode === secondCode
+
+    ) {
+
+        return true;
+
+    }
+
+
+    if (
+
+        first.subject_id != null &&
+
+        second.subject_id != null
+
+    ) {
+
+        return (
+
+            String(first.subject_id) ===
+
+            String(second.subject_id)
+
+        );
+
+    }
+
+
+    const firstName =
+        String(
+
+            first.subject_name ||
+
+            first.subjectName ||
+
+            first.name ||
+
+            ""
+
+        )
+        .trim()
+        .toLowerCase();
+
+
+    const secondName =
+        String(
+
+            second.subject_name ||
+
+            second.subjectName ||
+
+            second.name ||
+
+            ""
+
+        )
+        .trim()
+        .toLowerCase();
+
+
+    return (
+
+        firstName &&
+
+        secondName &&
+
+        firstName === secondName
+
+    );
+
+}
+
+
+// ============================================================
+// SUBJECT DETAILS
+// ============================================================
+
+function displaySubjectDetails(
+    subjects
+) {
+
+    const tbody =
+        document.getElementById(
+            "subjectDetailsBody"
+        );
+
+
+    if (!tbody) {
+        return;
+    }
+
+
+    tbody.innerHTML = "";
+
+
+    if (
+
+        !Array.isArray(subjects) ||
+
+        subjects.length === 0
+
+    ) {
+
+        tbody.innerHTML = `
+
+            <tr>
+
+                <td
+                    colspan="3"
+                    class="text-muted">
+
+                    No subject details available.
+
+                </td>
+
+            </tr>
+
+        `;
+
+        return;
+
+    }
+
+
+    subjects.forEach(
+        function (subject) {
+
+            tbody.innerHTML += `
+
+                <tr>
+
+                    <td>
+
+                        ${escapeHTML(
+                            subject.subject_code ||
+                            ""
+                        )}
+
+                    </td>
+
+
+                    <td>
+
+                        ${escapeHTML(
+                            subject.subject_name ||
+                            ""
+                        )}
+
+                    </td>
+
+
+                    <td>
+
+                        ${escapeHTML(
+                            subject.credits ??
+                            ""
+                        )}
+
+                    </td>
+
+                </tr>
+
+            `;
 
         }
     );
 
-    const result = await response.json();
-
-    console.log(result);
-
-    document.getElementById("displayDepartment").textContent =
-        result.department;
-
-    document.getElementById("displaySemester").textContent =
-        result.semester;
-
-    document.getElementById("displayBranch").textContent =
-        result.department;
-
-    document.getElementById("displayScheme").textContent =
-        result.scheme;
-
-    document.getElementById("displayAcademicYear").textContent =
-        result.academic_year;
-
-    displayTimetable(result.timetable);
-    loadSubjectDetails();
-    loadFacultyDetails();
 }
-async function loadDepartments() {
 
-    const response = await fetch(DEPARTMENT_API);
 
-    const departments = await response.json();
+// ============================================================
+// FACULTY DETAILS
+//
+// ONLY TWO COLUMNS:
+//
+// Faculty | Subject
+//
+// Theory:
+// Main Faculty
+//
+// Lab:
+// Main Faculty
+// Lab Faculty
+//
+// Co-Faculty is completely ignored.
+// ============================================================
+// ============================================================
+// FACULTY DETAILS
+//
+// ONE ROW PER SUBJECT
+//
+// Theory:
+// Faculty
+//
+// Lab:
+// Faculty / Lab Faculty
+//
+// Co-Faculty is completely ignored.
+// ============================================================
 
-    const select = document.getElementById("viewDepartment");
+function displayFacultyDetails(result) {
 
-    select.innerHTML = "";
+    const tbody =
+        document.getElementById(
+            "facultyDetailsBody"
+        );
 
-    departments.forEach(dept => {
-
-        select.innerHTML += `
-            <option value="${dept.department_code}">
-                ${dept.department_code}
-            </option>
-        `;
-
-    });
-
-}
-async function loadSchemes() {
-
-   const response = await fetch(SCHEME_API);
-    const schemes = await response.json();
-
-    const select = document.getElementById("viewScheme");
-
-    select.innerHTML = "";
-
-    schemes.forEach(scheme => {
-
-        select.innerHTML += `
-            <option value="${scheme.scheme_year}">
-                ${scheme.scheme_year}
-            </option>
-        `;
-
-    });
-
-}
-async function loadAcademicYears() {
-
-    const response = await fetch(ACADEMIC_YEAR_API);
-
-    const years = await response.json();
-
-    const select = document.getElementById("viewAcademicYear");
-
-    select.innerHTML = "";
-
-    years.forEach(year => {
-
-        select.innerHTML += `
-            <option value="${year.academic_year}">
-                ${year.academic_year}
-            </option>
-        `;
-
-    });
-
-}
-loadDepartments();
-loadSchemes();
-loadAcademicYears();
-
-async function loadSubjectDetails() {
-
-    const response = await fetch(`${API}/view-subject-details`, {
-
-        method: "POST",
-
-        headers: {
-            "Content-Type": "application/json"
-        },
-
-        body: JSON.stringify({
-
-        department: document.getElementById("viewDepartment").value,
-
-        scheme: document.getElementById("viewScheme").value,
-
-        academic_year: document.getElementById("viewAcademicYear").value,
-
-        semester_type: document.getElementById("viewSemesterType").value,
-
-        semester: document.getElementById("viewSemester").value
-
-    })
-
-    });
-
-    const subjects = await response.json();
-
-    const table =
-        document.getElementById("subjectDetailsBody");
-
-    table.innerHTML = "";
-
-    subjects.forEach(subject => {
-
-        table.innerHTML += `
-
-            <tr>
-
-                <td>${subject.subject_code}</td>
-
-                <td>${subject.subject_name}</td>
-
-                <td>${subject.credits}</td>
-
-            </tr>
-
-        `;
-
-    });
-
-}
-async function loadFacultyDetails() {
-
-    const response = await fetch(`${API}/view-faculty-details`, {
-
-        method: "POST",
-
-        headers: {
-            "Content-Type": "application/json"
-        },
-
-        body: JSON.stringify({
-
-            department: document.getElementById("viewDepartment").value,
-
-            scheme: document.getElementById("viewScheme").value,
-
-            academic_year: document.getElementById("viewAcademicYear").value,
-
-            semester_type: document.getElementById("viewSemesterType").value,
-
-            semester: document.getElementById("viewSemester").value
-
-        })
-
-    });
-
-    const faculty = await response.json();
-
-    const tbody = document.getElementById("facultyDetailsBody");
+    if (!tbody) {
+        return;
+    }
 
     tbody.innerHTML = "";
 
-    faculty.forEach(item => {
+    const timetable =
+        result.timetable || {};
 
-        tbody.innerHTML += `
-            <tr>
-                <td>${item.faculty_name}</td>
-                <td>${item.subject_code}</td>
-            </tr>
-        `;
+    const subjectFacultyMap = new Map();
+
+    const days = [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday"
+    ];
+
+
+    // ========================================================
+    // READ EVERY DAY
+    // ========================================================
+
+    days.forEach(function (day) {
+
+        const dayData =
+            timetable[day];
+
+        if (!dayData) {
+            return;
+        }
+
+
+        // ====================================================
+        // READ P1 - P7
+        // ====================================================
+
+        for (
+            let period = 1;
+            period <= 7;
+            period++
+        ) {
+
+            const slot =
+                dayData[`P${period}`];
+
+            if (
+                !slot ||
+                slot.free
+            ) {
+                continue;
+            }
+
+
+            const subjectId =
+                slot.subject_id;
+
+            const subjectCode =
+                slot.subject_code || "";
+
+            const subjectName =
+                slot.subject_name || "";
+
+
+            // =================================================
+            // UNIQUE SUBJECT KEY
+            // =================================================
+
+            const subjectKey =
+                subjectId != null
+                    ? String(subjectId)
+                    : subjectCode.toLowerCase();
+
+
+            // =================================================
+            // CREATE SUBJECT
+            // =================================================
+
+            if (
+                !subjectFacultyMap.has(subjectKey)
+            ) {
+
+                subjectFacultyMap.set(
+                    subjectKey,
+                    {
+                        subjectCode:
+                            subjectCode,
+
+                        subjectName:
+                            subjectName,
+
+                        faculty: [],
+
+                        labFaculty: []
+                    }
+                );
+
+            }
+
+
+            const subject =
+                subjectFacultyMap.get(
+                    subjectKey
+                );
+
+
+            // =================================================
+            // MAIN FACULTY
+            // =================================================
+
+            const facultyName =
+                (
+                    slot.faculty_name ||
+                    ""
+                ).trim();
+
+
+            if (
+                facultyName &&
+                !subject.faculty.includes(
+                    facultyName
+                )
+            ) {
+
+                subject.faculty.push(
+                    facultyName
+                );
+
+            }
+
+
+            // =================================================
+            // LAB FACULTY
+            //
+            // ONLY FOR LAB
+            // =================================================
+
+            const labFacultyName =
+                (
+                    slot.lab_faculty_name ||
+                    ""
+                ).trim();
+
+
+            if (
+
+                labFacultyName &&
+
+                isLabSlot(slot) &&
+
+                !subject.labFaculty.includes(
+                    labFacultyName
+                )
+
+            ) {
+
+                subject.labFaculty.push(
+                    labFacultyName
+                );
+
+            }
+
+        }
 
     });
 
-}
-function printTimetable() {
 
-    window.print();
+    // ========================================================
+    // NO DATA
+    // ========================================================
+
+    if (
+        subjectFacultyMap.size === 0
+    ) {
+
+        tbody.innerHTML = `
+
+            <tr>
+
+                <td
+                    colspan="2"
+                    class="text-muted">
+
+                    No faculty details available.
+
+                </td>
+
+            </tr>
+
+        `;
+
+        return;
+    }
+
+
+    // ========================================================
+    // DISPLAY ONE ROW PER SUBJECT
+    // ========================================================
+
+    subjectFacultyMap.forEach(
+        function (subject) {
+
+            let facultyNames = [];
+
+
+            // ------------------------------------------------
+            // MAIN FACULTY
+            // ------------------------------------------------
+
+            facultyNames.push(
+                ...subject.faculty
+            );
+
+
+            // ------------------------------------------------
+            // LAB FACULTY
+            // ------------------------------------------------
+
+            facultyNames.push(
+                ...subject.labFaculty
+            );
+
+
+            // ------------------------------------------------
+            // REMOVE DUPLICATES
+            // ------------------------------------------------
+
+            facultyNames =
+                [...new Set(
+                    facultyNames
+                )];
+
+
+            // ------------------------------------------------
+            // JOIN WITH /
+            // ------------------------------------------------
+
+            const facultyText =
+                facultyNames.join(
+                    " / "
+                );
+
+
+            // ------------------------------------------------
+            // ADD ROW
+            // ------------------------------------------------
+
+            tbody.innerHTML += `
+
+                <tr>
+
+                    <td>
+
+                        ${escapeHTML(
+                            facultyText
+                        )}
+
+                    </td>
+
+                    <td>
+
+                        ${escapeHTML(
+                            subject.subjectCode
+                        )}
+
+                        <br>
+
+                        <small>
+
+                            ${escapeHTML(
+                                subject.subjectName
+                            )}
+
+                        </small>
+
+                    </td>
+
+                </tr>
+
+            `;
+
+        }
+    );
 
 }
+
+
+// ============================================================
+// EMPTY TIMETABLE
+// ============================================================
+
+function showEmptyTimetable(
+    message
+) {
+
+    const container =
+        document.getElementById(
+            "professionalTimetable"
+        );
+
+
+    if (!container) {
+        return;
+    }
+
+
+    container.innerHTML = `
+
+        <div class="empty-timetable">
+
+            <i class="bi bi-calendar3"></i>
+
+            <p>
+
+                ${escapeHTML(message)}
+
+            </p>
+
+        </div>
+
+    `;
+
+}
+
+
+// ============================================================
+// ESCAPE HTML
+// ============================================================
+
+function escapeHTML(value) {
+
+    return String(value)
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+// ============================================================
+// LOAD DEPARTMENTS
+// ============================================================
+
+async function loadDepartments() {
+
+    if (!departmentSelect) {
+        return;
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                DEPARTMENT_API
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                `Server error: ${response.status}`
+            );
+
+        }
+
+
+        const data =
+            await response.json();
+
+
+        departmentSelect.innerHTML = `
+
+            <option value="">
+                Select Department
+            </option>
+
+        `;
+
+
+        const departments =
+            Array.isArray(data)
+
+                ? data
+
+                : data.departments || [];
+
+
+        departments.forEach(
+            function (department) {
+
+                const option =
+                    document.createElement(
+                        "option"
+                    );
+
+
+                const id =
+                    department.department_id ??
+
+                    department.id ??
+
+                    department.department_code ??
+
+                    department.code ??
+
+                    "";
+
+
+                const code =
+                    department.department_code ??
+
+                    department.code ??
+
+                    "";
+
+
+                const name =
+                    department.department_name ??
+
+                    department.name ??
+
+                    "";
+
+
+                option.value =
+                    id;
+
+
+                option.textContent =
+                    code && name
+
+                        ? `${code} - ${name}`
+
+                        : name ||
+
+                          code ||
+
+                          id;
+
+
+                departmentSelect.appendChild(
+                    option
+                );
+
+            }
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Department loading error:",
+            error
+        );
+
+    }
+
+}
+
+
+// ============================================================
+// LOAD SCHEMES
+// ============================================================
+
+async function loadSchemes() {
+
+    if (!schemeSelect) {
+        return;
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                SCHEME_API
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                `Server error: ${response.status}`
+            );
+
+        }
+
+
+        const data =
+            await response.json();
+
+
+        schemeSelect.innerHTML = `
+
+            <option value="">
+                Select Scheme
+            </option>
+
+        `;
+
+
+        const schemes =
+            Array.isArray(data)
+
+                ? data
+
+                : data.schemes || [];
+
+
+        schemes.forEach(
+            function (scheme) {
+
+                const option =
+                    document.createElement(
+                        "option"
+                    );
+
+
+                const id =
+                    scheme.scheme_id ??
+
+                    scheme.id ??
+
+                    scheme.scheme_year ??
+
+                    scheme.year ??
+
+                    "";
+
+
+                const name =
+                    scheme.scheme_year ??
+
+                    scheme.year ??
+
+                    scheme.scheme_name ??
+
+                    scheme.name ??
+
+                    id;
+
+
+                option.value =
+                    id;
+
+
+                option.textContent =
+                    name;
+
+
+                schemeSelect.appendChild(
+                    option
+                );
+
+            }
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Scheme loading error:",
+            error
+        );
+
+    }
+
+}
+
+
+// ============================================================
+// LOAD ACADEMIC YEARS
+// ============================================================
+
+async function loadAcademicYears() {
+
+    if (!academicYearSelect) {
+        return;
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                ACADEMIC_YEAR_API
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                `Server error: ${response.status}`
+            );
+
+        }
+
+
+        const data =
+            await response.json();
+
+
+        academicYearSelect.innerHTML = `
+
+            <option value="">
+                Select Academic Year
+            </option>
+
+        `;
+
+
+        const years =
+            Array.isArray(data)
+
+                ? data
+
+                : data.academic_years || [];
+
+
+        years.forEach(
+            function (year) {
+
+                const option =
+                    document.createElement(
+                        "option"
+                    );
+
+
+                const value =
+                    year.academic_year ??
+
+                    year.year ??
+
+                    year.id ??
+
+                    year;
+
+
+                option.value =
+                    value;
+
+
+                option.textContent =
+                    value;
+
+
+                academicYearSelect.appendChild(
+                    option
+                );
+
+            }
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Academic year loading error:",
+            error
+        );
+
+    }
+
+}
+
+
+// ============================================================
+// SAVE TIMETABLE
+// ============================================================
+
+if (saveTimetableBtn) {
+
+    saveTimetableBtn.addEventListener(
+        "click",
+        saveTimetable
+    );
+
+}
+
+
+async function saveTimetable() {
+
+    try {
+
+        const data = {
+
+            department:
+                getValue("viewDepartment"),
+
+            scheme:
+                getValue("viewScheme"),
+
+            academic_year:
+                getValue("viewAcademicYear"),
+
+            semester_type:
+                getValue("viewSemesterType"),
+
+            semester:
+                getValue("viewSemester"),
+
+            view_type:
+                "single"
+
+        };
+
+
+        if (!data.department) {
+
+            alert(
+                "Please select Department."
+            );
+
+            return;
+
+        }
+
+
+        if (!data.scheme) {
+
+            alert(
+                "Please select Scheme."
+            );
+
+            return;
+
+        }
+
+
+        if (!data.academic_year) {
+
+            alert(
+                "Please select Academic Year."
+            );
+
+            return;
+
+        }
+
+
+        if (!data.semester_type) {
+
+            alert(
+                "Please select Semester Type."
+            );
+
+            return;
+
+        }
+
+
+        if (!data.semester) {
+
+            alert(
+                "Please select Semester."
+            );
+
+            return;
+
+        }
+
+
+        const oldText =
+            saveTimetableBtn.innerHTML;
+
+
+        saveTimetableBtn.disabled =
+            true;
+
+
+        saveTimetableBtn.innerHTML =
+            `<i class="bi bi-hourglass-split"></i>
+             Saving...`;
+
+
+        const response =
+            await fetch(
+                `${API}/save-timetable`,
+                {
+
+                    method: "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json"
+
+                    },
+
+                    body:
+                        JSON.stringify(data)
+
+                }
+            );
+
+
+        let result = {};
+
+
+        try {
+
+            result =
+                await response.json();
+
+        }
+
+        catch (error) {}
+
+
+        if (!response.ok) {
+
+            throw new Error(
+
+                result.message ||
+
+                result.error ||
+
+                `Server error: ${response.status}`
+
+            );
+
+        }
+
+
+        alert(
+
+            result.message ||
+
+            "Timetable saved successfully."
+
+        );
+
+
+        saveTimetableBtn.innerHTML =
+            `<i class="bi bi-check-circle"></i>
+             Saved`;
+
+
+        setTimeout(
+            function () {
+
+                saveTimetableBtn.innerHTML =
+                    oldText;
+
+                saveTimetableBtn.disabled =
+                    false;
+
+            },
+            2000
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "SAVE TIMETABLE ERROR:",
+            error
+        );
+
+
+        alert(
+            "Failed to save timetable.\n\n" +
+            error.message
+        );
+
+
+        saveTimetableBtn.disabled =
+            false;
+
+
+        saveTimetableBtn.innerHTML =
+            `<i class="bi bi-database-check"></i>
+             Save Timetable`;
+
+    }
+
+}
+
+
+// ============================================================
+// PRINT
+// ============================================================
+
+if (printTimetableBtn) {
+
+    printTimetableBtn.addEventListener(
+        "click",
+        function () {
+
+            window.print();
+
+        }
+    );
+
+}
+
+
+// ============================================================
+// EXPORT PDF
+// ============================================================
+
+if (exportPdfBtn) {
+
+    exportPdfBtn.addEventListener(
+        "click",
+        exportPDF
+    );
+
+}
+
+
 function exportPDF() {
 
-    const element = document.getElementById("printArea");
+    const element =
+        document.getElementById(
+            "printArea"
+        );
+
+
+    if (!element) {
+
+        alert(
+            "Timetable area not found."
+        );
+
+        return;
+
+    }
+
+
+    if (
+        typeof html2pdf ===
+        "undefined"
+    ) {
+
+        alert(
+            "PDF library is not loaded."
+        );
+
+        return;
+
+    }
+
 
     const options = {
 
-        margin: [0.1, 0.1, 0.1, 0.1],
+        margin: 5,
 
-        filename: "Timetable.pdf",
+        filename:
+            "Timetable.pdf",
 
         image: {
 
@@ -524,150 +2596,96 @@ function exportPDF() {
 
             orientation: "landscape"
 
-        },
-
-        pagebreak: {
-
-            mode: ["avoid-all", "css", "legacy"]
-
         }
 
     };
 
-    html2pdf().set(options).from(element).save();
+
+    html2pdf()
+
+        .set(options)
+
+        .from(element)
+
+        .save();
 
 }
+
+
+// ============================================================
+// EXPORT EXCEL
+// ============================================================
+
+if (exportExcelBtn) {
+
+    exportExcelBtn.addEventListener(
+        "click",
+        exportExcel
+    );
+
+}
+
+
 function exportExcel() {
 
-    const timetableTable =
-        document.querySelector("#professionalTimetable table");
+    if (
+        typeof XLSX ===
+        "undefined"
+    ) {
 
-    const subjectTable =
-        document.querySelector("#subjectDetailsBody").closest("table");
-
-    const facultyTable =
-        document.querySelector("#facultyDetailsBody").closest("table");
-
-    if (!timetableTable) {
-
-        alert("Please view the timetable first.");
+        alert(
+            "Excel library is not loaded."
+        );
 
         return;
 
     }
 
-    const workbook = XLSX.utils.book_new();
+
+    const table =
+        document.querySelector(
+            "#professionalTimetable table"
+        );
 
 
-    // =========================
-    // TIMETABLE SHEET
-    // =========================
+    if (!table) {
 
-    const timetableSheet =
-        XLSX.utils.table_to_sheet(timetableTable);
+        alert(
+            "Please view the timetable first."
+        );
 
-    XLSX.utils.book_append_sheet(
-        workbook,
-        timetableSheet,
-        "Timetable"
-    );
-
-
-    // =========================
-    // SUBJECT DETAILS SHEET
-    // =========================
-
-    const subjectSheet =
-        XLSX.utils.table_to_sheet(subjectTable);
-
-    XLSX.utils.book_append_sheet(
-        workbook,
-        subjectSheet,
-        "Subject Details"
-    );
-
-
-    // =========================
-    // FACULTY DETAILS SHEET
-    // =========================
-
-    const facultySheet =
-        XLSX.utils.table_to_sheet(facultyTable);
-
-    XLSX.utils.book_append_sheet(
-        workbook,
-        facultySheet,
-        "Faculty Details"
-    );
-    // Set column widths
-
-    timetableSheet["!cols"] = [
-        { wch: 15 },
-        { wch: 15 },
-        { wch: 15 },
-        { wch: 15 },
-        { wch: 15 },
-        { wch: 15 },
-        { wch: 15 },
-        { wch: 15 }
-    ];
-
-    subjectSheet["!cols"] = [
-        { wch: 18 },
-        { wch: 45 },
-        { wch: 12 }
-    ];
-
-    facultySheet["!cols"] = [
-        { wch: 35 },
-        { wch: 20 }
-    ];
-    function formatHeader(sheet) {
-
-    const range = XLSX.utils.decode_range(sheet["!ref"]);
-
-    for (let col = range.s.c; col <= range.e.c; col++) {
-
-        const cellAddress =
-            XLSX.utils.encode_cell({
-                r: 0,
-                c: col
-            });
-
-        const cell = sheet[cellAddress];
-
-        if (cell) {
-
-            cell.s = {
-                font: {
-                    bold: true
-                },
-                alignment: {
-                    horizontal: "center",
-                    vertical: "center"
-                }
-            };
-
-        }
+        return;
 
     }
 
-}
 
-formatHeader(timetableSheet);
-formatHeader(subjectSheet);
-formatHeader(facultySheet);
+    const workbook =
+        XLSX.utils.book_new();
 
 
-    // =========================
-    // DOWNLOAD
-    // =========================
+    const worksheet =
+        XLSX.utils.table_to_sheet(
+            table
+        );
+
+
+    XLSX.utils.book_append_sheet(
+
+        workbook,
+
+        worksheet,
+
+        "Timetable"
+
+    );
+
 
     XLSX.writeFile(
+
         workbook,
+
         "Timetable.xlsx"
+
     );
 
 }
-// Format header rows
-

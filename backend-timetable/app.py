@@ -14,6 +14,7 @@ from dashboard_api import dashboard_api
 from scheme_details_api import scheme_details_api
 from scheme_pdf_api import scheme_pdf_api
 from academic_year_api import academic_year_api
+from view_timetable import view_timetable_api
 
 app = Flask(__name__)
 CORS(app)
@@ -27,7 +28,7 @@ def serve_scheme_pdf(filename):
         PDF_FOLDER,
         filename
     )
-
+app.register_blueprint(view_timetable_api)
 app.register_blueprint(academic_year_api)
 app.register_blueprint(scheme_pdf_api)
 app.register_blueprint(scheme_details_api)

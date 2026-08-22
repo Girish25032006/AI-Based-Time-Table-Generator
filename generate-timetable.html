@@ -4,415 +4,995 @@
 <head>
 
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
     <title>Generate Timetable</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet">
 
-    <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Bootstrap Icons -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+        rel="stylesheet">
 
-    <link rel="stylesheet" href="css/style.css">
+    <!-- Project CSS -->
+    <link
+        rel="stylesheet"
+        href="css/style.css">
+
+    <style>
+
+        body {
+            background: #f6f8f7;
+        }
+
+        .main-content {
+            min-height: 100vh;
+        }
+
+        .page-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 14px;
+            background: #ffffff;
+        }
+
+        .section-title {
+            color: #12372a;
+            font-weight: 700;
+        }
+
+        .selection-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            background: #ffffff;
+        }
+
+        .semester-btn {
+            min-width: 120px;
+        }
+
+        .semester-btn.active {
+            background: #087443;
+            border-color: #087443;
+            color: #ffffff;
+        }
+
+        .cycle-btn {
+            min-width: 120px;
+        }
+
+        .cycle-btn.active {
+            background: #087443;
+            border-color: #087443;
+            color: #ffffff;
+        }
+
+        .generate-btn {
+            min-width: 180px;
+        }
+
+        .option-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 14px;
+            background: #ffffff;
+            transition: 0.2s;
+        }
+
+        .option-card:hover {
+            box-shadow: 0 5px 18px rgba(0, 0, 0, 0.08);
+        }
+
+        .option-header {
+            background: #f7faf8;
+            border-bottom: 1px solid #e5e7eb;
+            border-radius: 14px 14px 0 0;
+        }
+
+        .empty-state {
+            border: 1px dashed #cbd5d1;
+            border-radius: 14px;
+            padding: 45px 20px;
+            text-align: center;
+            background: #ffffff;
+        }
+
+        .empty-state i {
+            font-size: 45px;
+            color: #087443;
+        }
+
+        .status-badge {
+            font-size: 12px;
+        }
+
+        .rule-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .rule-item:last-child {
+            border-bottom: none;
+        }
+
+        .semester-selection-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .cycle-section {
+            display: none;
+        }
+
+        .cycle-section.show {
+            display: block;
+        }
+
+        .selected-info {
+            background: #f1f8f4;
+            border: 1px solid #d7eadf;
+            border-radius: 10px;
+        }
+
+        .warning-box {
+            background: #fff8e6;
+            border: 1px solid #f5df9d;
+            border-radius: 10px;
+        }
+
+        .loading-box {
+            display: none;
+        }
+
+    </style>
 
 </head>
 
+
 <body>
+
 
 <div class="d-flex">
 
-    <!-- Sidebar -->
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
 
     <div class="sidebar">
 
         <div class="logo">
-            <h3>AI Timetable</h3>
+
+            <h3>
+                AI Timetable
+            </h3>
+
         </div>
+
 
         <ul class="nav flex-column">
 
+
             <li class="nav-item">
-                <a href="dashboard.html" class="nav-link">
+
+                <a
+                    href="dashboard.html"
+                    class="nav-link">
+
                     <i class="bi bi-speedometer2"></i>
+
                     Dashboard
+
                 </a>
+
             </li>
 
+
             <li class="nav-item">
-                <a href="department.html" class="nav-link">
+
+                <a
+                    href="department.html"
+                    class="nav-link">
+
                     <i class="bi bi-building"></i>
+
                     Department
+
                 </a>
+
             </li>
 
+
             <li class="nav-item">
-                <a href="scheme.html" class="nav-link">
+
+                <a
+                    href="scheme.html"
+                    class="nav-link">
+
                     <i class="bi bi-journal-bookmark"></i>
+
                     Scheme
+
                 </a>
+
             </li>
+
+
             <li class="nav-item">
-                <a href="academic-year.html" class="nav-link">
+
+                <a
+                    href="academic-year.html"
+                    class="nav-link">
+
                     <i class="bi bi-calendar3"></i>
+
                     Academic Year
+
                 </a>
+
             </li>
 
+
             <li class="nav-item">
-                <a href="subject.html" class="nav-link">
+
+                <a
+                    href="subject.html"
+                    class="nav-link">
+
                     <i class="bi bi-book"></i>
+
                     Subject
+
                 </a>
+
             </li>
 
+
             <li class="nav-item">
-                <a href="faculty.html" class="nav-link">
+
+                <a
+                    href="faculty.html"
+                    class="nav-link">
+
                     <i class="bi bi-person-workspace"></i>
+
                     Faculty
+
                 </a>
+
             </li>
+
+
             <li class="nav-item">
-                <a href="faculty-subject-assignment.html" class="nav-link">
+
+                <a
+                    href="faculty-subject-assignment.html"
+                    class="nav-link">
+
                     <i class="bi bi-diagram-3"></i>
+
                     Faculty Subject Assignment
+
                 </a>
+
             </li>
+
+
             <li class="nav-item">
-                <a href="timetable-constraints.html" class="nav-link">
+
+                <a
+                    href="timetable-constraints.html"
+                    class="nav-link">
+
                     <i class="bi bi-sliders"></i>
+
                     Timetable Constraints
+
                 </a>
+
             </li>
 
+
             <li class="nav-item">
-                <a href="generate-timetable.html" class="nav-link active">
-                    <i class="bi bi-calendar-week"></i>
+
+                <a
+                    href="generate-timetable.html"
+                    class="nav-link active">
+
+                    <i class="bi bi-calendar2-week"></i>
+
                     Generate Timetable
+
                 </a>
+
             </li>
 
+
             <li class="nav-item">
-                <a href="view-timetable.html" class="nav-link">
+
+                <a
+                    href="view-timetable.html"
+                    class="nav-link">
+
                     <i class="bi bi-table"></i>
+
                     View Timetable
+
                 </a>
+
             </li>
 
+
             <li class="nav-item">
-                <a href="index.html" class="nav-link text-danger">
+
+                <a
+                    href="index.html"
+                    class="nav-link text-danger">
+
                     <i class="bi bi-box-arrow-right"></i>
+
                     Logout
+
                 </a>
+
             </li>
 
         </ul>
 
     </div>
 
-    <!-- Main Content -->
 
-    <div class="main-content">
 
-        <nav class="navbar bg-white shadow-sm rounded px-4 mb-4">
+    <!-- =====================================================
+         MAIN CONTENT
+    ====================================================== -->
 
-            <h4>Generate Timetable</h4>
+    <div class="main-content w-100">
+
+
+        <!-- =================================================
+             HEADER
+        ================================================== -->
+
+        <nav
+            class="navbar bg-white shadow-sm rounded px-4 mb-4">
 
             <div>
 
-                <i class="bi bi-person-circle fs-4"></i>
+                <div class="text-muted small">
 
-                <b class="ms-2">Admin</b>
+                    Dashboard &gt;
+                    Generate Timetable
+
+                </div>
+
+                <h4 class="mb-0">
+
+                    Generate Timetable
+
+                </h4>
+
+                <small class="text-muted">
+
+                    Generate three unique weekly timetable
+                    options for the selected semesters.
+
+                </small>
+
+            </div>
+
+
+            <div>
+
+                <i
+                    class="bi bi-person-circle fs-4">
+                </i>
+
+                <b class="ms-2">
+                    Admin
+                </b>
 
             </div>
 
         </nav>
 
-        <!-- Generate Form -->
 
-        <div class="card shadow-sm">
 
-            <div class="card-header bg-primary text-white">
+        <!-- =================================================
+             1. GENERATION CONTEXT
+        ================================================== -->
 
-                <h5 class="mb-0">
-                    Generate Timetable
-                </h5>
-
-            </div>
+        <div class="card page-card shadow-sm mb-3">
 
             <div class="card-body">
 
+
+                <h5 class="section-title mb-3">
+
+                    <i class="bi bi-funnel me-2"></i>
+
+                    1. Generation Context
+
+                </h5>
+
+
+                <div class="row g-3">
+
+
+                    <!-- Department -->
+
+                    <div class="col-md-3">
+
+                        <label
+                            for="department"
+                            class="form-label fw-semibold">
+
+                            Department
+
+                        </label>
+
+
+                        <select
+                            id="department"
+                            class="form-select">
+
+                            <option value="">
+
+                                Select Department
+
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+
+                    <!-- Scheme -->
+
+                    <div class="col-md-3">
+
+                        <label
+                            for="scheme"
+                            class="form-label fw-semibold">
+
+                            Scheme
+
+                        </label>
+
+
+                        <select
+                            id="scheme"
+                            class="form-select">
+
+                            <option value="">
+
+                                Select Scheme
+
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+
+                    <!-- Semester Type -->
+
+                    <div class="col-md-3">
+
+                        <label
+                            for="semesterType"
+                            class="form-label fw-semibold">
+
+                            Semester Type
+
+                        </label>
+
+
+                        <select
+                            id="semesterType"
+                            class="form-select">
+
+                            <option value="">
+
+                                Select Semester Type
+
+                            </option>
+
+
+                            <option value="odd">
+
+                                Odd
+                                (1, 3, 5, 7)
+
+                            </option>
+
+
+                            <option value="even">
+
+                                Even
+                                (2, 4, 6, 8)
+
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+
+                    <!-- Academic Year -->
+
+                    <div class="col-md-3">
+
+                        <label
+                            for="academicYear"
+                            class="form-label fw-semibold">
+
+                            Academic Year
+
+                        </label>
+
+
+                        <select
+                            id="academicYear"
+                            class="form-select">
+
+                            <option value="">
+
+                                Select Academic Year
+
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             2. SEMESTER SELECTION
+        ================================================== -->
+
+        <div class="card page-card shadow-sm mb-3">
+
+            <div class="card-body">
+
+
+                <h5 class="section-title mb-2">
+
+                    <i class="bi bi-mortarboard me-2"></i>
+
+                    2. Semester Selection
+
+                </h5>
+
+
+                <p class="text-muted mb-3">
+
+                    Semesters are automatically determined by
+                    the selected Odd / Even semester type.
+
+                </p>
+
+
+                <div
+                    id="semesterSelection"
+                    class="semester-selection-container">
+
+
+                    <!-- Buttons will be created by JS -->
+
+                </div>
+
+
+                <div
+                    id="selectedSemesterInfo"
+                    class="selected-info p-3 mt-3">
+
+                    <strong>
+                        Selected Semesters:
+                    </strong>
+
+                    <span id="selectedSemesterText">
+
+                        Select semester type first.
+
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             3. P / C CYCLE
+        ================================================== -->
+
+        <div
+            id="cycleSection"
+            class="card page-card shadow-sm mb-3 cycle-section">
+
+            <div class="card-body">
+
+
+                <h5 class="section-title mb-2">
+
+                    <i class="bi bi-arrow-repeat me-2"></i>
+
+                    3. P-Cycle / C-Cycle
+
+                </h5>
+
+
+                <p class="text-muted">
+
+                    Select the cycle for the common
+                    1st / 2nd semester timetable.
+
+                </p>
+
+
+                <div
+                    class="d-flex flex-wrap gap-2">
+
+
+                    <button
+                        type="button"
+                        id="pCycleBtn"
+                        class="btn btn-outline-success cycle-btn">
+
+                        P-Cycle
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        id="cCycleBtn"
+                        class="btn btn-outline-success cycle-btn">
+
+                        C-Cycle
+
+                    </button>
+
+
+                </div>
+
+
+                <div
+                    id="cycleInfo"
+                    class="alert alert-light border mt-3 mb-0">
+
+                    Select P-Cycle or C-Cycle when
+                    1st / 2nd semester is being generated.
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             4. GENERATION RULES
+        ================================================== -->
+
+        <div class="card page-card shadow-sm mb-3">
+
+            <div class="card-body">
+
+
+                <h5 class="section-title mb-3">
+
+                    <i class="bi bi-shield-check me-2"></i>
+
+                    4. Generation Rules
+
+                </h5>
+
+
                 <div class="row">
 
-                    <div class="col-md-6 mb-3">
 
-                        <label class="form-label">
-                            Department
-                        </label>
+                    <div class="col-md-6">
 
-                        <select
-                            id="generateDepartment"
-                            class="form-select">
 
-                        </select>
+                        <div class="rule-item">
 
-                    </div>
+                            <i
+                                class="bi bi-check-circle-fill text-success me-2">
+                            </i>
 
-                    <div class="col-md-6 mb-3">
+                            1 credit → 1 class per week
 
-                        <label class="form-label">
-                            Scheme
-                        </label>
+                        </div>
 
-                        <select
-                            id="generateScheme"
-                            class="form-select">
 
-                        </select>
+                        <div class="rule-item">
 
-                    </div>
+                            <i
+                                class="bi bi-check-circle-fill text-success me-2">
+                            </i>
 
-                    <div class="col-md-6 mb-3">
+                            2, 3 and 4 credits →
+                            4 classes per week
 
-                        <label class="form-label">
-                            Academic Year
-                        </label>
+                        </div>
 
-                        <select
-                            id="generateAcademicYear"
-                            class="form-select">
 
-                            
+                        <div class="rule-item">
 
-                            
-                        </select>
+                            <i
+                                class="bi bi-check-circle-fill text-success me-2">
+                            </i>
 
-                    </div>
+                            0 credit → Saturday only
 
-                    <div class="col-md-6 mb-3">
+                        </div>
 
-                        <label class="form-label">
-                            Semester Type
-                        </label>
 
-                        <select
-                            id="generateSemesterType"
-                            class="form-select">
+                        <div class="rule-item">
 
-                            <option value="">Select Type</option>
+                            <i
+                                class="bi bi-check-circle-fill text-success me-2">
+                            </i>
 
-                            <option value="Odd">Odd</option>
+                            More than 4 credits →
+                            Saturday only
 
-                            <option value="Even">Even</option>
+                        </div>
 
-                        </select>
-
-                    </div>
-                                        
-
-                    <div class="col-md-6 mb-3">
-
-                        
 
                     </div>
 
-                    <div class="col-md-6 mb-3">
 
-                        
 
-                    </div>
+                    <div class="col-md-6">
 
-                    <div class="col-md-6 mb-3">
+
+                        <div class="rule-item">
+
+                            <i
+                                class="bi bi-check-circle-fill text-success me-2">
+                            </i>
+
+                            No faculty clash across semesters
+
+                        </div>
+
+
+                        <div class="rule-item">
+
+                            <i
+                                class="bi bi-check-circle-fill text-success me-2">
+                            </i>
+
+                            Faculty morning hours balanced
+                            during the week
+
+                        </div>
+
+
+                        <div class="rule-item">
+
+                            <i
+                                class="bi bi-check-circle-fill text-success me-2">
+                            </i>
+
+                            Labs occupy 2 consecutive periods
+
+                        </div>
+
+
+                        <div class="rule-item">
+
+                            <i
+                                class="bi bi-check-circle-fill text-success me-2">
+                            </i>
+
+                            Two labs of the same semester
+                            must be on different days
+
+                        </div>
+
+
+                        <div class="rule-item">
+
+                            <i
+                                class="bi bi-check-circle-fill text-success me-2">
+                            </i>
+
+                            Each lab occurs only once per week
+
+                        </div>
 
 
                     </div>
 
                 </div>
 
-                <hr>
-                <div class="card mt-3">
-
-    <div class="card-header bg-light">
-
-        <h6 class="mb-0">
-            Timetable Summary
-        </h6>
-
-    </div>
-
-    <div class="card-body">
-
-        <div class="row">
-
-            <div class="col-md-6 mb-3">
-
-                <label class="form-label">
-                    Working Days
-                </label>
-
-                <input
-                    type="text"
-                    id="summaryWorkingDays"
-                    class="form-control"
-                    readonly>
-
-            </div>
-
-            <div class="col-md-6 mb-3">
-
-                <label class="form-label">
-                    Periods Per Day
-                </label>
-
-                <input
-                    type="text"
-                    id="summaryPeriodsPerDay"
-                    class="form-control"
-                    readonly>
-
-            </div>
-
-            <div class="col-md-6 mb-3">
-
-                <label class="form-label">
-                    Lunch Break
-                </label>
-
-                <input
-                    type="text"
-                    id="summaryLunchBreak"
-                    class="form-control"
-                    readonly>
-
-            </div>
-
-            <div class="col-md-6 mb-3">
-
-                <label class="form-label">
-                    Short Break
-                </label>
-
-                <input
-                    type="text"
-                    id="summaryShortBreak"
-                    class="form-control"
-                    readonly>
-
-            </div>
-
-            <div class="col-md-6 mb-3">
-
-                <label class="form-label">
-                    Total Subjects
-                </label>
-
-                <input
-                    type="text"
-                    id="summarySubjects"
-                    class="form-control"
-                    readonly>
-
-            </div>
-
-            <div class="col-md-6 mb-3">
-
-                <label class="form-label">
-                    Faculty Assigned
-                </label>
-
-                <input
-                    type="text"
-                    id="summaryFaculty"
-                    class="form-control"
-                    readonly>
-
             </div>
 
         </div>
 
-    </div>
 
-</div>
 
-                <div class="d-flex gap-3">
+        <!-- =================================================
+             5. GENERATE
+        ================================================== -->
 
-                   <button
-                        id="generateTimetableBtn"
-                        class="btn btn-success">
+        <div class="card page-card shadow-sm mb-3">
 
-                        <i class="bi bi-magic"></i>
+            <div class="card-body">
+
+
+                <div
+                    class="d-flex justify-content-between
+                           align-items-center">
+
+
+                    <div>
+
+                        <h5 class="mb-1">
+
+                            Generate Weekly Timetable
+
+                        </h5>
+
+
+                        <small class="text-muted">
+
+                            Three unique timetable options
+                            will be generated for every
+                            selected semester.
+
+                        </small>
+
+                    </div>
+
+
+                    <button
+                        type="button"
+                        id="generateBtn"
+                        class="btn btn-success
+                               generate-btn">
+
+                        <i
+                            class="bi bi-magic me-1">
+                        </i>
 
                         Generate Timetable
 
                     </button>
 
-                    <button class="btn btn-secondary">
+                </div>
 
-                        <i class="bi bi-arrow-clockwise"></i>
 
-                        Reset
+                <!-- Loading -->
 
-                    </button>
+                <div
+                    id="loadingBox"
+                    class="loading-box
+                           text-center py-4">
+
+
+                    <div
+                        class="spinner-border text-success"
+                        role="status">
+
+                    </div>
+
+
+                    <div class="mt-2 fw-semibold">
+
+                        Generating timetables...
+
+                    </div>
+
+
+                    <small class="text-muted">
+
+                        Checking faculty clashes,
+                        semester clashes, labs,
+                        credits and weekly rules.
+
+                    </small>
 
                 </div>
 
-                <div class="alert alert-info mt-4">
 
-                    <h6 class="mb-2">
-                        Status
-                    </h6>
+                <!-- Warning -->
 
-                    Ready to generate timetable.
+                <div
+                    id="generationWarning"
+                    class="warning-box p-3 mt-3 d-none">
+
+                    <i
+                        class="bi bi-exclamation-triangle
+                               me-2">
+                    </i>
+
+                    <span id="generationWarningText">
+
+                    </span>
 
                 </div>
-                <hr class="my-4">
-
-<div class="card shadow-sm">
-
-    <div class="card-header bg-success text-white">
-
-        <h5 class="mb-0">
-            Generated Timetable
-        </h5>
-
-    </div>
-    <button
-        id="saveTimetableBtn"
-        type="button"
-        class="btn btn-primary">
-
-        <i class="bi bi-save"></i>
-
-        Save Timetable
-
-    </button>
-
-    <div class="card-body">
-
-        <div id="timetableContainer">
-
-            <div class="text-center text-muted">
-
-                Click <b>Generate Timetable</b> to view the timetable.
 
             </div>
 
         </div>
 
+
+
+        <!-- =================================================
+             6. GENERATED TIMETABLES
+        ================================================== -->
+
+        <div
+            id="generatedResults"
+            class="mb-5">
+
+
+            <div
+                id="emptyState"
+                class="empty-state">
+
+
+                <i class="bi bi-calendar2-week"></i>
+
+
+                <h5 class="mt-3">
+
+                    No Timetable Generated
+
+                </h5>
+
+
+                <p class="text-muted mb-0">
+
+                    Select the department, scheme,
+                    semester type and academic year,
+                    then click Generate Timetable.
+
+                </p>
+
+            </div>
+
+
+        </div>
+
+
     </div>
 
 </div>
 
-            </div>
 
-        </div>
-            </div>
 
-</div>
+<!-- =========================================================
+     JAVASCRIPT
+========================================================== -->
 
-<!-- Bootstrap JS -->
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="js/generate-timetable.js"></script>
+
 
 </body>
 
